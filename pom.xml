@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>fish.payara.cloud.connectors</groupId>
+    <artifactId>CloudConnectors</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>Payara Cloud Connectors</name>
+    <description>Project for JCA modules that connect to various cloud services</description>
+    <url>http://www.payara.org</url>
+    <licenses>
+        <license>
+            <name>GPL Version 2 with Classpath Exception</name>
+            <url>https://github.com/payara/Payara/blob/master/LICENSE.txt</url>
+        </license>
+    </licenses>
+    <developers>
+    <developer>
+        <id>smillidge</id>
+        <name>Steve Millidge</name>
+        <organization>Payara Foundation</organization>
+        <organizationUrl>http://www.payara.org</organizationUrl>
+    </developer>
+    </developers>
+    <scm>
+        <connection>scm:git:git:github.com/payara/Cloud-Connectors.git</connection>
+        <developerConnection>git@github.com:payara/Cloud-Connectors.git</developerConnection>
+        <url>https://github.com/payara/Cloud-Connectors</url>
+        <tag>master</tag>
+    </scm>
+    <issueManagement>
+        <system>GITHub</system>
+        <url>https://github.com/payara/Cloud-Connectors/issues</url>
+    </issueManagement>
+    <modules>
+        <module>Kafka/KafkaRAR</module>
+        <module>Kafka/KafkaRARPackaging</module>
+    </modules>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+</project>
