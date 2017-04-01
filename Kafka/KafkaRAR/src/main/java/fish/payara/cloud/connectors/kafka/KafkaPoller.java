@@ -40,6 +40,7 @@
 package fish.payara.cloud.connectors.kafka;
 
 import fish.payara.cloud.connectors.kafka.api.OnRecord;
+import fish.payara.cloud.connectors.kafka.api.OnRecords;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.TimerTask;
@@ -74,14 +75,46 @@ class KafkaPoller extends TimerTask {
     @Override
     public void run() {
         ConsumerRecords<Object, Object> records = consumer.poll(Long.parseLong(kSpec.getPollInterval()));
+        
+        // if we got noting just return
+        if (records.isEmpty()) {
+            return;
+        }
+        
+        Class<?> mdbClass = endpointFactory.getEndpointClass();
+        
+        // search for methods with OnRecords annotation. This takes precedent.
+        for (Method m : mdbClass.getMethods()) {
+            if (m.isAnnotationPresent(OnRecords.class) && m.getParameterCount() == 1) {
+                try {
+                    // method receives a ConsumerRecord
+                    OnRecords recordsAttn;
+                    recordsAttn = m.getAnnotation(OnRecords.class);                 
+                    context.getWorkManager().scheduleWork(new KafkaWork(endpointFactory, m, records));
+                    if (!recordsAttn.matchOtherMethods()) {
+                        return;
+                    }
+                } catch (WorkException ex) {
+                    Logger.getLogger(KafkaResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }   
+        
+        // match methods with OnRecord annotation
         for (ConsumerRecord<Object, Object> record : records) {
-            // create an endpoint for each record
-            Class<?> mdbClass = endpointFactory.getEndpointClass();
             for (Method m : mdbClass.getMethods()) {
                 if (m.isAnnotationPresent(OnRecord.class) && m.getParameterCount() == 1) {
                     try {
                         // method receives a ConsumerRecord
-                        context.getWorkManager().scheduleWork(new KafkaWork(endpointFactory, m, record));
+                        OnRecord recordAttn;
+                        recordAttn = m.getAnnotation(OnRecord.class);
+                        String topics[] = recordAttn.topics();
+                        if ((topics.length == 0) || Arrays.binarySearch(recordAttn.topics(), record.topic()) >=0 ){
+                            context.getWorkManager().scheduleWork(new KafkaWork(endpointFactory, m, record));
+                            if (!recordAttn.matchOtherMethods()) {
+                                break;
+                            }
+                        }
                     } catch (WorkException ex) {
                         Logger.getLogger(KafkaResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
                     }

@@ -47,26 +47,20 @@ import javax.enterprise.util.Nonbinding;
 
 /**
  * Annotation to indicate the method to be called on an MDB when a message is
- * received on the specified topics. Use this annotation when yuou want to receive
- * each individual record as a single method call.
- * @see OnRecords
+ * received on the specified topics. Use this annotation when you want to receive
+ * all the records received in a single poll as a single method call.
+ * The OnRecords annotation is processed before any OnRecord annotations
+ * @see OnRecord
  * If topics is an empty array all topics will trigger the callback
  * @author Steve Millidge (Payara Foundation)
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({METHOD})
-public @interface OnRecord {
-    /**
-     * If topics is an empty array all topics will trigger the callback
-     * Otherwise this method will only match records sent on the topics specified.
-     * 
-     * @return 
-    */
-    @Nonbinding String[] topics() default {};
+public @interface OnRecords {
     
     /**
      * If set to true other methods on the KafkaListener class will be called
-     * if they also match the topic as well as this annotated method
+     * if they also match the topic as well as this annotated method.
      * If set to false (the default) other methods will not be tested to see if they
      * have matching annotations.
      * @return 
