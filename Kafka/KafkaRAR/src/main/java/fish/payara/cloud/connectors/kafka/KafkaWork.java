@@ -48,6 +48,7 @@ import javax.resource.spi.endpoint.MessageEndpoint;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
 import javax.resource.spi.work.Work;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
 
 /**
  *
@@ -58,12 +59,19 @@ public class KafkaWork implements Work {
     private MessageEndpoint endpoint;
     private final MessageEndpointFactory factory;
     private final Method m;
-    private final ConsumerRecord record;
+    private ConsumerRecord record;
+    private ConsumerRecords records;
 
     public KafkaWork(MessageEndpointFactory factory, Method m, ConsumerRecord record) {
         this.factory = factory;
         this.m = m;
         this.record = record;
+    }
+    
+    public KafkaWork(MessageEndpointFactory factory, Method m, ConsumerRecords records) {
+        this.factory = factory;
+        this.m = m;
+        this.records = records;
     }
     
     @Override
@@ -76,7 +84,11 @@ public class KafkaWork implements Work {
         try {
             endpoint = factory.createEndpoint(null);
             endpoint.beforeDelivery(m);
-            m.invoke(endpoint, record);
+            if (record != null) {
+                m.invoke(endpoint, record);
+            } else {
+                m.invoke(endpoint, records);                
+            }
             endpoint.afterDelivery();
             endpoint.release();
         } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ResourceException ex) {

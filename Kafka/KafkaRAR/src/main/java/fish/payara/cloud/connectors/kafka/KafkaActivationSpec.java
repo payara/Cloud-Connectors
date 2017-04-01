@@ -65,7 +65,7 @@ public class KafkaActivationSpec implements ActivationSpec {
     private String valueDeserializer;
     private String keyDeserializer;
     private String topics;
-    private String pollInterval = "100";
+    private String pollInterval = "1000";
     private String initialPollDelay = "1000";
 
     public KafkaActivationSpec() {
