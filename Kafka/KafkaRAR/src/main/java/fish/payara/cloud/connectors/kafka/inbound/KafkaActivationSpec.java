@@ -44,7 +44,6 @@ import java.util.Properties;
 import javax.resource.ResourceException;
 import javax.resource.spi.Activation;
 import javax.resource.spi.ActivationSpec;
-import javax.resource.spi.ConfigProperty;
 import javax.resource.spi.InvalidPropertyException;
 import javax.resource.spi.ResourceAdapter;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -59,35 +58,33 @@ public class KafkaActivationSpec implements ActivationSpec {
     private final Properties consumerProperties;
     private ResourceAdapter ra;
     
-    @ConfigProperty()
-    private String autoCommitInterval;
-       
-    @ConfigProperty()
+    private Long autoCommitInterval;
     private String bootstrapServersConfig;
-    
-    @ConfigProperty()
     private String clientId;
-    
-    @ConfigProperty()
-    private String enableAutoCommit;
-    
-    @ConfigProperty()
+    private Boolean enableAutoCommit;
     private String groupIdConfig;
-    
-    @ConfigProperty()
     private String valueDeserializer;
-    
-    @ConfigProperty()
     private String keyDeserializer;
-    
-    @ConfigProperty()
     private String topics;
+    private Long pollInterval = new Long(1000);
+    private Long initialPollDelay = new Long(1000);
+    private Long fetchMinBytes;
+    private Long fetchMaxBytes;
+    private Integer heartbeatInterval;
+    private Integer maxPartitionFetchBytes;
+    private Integer sessionTimeout;
+    private String autoOffsetReset;
+    private Long connectionsMaxIdle;
+    private Integer receiveBuffer;
+    private Integer requestTimeout;
+    private Boolean checkCRCs;
+    private Integer fetchMaxWait;
+    private Long metadataMaxAge;
+    private Long reconnectBackoff;
+    private Long retryBackoff;
     
-    @ConfigProperty()
-    private String pollInterval = "1000";
     
-    @ConfigProperty()
-    private String initialPollDelay = "1000";
+    
 
     public KafkaActivationSpec() {
         consumerProperties = new Properties();
@@ -95,7 +92,17 @@ public class KafkaActivationSpec implements ActivationSpec {
 
     @Override
     public void validate() throws InvalidPropertyException {
-        // TBD check minimum set.
+        if (bootstrapServersConfig == null) {
+            throw new InvalidPropertyException("bootstrapServersConfig is a mandatory property");
+        }
+        
+        if (keyDeserializer == null) {
+            throw new InvalidPropertyException("keyDeserializer is a mandatory property");
+        }
+        
+        if (valueDeserializer == null) {
+            throw new InvalidPropertyException("valueDeserializer is a mandatory property");
+        }
     }
 
     @Override
@@ -108,13 +115,13 @@ public class KafkaActivationSpec implements ActivationSpec {
         this.ra = ra;
     }
 
-    public String getAutoCommitInterval() {
+    public Long getAutoCommitInterval() {
         return autoCommitInterval;
     }
 
-    public void setAutoCommitInterval(String autoCommitInterval) {
+    public void setAutoCommitInterval(Long autoCommitInterval) {
         this.autoCommitInterval = autoCommitInterval;
-        consumerProperties.setProperty(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, autoCommitInterval);
+        consumerProperties.setProperty(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, Long.toString(autoCommitInterval));
     }
 
     public String getBootstrapServersConfig() {
@@ -135,13 +142,13 @@ public class KafkaActivationSpec implements ActivationSpec {
         consumerProperties.setProperty(ConsumerConfig.CLIENT_ID_CONFIG, clientId);
     }
 
-    public String getEnableAutoCommit() {
+    public Boolean getEnableAutoCommit() {
         return enableAutoCommit;
     }
 
-    public void setEnableAutoCommit(String enableAutoCommit) {
+    public void setEnableAutoCommit(Boolean enableAutoCommit) {
         this.enableAutoCommit = enableAutoCommit;
-        consumerProperties.setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, enableAutoCommit);        
+        consumerProperties.setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, Boolean.toString(enableAutoCommit));        
     }
 
     public String getGroupIdConfig() {
@@ -171,11 +178,11 @@ public class KafkaActivationSpec implements ActivationSpec {
         consumerProperties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, keyDeserializer);        
     }
 
-    public String getPollInterval() {
+    public Long getPollInterval() {
         return pollInterval;
     }
 
-    public void setPollInterval(String pollInterval) {
+    public void setPollInterval(Long pollInterval) {
         this.pollInterval = pollInterval;
     }
     
@@ -191,12 +198,146 @@ public class KafkaActivationSpec implements ActivationSpec {
         this.topics = topics;
     }
 
-    public String getInitialPollDelay() {
+    public Long getInitialPollDelay() {
         return initialPollDelay;
     }
 
-    public void setInitialPollDelay(String initialPollDelay) {
+    public void setInitialPollDelay(Long initialPollDelay) {
         this.initialPollDelay = initialPollDelay;
+    }
+
+    public ResourceAdapter getRa() {
+        return ra;
+    }
+
+    public void setRa(ResourceAdapter ra) {
+        this.ra = ra;
+    }
+
+    public Long getFetchMinBytes() {
+        return fetchMinBytes;
+    }
+
+    public void setFetchMinBytes(Long fetchMinBytes) {
+        this.fetchMinBytes = fetchMinBytes;
+        consumerProperties.setProperty(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, Long.toString(fetchMinBytes));        
+    }
+
+    public Long getFetchMaxBytes() {
+        return fetchMaxBytes;
+    }
+
+    public void setFetchMaxBytes(Long fetchMaxBytes) {
+        this.fetchMaxBytes = fetchMaxBytes;
+        consumerProperties.setProperty(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, Long.toString(fetchMaxBytes));        
+    }
+
+    public Integer getHeartbeatInterval() {
+        return heartbeatInterval;
+    }
+
+    public void setHeartbeatInterval(Integer heartbeatInterval) {
+        this.heartbeatInterval = heartbeatInterval;
+        consumerProperties.setProperty(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, Integer.toString(heartbeatInterval));        
+    }
+
+    public Integer getMaxPartitionFetchBytes() {
+        return maxPartitionFetchBytes;
+    }
+
+    public void setMaxPartitionFetchBytes(Integer maxPartitionFetchBytes) {
+        this.maxPartitionFetchBytes = maxPartitionFetchBytes;
+        consumerProperties.setProperty(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, Integer.toString(maxPartitionFetchBytes));        
+    }
+
+    public Integer getSessionTimeout() {
+        return sessionTimeout;
+    }
+
+    public void setSessionTimeout(Integer sessionTimeout) {
+        this.sessionTimeout = sessionTimeout;
+        consumerProperties.setProperty(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, Integer.toString(sessionTimeout));        
+    }
+
+    public String getAutoOffsetReset() {
+        return autoOffsetReset;
+    }
+
+    public void setAutoOffsetReset(String autoOffsetReset) {
+        this.autoOffsetReset = autoOffsetReset;
+        consumerProperties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, autoOffsetReset);        
+    }
+
+    public Long getConnectionsMaxIdle() {
+        return connectionsMaxIdle;
+    }
+
+    public void setConnectionsMaxIdle(Long connectionsMaxIdle) {
+        this.connectionsMaxIdle = connectionsMaxIdle;
+        consumerProperties.setProperty(ConsumerConfig.CONNECTIONS_MAX_IDLE_MS_CONFIG, Long.toString(connectionsMaxIdle));        
+    }
+
+    public Integer getReceiveBuffer() {
+        return receiveBuffer;
+    }
+
+    public void setReceiveBuffer(Integer receiveBuffer) {
+        this.receiveBuffer = receiveBuffer;
+        consumerProperties.setProperty(ConsumerConfig.RECEIVE_BUFFER_CONFIG, Integer.toString(receiveBuffer));        
+    }
+
+    public Integer getRequestTimeout() {
+        return requestTimeout;
+    }
+
+    public void setRequestTimeout(Integer requestTimeout) {
+        this.requestTimeout = requestTimeout;
+        consumerProperties.setProperty(ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG, Integer.toString(requestTimeout));        
+    }
+
+    public Boolean getCheckCRCs() {
+        return checkCRCs;
+    }
+
+    public void setCheckCRCs(Boolean checkCRCs) {
+        this.checkCRCs = checkCRCs;
+        consumerProperties.setProperty(ConsumerConfig.CHECK_CRCS_CONFIG, Boolean.toString(checkCRCs));        
+    }
+
+    public Integer getFetchMaxWait() {
+        return fetchMaxWait;
+    }
+
+    public void setFetchMaxWait(Integer fetchMaxWait) {
+        this.fetchMaxWait = fetchMaxWait;
+        consumerProperties.setProperty(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, Integer.toString(fetchMaxWait));        
+    }
+
+    public Long getMetadataMaxAge() {
+        return metadataMaxAge;
+    }
+
+    public void setMetadataMaxAge(Long metadataMaxAge) {
+        this.metadataMaxAge = metadataMaxAge;
+        consumerProperties.setProperty(ConsumerConfig.METADATA_MAX_AGE_CONFIG, Long.toString(metadataMaxAge));        
+    }
+
+    public Long getReconnectBackoff() {
+        return reconnectBackoff;
+    }
+
+    public void setReconnectBackoff(Long reconnectBackoff) {
+        this.reconnectBackoff = reconnectBackoff;
+        consumerProperties.setProperty(ConsumerConfig.RECONNECT_BACKOFF_MS_CONFIG, Long.toString(reconnectBackoff));        
+    }
+
+    public Long getRetryBackoff() {
+        return retryBackoff;
+    }
+
+    public void setRetryBackoff(Long retryBackoff) {
+        this.retryBackoff = retryBackoff;
+        consumerProperties.setProperty(ConsumerConfig.RETRY_BACKOFF_MS_CONFIG, Long.toString(retryBackoff));        
     }
     
     

@@ -74,7 +74,7 @@ class KafkaPoller extends TimerTask {
 
     @Override
     public void run() {
-        ConsumerRecords<Object, Object> records = consumer.poll(Long.parseLong(kSpec.getPollInterval()));
+        ConsumerRecords<Object, Object> records = consumer.poll(kSpec.getPollInterval());
         
         // if we got noting just return
         if (records.isEmpty()) {

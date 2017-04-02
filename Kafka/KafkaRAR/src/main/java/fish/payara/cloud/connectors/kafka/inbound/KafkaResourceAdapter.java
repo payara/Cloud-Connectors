@@ -103,7 +103,7 @@ public class KafkaResourceAdapter implements ResourceAdapter, Serializable{
             KafkaActivationSpec kSpec = (KafkaActivationSpec) spec;
             KafkaPoller kTask = new KafkaPoller(kSpec,context,endpointFactory);
             registeredFactories.put(endpointFactory, kTask);
-            poller.schedule(kTask, Long.parseLong(kSpec.getInitialPollDelay()), Long.parseLong(kSpec.getPollInterval()));
+            poller.schedule(kTask, kSpec.getInitialPollDelay(), kSpec.getPollInterval());
         } else {
             LOGGER.warning("Got endpoint activation for an ActivationSpec of unknown class " + spec.getClass().getName());
         } 
