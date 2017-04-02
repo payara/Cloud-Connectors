@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.cloud.connectors.kafka;
+package fish.payara.cloud.connectors.kafka.inbound;
 
 import fish.payara.cloud.connectors.kafka.api.OnRecord;
 import fish.payara.cloud.connectors.kafka.api.OnRecords;
