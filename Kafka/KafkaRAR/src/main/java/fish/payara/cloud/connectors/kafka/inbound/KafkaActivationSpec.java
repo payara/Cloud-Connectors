@@ -37,13 +37,14 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.cloud.connectors.kafka;
+package fish.payara.cloud.connectors.kafka.inbound;
 
 import fish.payara.cloud.connectors.kafka.api.KafkaListener;
 import java.util.Properties;
 import javax.resource.ResourceException;
 import javax.resource.spi.Activation;
 import javax.resource.spi.ActivationSpec;
+import javax.resource.spi.ConfigProperty;
 import javax.resource.spi.InvalidPropertyException;
 import javax.resource.spi.ResourceAdapter;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -57,15 +58,35 @@ public class KafkaActivationSpec implements ActivationSpec {
     
     private final Properties consumerProperties;
     private ResourceAdapter ra;
+    
+    @ConfigProperty()
     private String autoCommitInterval;
+       
+    @ConfigProperty()
     private String bootstrapServersConfig;
+    
+    @ConfigProperty()
     private String clientId;
+    
+    @ConfigProperty()
     private String enableAutoCommit;
+    
+    @ConfigProperty()
     private String groupIdConfig;
+    
+    @ConfigProperty()
     private String valueDeserializer;
+    
+    @ConfigProperty()
     private String keyDeserializer;
+    
+    @ConfigProperty()
     private String topics;
+    
+    @ConfigProperty()
     private String pollInterval = "1000";
+    
+    @ConfigProperty()
     private String initialPollDelay = "1000";
 
     public KafkaActivationSpec() {

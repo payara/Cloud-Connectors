@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.cloud.connectors.kafka;
+package fish.payara.cloud.connectors.kafka.inbound;
 
 import java.io.Serializable;
 import java.util.Map;
