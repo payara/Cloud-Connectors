@@ -12,3 +12,5 @@
 hs_err_pid*
 /Kafka/KafkaRAR/target/
 /Kafka/KafkaRARPackaging/target/
+/AmazonSQS/AmazonSQSJCAAPI/target/
+/AmazonSQS/AmazonSQSRAR/target/

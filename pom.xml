@@ -35,6 +35,8 @@
     <modules>
         <module>Kafka/KafkaRAR</module>
         <module>Kafka/KafkaRARPackaging</module>
+        <module>AmazonSQS/AmazonSQSJCAAPI</module>
+        <module>AmazonSQS/AmazonSQSRAR</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

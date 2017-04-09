@@ -1,6 +1,9 @@
-# Cloud-Connectors
-Repository for Java EE7 JCA connectors that connect to Cloud Services. 
+# Payara Cloud Connectors
 
-This Repository currently includes
+Payara Cloud Connectors is a project to provide JavaEE standards based connectivity 
+to Cloud infrastructure. Utilising JCA we will provide connectivity to many different 
+services provided by the leading cloud providers and open source technologies.
 
-Inbound JCA adapter for Apache Kafka
+Currently we have JCA adapters for;
+Apache Kafka
+Amazon SQS
