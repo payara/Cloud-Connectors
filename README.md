@@ -6,3 +6,4 @@ services provided by the leading cloud providers and open source technologies.
 
 Currently we have JCA adapters for;
 Apache Kafka
+Amazon SQS
