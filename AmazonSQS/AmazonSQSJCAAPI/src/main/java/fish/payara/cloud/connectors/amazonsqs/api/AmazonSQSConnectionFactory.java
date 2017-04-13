@@ -39,18 +39,12 @@
  */
 package fish.payara.cloud.connectors.amazonsqs.api;
 
-import static java.lang.annotation.ElementType.METHOD;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 /**
- * Annotation to indicate the method to be called on an MDB when a message is
- * received from Amazon SQS.
+ *
  * @author Steve Millidge (Payara Foundation)
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({METHOD})
-public @interface OnSQSMessage {
-
+public interface AmazonSQSConnectionFactory {
+    
+    public AmazonSQSConnection getConnection();
+    
 }

@@ -37,20 +37,45 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.cloud.connectors.amazonsqs.api;
+package fish.payara.cloud.connectors.amazonsqs.api.outbound;
 
-import static java.lang.annotation.ElementType.METHOD;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnection;
+import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.resource.ResourceException;
+import javax.resource.spi.ConnectionManager;
 
 /**
- * Annotation to indicate the method to be called on an MDB when a message is
- * received from Amazon SQS.
+ *
  * @author Steve Millidge (Payara Foundation)
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({METHOD})
-public @interface OnSQSMessage {
+class AmazonSQSConnectionFactoryImpl implements AmazonSQSConnectionFactory{
+    
+    private ConnectionManager cxManager;
+    private AmazonSQSManagedConnectionFactory mcf;
 
+    AmazonSQSConnectionFactoryImpl(ConnectionManager cxManager, AmazonSQSManagedConnectionFactory mcf) {
+        this.cxManager = cxManager;
+        this.mcf = mcf;
+    }
+
+    @Override
+    public AmazonSQSConnection getConnection() {
+        if (cxManager != null) {
+            try {
+                return (AmazonSQSConnection) cxManager.allocateConnection(mcf, null);
+            } catch (ResourceException ex) {
+                Logger.getLogger(AmazonSQSConnectionFactoryImpl.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            try {
+                return (AmazonSQSConnection) mcf.createManagedConnection(null, null);
+            } catch (ResourceException ex) {
+                Logger.getLogger(AmazonSQSConnectionFactoryImpl.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return null;
+    }
+    
 }

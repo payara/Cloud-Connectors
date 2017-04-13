@@ -37,20 +37,55 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.cloud.connectors.amazonsqs.api;
+package fish.payara.cloud.connectors.amazonsqs.api.outbound;
 
-import static java.lang.annotation.ElementType.METHOD;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.amazonaws.services.sqs.model.SendMessageBatchRequest;
+import com.amazonaws.services.sqs.model.SendMessageBatchRequestEntry;
+import com.amazonaws.services.sqs.model.SendMessageBatchResult;
+import com.amazonaws.services.sqs.model.SendMessageRequest;
+import com.amazonaws.services.sqs.model.SendMessageResult;
+import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnection;
+import java.util.List;
 
 /**
- * Annotation to indicate the method to be called on an MDB when a message is
- * received from Amazon SQS.
+ *
  * @author Steve Millidge (Payara Foundation)
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({METHOD})
-public @interface OnSQSMessage {
+class AmazonSQSConnectionImpl  implements AmazonSQSConnection {
+    
+    private AmazonSQSManagedConnection underlyingConnection;
+    
+    AmazonSQSConnectionImpl(AmazonSQSManagedConnection realConn) {
+        underlyingConnection = realConn;
+    }
 
+    @Override
+    public SendMessageResult sendMessage(SendMessageRequest request) {
+        return underlyingConnection.sendMessage(request);
+    }
+
+    @Override
+    public SendMessageResult sendMessage(String queueURL, String messageBody) {
+        return underlyingConnection.sendMessage(queueURL, messageBody);
+    }
+
+    @Override
+    public SendMessageBatchResult sendMessageBatch(String queueURL, List<SendMessageBatchRequestEntry> entries) {
+        return underlyingConnection.sendMessageBatch(queueURL, entries);
+    }
+
+    @Override
+    public SendMessageBatchResult sendMessageBatch(SendMessageBatchRequest batch) {
+        return underlyingConnection.sendMessageBatch(batch);
+    }
+
+    @Override
+    public void close() throws Exception {
+        underlyingConnection.removeHandle(this);
+    }
+
+    void setRealConnection(AmazonSQSManagedConnection aThis) {
+        this.underlyingConnection = aThis;
+    }
+    
 }
