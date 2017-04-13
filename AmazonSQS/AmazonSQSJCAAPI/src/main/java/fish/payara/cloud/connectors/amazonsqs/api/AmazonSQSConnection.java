@@ -39,18 +39,22 @@
  */
 package fish.payara.cloud.connectors.amazonsqs.api;
 
-import static java.lang.annotation.ElementType.METHOD;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.amazonaws.services.sqs.model.SendMessageBatchRequest;
+import com.amazonaws.services.sqs.model.SendMessageBatchRequestEntry;
+import com.amazonaws.services.sqs.model.SendMessageBatchResult;
+import com.amazonaws.services.sqs.model.SendMessageRequest;
+import com.amazonaws.services.sqs.model.SendMessageResult;
+import java.util.List;
 
 /**
- * Annotation to indicate the method to be called on an MDB when a message is
- * received from Amazon SQS.
+ *
  * @author Steve Millidge (Payara Foundation)
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({METHOD})
-public @interface OnSQSMessage {
-
+public interface AmazonSQSConnection extends AutoCloseable {
+    
+    public SendMessageResult sendMessage(SendMessageRequest request);
+    public SendMessageResult sendMessage(String queueURL, String messageBody);
+    public SendMessageBatchResult sendMessageBatch(String queueURL, List<SendMessageBatchRequestEntry> entries);
+    public SendMessageBatchResult sendMessageBatch(SendMessageBatchRequest batch);
+    
 }
