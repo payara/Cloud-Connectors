@@ -37,65 +37,44 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.cloud.connectors.amazonsqs.api.inbound;
+package fish.payara.cloud.connectors.kafka.example;
 
-import com.amazonaws.services.sqs.AmazonSQS;
-import com.amazonaws.services.sqs.model.DeleteMessageRequest;
-import com.amazonaws.services.sqs.model.Message;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import fish.payara.cloud.connectors.kafka.api.KafkaConnection;
+import fish.payara.cloud.connectors.kafka.api.KafkaConnectionFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.resource.ResourceException;
-import javax.resource.spi.endpoint.MessageEndpoint;
-import javax.resource.spi.endpoint.MessageEndpointFactory;
-import javax.resource.spi.work.Work;
+import javax.annotation.Resource;
+import javax.ejb.Schedule;
+import javax.ejb.Stateless;
+import javax.resource.ConnectionFactoryDefinition;
+import javax.resource.spi.TransactionSupport.TransactionSupportLevel;
+import org.apache.kafka.clients.producer.ProducerRecord;
 
 /**
  *
  * @author Steve Millidge (Payara Foundation)
  */
-public class SQSWork implements Work {
+@ConnectionFactoryDefinition(name = "java:comp/env/KafkaConnectionFactory", 
+  description = "Kafka Conn Factory", 
+  interfaceName = "fish.payara.cloud.connectors.kafka.KafkaConnectionFactory", 
+  resourceAdapter = "KafkaRAR-1.0.0-SNAPSHOT", 
+  minPoolSize = 2, 
+  maxPoolSize = 2,
+  transactionSupport = TransactionSupportLevel.NoTransaction,
+  properties = {})
+@Stateless
+public class SendSQSMessage {
     
-    private final MessageEndpointFactory factory;
-    private final Method m;
-    private final Message message;
-    private MessageEndpoint endpoint;
-    private AmazonSQS client;
-    private String url;
+    @Resource(lookup="java:comp/env/KafkaConnectionFactory")
+    KafkaConnectionFactory factory;
     
-    public SQSWork(AmazonSQS client, MessageEndpointFactory factory, Method m, Message message, String url) {
-        this.factory = factory;
-        this.m = m;
-        this.message = message;
-        this.client = client;
-        this.url = url;
-    }
+    @Schedule(second = "*/1", hour="*", minute="*")
+    public void sendMessage() throws Exception {
 
-    @Override
-    public void release() {
-        if (endpoint != null) {
-            endpoint.release();
+        try (KafkaConnection conn = factory.createConnection()) {
+            conn.send(new ProducerRecord("test","hello","world"));
+        } catch (Exception ex) {
+            Logger.getLogger(SendSQSMessage.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
-    @Override
-    public void run() {
-        try {
-            endpoint = factory.createEndpoint(null);
-            endpoint.beforeDelivery(m);
-            if (message != null) {
-                m.invoke(endpoint, message);
-            }
-            client.deleteMessage(new DeleteMessageRequest().withQueueUrl(url).withReceiptHandle(message.getReceiptHandle()));
-            endpoint.afterDelivery();
-        } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ResourceException ex) {
-            Logger.getLogger(AmazonSQSResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            if (endpoint != null) {
-                endpoint.release();                
-            }
-        }
-    }
-    
 }

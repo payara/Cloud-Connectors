@@ -37,11 +37,9 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.cloud.connectors.amazonsqs.api.inbound;
+package fish.payara.cloud.connectors.mqtt.api.inbound;
 
-import com.amazonaws.services.sqs.AmazonSQS;
-import com.amazonaws.services.sqs.model.DeleteMessageRequest;
-import com.amazonaws.services.sqs.model.Message;
+import fish.payara.cloud.connectors.mqtt.api.OnMQTTMessage;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.logging.Level;
@@ -50,26 +48,23 @@ import javax.resource.ResourceException;
 import javax.resource.spi.endpoint.MessageEndpoint;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
 import javax.resource.spi.work.Work;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 /**
  *
  * @author Steve Millidge (Payara Foundation)
  */
-public class SQSWork implements Work {
+public class MQTTWork implements Work {
     
+    private final String topic;
+    private final MqttMessage message;
     private final MessageEndpointFactory factory;
-    private final Method m;
-    private final Message message;
     private MessageEndpoint endpoint;
-    private AmazonSQS client;
-    private String url;
-    
-    public SQSWork(AmazonSQS client, MessageEndpointFactory factory, Method m, Message message, String url) {
+
+    MQTTWork(String topic, MqttMessage mm, MessageEndpointFactory factory) {
+        this.topic = topic;
+        this.message = mm;
         this.factory = factory;
-        this.m = m;
-        this.message = message;
-        this.client = client;
-        this.url = url;
     }
 
     @Override
@@ -82,19 +77,30 @@ public class SQSWork implements Work {
     @Override
     public void run() {
         try {
-            endpoint = factory.createEndpoint(null);
-            endpoint.beforeDelivery(m);
-            if (message != null) {
-                m.invoke(endpoint, message);
+            Method methods[] = factory.getEndpointClass().getMethods();
+            Method method = null;
+            for (Method test : methods) {
+                if (test.isAnnotationPresent(OnMQTTMessage.class) && 
+                        test.getParameterCount() == 2 && 
+                        test.getParameterTypes()[0].equals(String.class) && 
+                        test.getParameterTypes()[1].equals(MqttMessage.class)){
+                    method = test;
+                    break;
+                }
             }
-            client.deleteMessage(new DeleteMessageRequest().withQueueUrl(url).withReceiptHandle(message.getReceiptHandle()));
-            endpoint.afterDelivery();
+            if (method != null) {
+                endpoint = factory.createEndpoint(null);
+                endpoint.beforeDelivery(method);
+                if (message != null) {
+                    method.invoke(endpoint, topic, message);
+                }
+                endpoint.afterDelivery();
+            }
         } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ResourceException ex) {
-            Logger.getLogger(AmazonSQSResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
+            Logger.getLogger(MQTTWork.class.getName()).log(Level.SEVERE, null, ex);
             if (endpoint != null) {
                 endpoint.release();                
-            }
+            }       
         }
     }
     

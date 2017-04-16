@@ -37,65 +37,34 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.cloud.connectors.amazonsqs.api.inbound;
+package fish.payara.cloud.connectors.mqtt.api;
 
-import com.amazonaws.services.sqs.AmazonSQS;
-import com.amazonaws.services.sqs.model.DeleteMessageRequest;
-import com.amazonaws.services.sqs.model.Message;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.io.Closeable;
 import javax.resource.ResourceException;
-import javax.resource.spi.endpoint.MessageEndpoint;
-import javax.resource.spi.endpoint.MessageEndpointFactory;
-import javax.resource.spi.work.Work;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 /**
  *
  * @author Steve Millidge (Payara Foundation)
  */
-public class SQSWork implements Work {
+public interface MQTTConnection extends AutoCloseable {
     
-    private final MessageEndpointFactory factory;
-    private final Method m;
-    private final Message message;
-    private MessageEndpoint endpoint;
-    private AmazonSQS client;
-    private String url;
+    /**
+     * Publish a message on the MQTT topic
+     * @param topic Name of the topic to publish the message
+      * @param payload Byte array to use as message payload
+     * @param qos Quality of Service valid values are 0,1,2
+     * @param retained Whether or not this message should be retained by the server.
+     * @throws javax.resource.ResourceException
+     */
+    public void publish(String topic, byte payload[], int qos, boolean retained) throws ResourceException;
     
-    public SQSWork(AmazonSQS client, MessageEndpointFactory factory, Method m, Message message, String url) {
-        this.factory = factory;
-        this.m = m;
-        this.message = message;
-        this.client = client;
-        this.url = url;
-    }
-
-    @Override
-    public void release() {
-        if (endpoint != null) {
-            endpoint.release();
-        }
-    }
-
-    @Override
-    public void run() {
-        try {
-            endpoint = factory.createEndpoint(null);
-            endpoint.beforeDelivery(m);
-            if (message != null) {
-                m.invoke(endpoint, message);
-            }
-            client.deleteMessage(new DeleteMessageRequest().withQueueUrl(url).withReceiptHandle(message.getReceiptHandle()));
-            endpoint.afterDelivery();
-        } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ResourceException ex) {
-            Logger.getLogger(AmazonSQSResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            if (endpoint != null) {
-                endpoint.release();                
-            }
-        }
-    }
+    /**
+     * Publish a message on the MQTT topic
+     * @param topic
+     * @param message
+     * @throws ResourceException
+     */
+    public void publish (String topic, MqttMessage message) throws ResourceException;
     
 }

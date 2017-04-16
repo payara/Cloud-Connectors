@@ -37,65 +37,43 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.cloud.connectors.amazonsqs.api.inbound;
+package fish.payara.cloud.connectors.mqtt.api.outbound;
 
-import com.amazonaws.services.sqs.AmazonSQS;
-import com.amazonaws.services.sqs.model.DeleteMessageRequest;
-import com.amazonaws.services.sqs.model.Message;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import fish.payara.cloud.connectors.mqtt.api.MQTTConnection;
+import java.io.Closeable;
+import java.io.IOException;
 import javax.resource.ResourceException;
-import javax.resource.spi.endpoint.MessageEndpoint;
-import javax.resource.spi.endpoint.MessageEndpointFactory;
-import javax.resource.spi.work.Work;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 /**
  *
  * @author Steve Millidge (Payara Foundation)
  */
-public class SQSWork implements Work {
+public class MQTTConnectionImpl implements MQTTConnection, Closeable {
     
-    private final MessageEndpointFactory factory;
-    private final Method m;
-    private final Message message;
-    private MessageEndpoint endpoint;
-    private AmazonSQS client;
-    private String url;
-    
-    public SQSWork(AmazonSQS client, MessageEndpointFactory factory, Method m, Message message, String url) {
-        this.factory = factory;
-        this.m = m;
-        this.message = message;
-        this.client = client;
-        this.url = url;
+    private MQTTManagedConnection realConnection;
+
+    MQTTConnectionImpl(MQTTManagedConnection aThis) {
+        realConnection = aThis;
     }
 
     @Override
-    public void release() {
-        if (endpoint != null) {
-            endpoint.release();
-        }
+    public void publish(String topic, byte[] payload, int qos, boolean retained) throws ResourceException {
+        realConnection.publish(topic, payload, qos, retained);
+    }
+
+    void setRealConnection(MQTTManagedConnection aThis) {
+        realConnection = aThis;
     }
 
     @Override
-    public void run() {
-        try {
-            endpoint = factory.createEndpoint(null);
-            endpoint.beforeDelivery(m);
-            if (message != null) {
-                m.invoke(endpoint, message);
-            }
-            client.deleteMessage(new DeleteMessageRequest().withQueueUrl(url).withReceiptHandle(message.getReceiptHandle()));
-            endpoint.afterDelivery();
-        } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ResourceException ex) {
-            Logger.getLogger(AmazonSQSResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            if (endpoint != null) {
-                endpoint.release();                
-            }
-        }
+    public void close() throws IOException {
+        realConnection.removeHandle(this);
+    }
+
+    @Override
+    public void publish(String topic, MqttMessage message) throws ResourceException {
+        realConnection.publish(topic, message);
     }
     
 }

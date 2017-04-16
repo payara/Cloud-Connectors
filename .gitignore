@@ -14,3 +14,10 @@ hs_err_pid*
 /Kafka/KafkaRARPackaging/target/
 /AmazonSQS/AmazonSQSJCAAPI/target/
 /AmazonSQS/AmazonSQSRAR/target/
+/MQTT/MQTTJCA/nbproject/private/
+/MQTT/MQTT-JCA-API/target/
+/MQTTRAR/target/
+/MQTT/MQTTRAR/target/
+/Kafka/KafkaExample/target/
+/AmazonSQS/AmazonSQSExample/target/
+/MQTT/MQTTExample/target/

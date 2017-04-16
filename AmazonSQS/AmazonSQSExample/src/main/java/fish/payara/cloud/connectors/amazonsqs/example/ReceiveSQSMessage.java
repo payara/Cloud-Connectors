@@ -37,65 +37,41 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.cloud.connectors.amazonsqs.api.inbound;
+package fish.payara.cloud.connectors.amazonsqs.example;
 
-import com.amazonaws.services.sqs.AmazonSQS;
-import com.amazonaws.services.sqs.model.DeleteMessageRequest;
+import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSListener;
+import javax.ejb.ActivationConfigProperty;
+import javax.ejb.MessageDriven;
 import com.amazonaws.services.sqs.model.Message;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.resource.ResourceException;
-import javax.resource.spi.endpoint.MessageEndpoint;
-import javax.resource.spi.endpoint.MessageEndpointFactory;
-import javax.resource.spi.work.Work;
+import com.amazonaws.services.sqs.model.MessageAttributeValue;
+import fish.payara.cloud.connectors.amazonsqs.api.OnSQSMessage;
+import java.util.Map;
+import javax.ejb.EJB;
 
 /**
  *
  * @author Steve Millidge (Payara Foundation)
  */
-public class SQSWork implements Work {
-    
-    private final MessageEndpointFactory factory;
-    private final Method m;
-    private final Message message;
-    private MessageEndpoint endpoint;
-    private AmazonSQS client;
-    private String url;
-    
-    public SQSWork(AmazonSQS client, MessageEndpointFactory factory, Method m, Message message, String url) {
-        this.factory = factory;
-        this.m = m;
-        this.message = message;
-        this.client = client;
-        this.url = url;
-    }
+@MessageDriven(activationConfig = {
+    @ActivationConfigProperty(propertyName = "awsAccessKeyId", propertyValue = "${ENV=accessKey}"),
+    @ActivationConfigProperty(propertyName = "awsSecretKey", propertyValue = "${ENV=secretKey}"),
+    @ActivationConfigProperty(propertyName = "queueURL", propertyValue = "https://sqs.eu-west-2.amazonaws.com/282006333273/CloudConnectorTest"),   
+    @ActivationConfigProperty(propertyName = "pollInterval", propertyValue = "3"),    
+    @ActivationConfigProperty(propertyName = "region", propertyValue = "eu-west-2")    
+})
+public class ReceiveSQSMessage implements AmazonSQSListener {
 
-    @Override
-    public void release() {
-        if (endpoint != null) {
-            endpoint.release();
+    @OnSQSMessage
+    public void receiveMessage(Message message) {
+        System.out.println("Got message " + message.getBody());
+        Map<String,MessageAttributeValue> mattrs = message.getMessageAttributes();
+        for (String key : mattrs.keySet()) {
+            System.out.println("Got Message attribute " + key + "," + mattrs.get(key).getStringValue());
+        }
+        
+        Map<String,String> attrs = message.getAttributes();
+        for (String key : attrs.keySet()) {
+            System.out.println("Got attribute " + key + "," + attrs.get(key));
         }
     }
-
-    @Override
-    public void run() {
-        try {
-            endpoint = factory.createEndpoint(null);
-            endpoint.beforeDelivery(m);
-            if (message != null) {
-                m.invoke(endpoint, message);
-            }
-            client.deleteMessage(new DeleteMessageRequest().withQueueUrl(url).withReceiptHandle(message.getReceiptHandle()));
-            endpoint.afterDelivery();
-        } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ResourceException ex) {
-            Logger.getLogger(AmazonSQSResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            if (endpoint != null) {
-                endpoint.release();                
-            }
-        }
-    }
-    
 }
