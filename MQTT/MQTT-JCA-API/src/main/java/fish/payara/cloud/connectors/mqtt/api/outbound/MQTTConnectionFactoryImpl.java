@@ -37,65 +37,45 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.cloud.connectors.amazonsqs.api.inbound;
+package fish.payara.cloud.connectors.mqtt.api.outbound;
 
-import com.amazonaws.services.sqs.AmazonSQS;
-import com.amazonaws.services.sqs.model.DeleteMessageRequest;
-import com.amazonaws.services.sqs.model.Message;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import fish.payara.cloud.connectors.mqtt.api.MQTTConnection;
+import fish.payara.cloud.connectors.mqtt.api.MQTTConnectionFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.resource.ResourceException;
-import javax.resource.spi.endpoint.MessageEndpoint;
-import javax.resource.spi.endpoint.MessageEndpointFactory;
-import javax.resource.spi.work.Work;
+import javax.resource.spi.ConnectionManager;
 
 /**
  *
  * @author Steve Millidge (Payara Foundation)
  */
-public class SQSWork implements Work {
+public class MQTTConnectionFactoryImpl implements MQTTConnectionFactory {
     
-    private final MessageEndpointFactory factory;
-    private final Method m;
-    private final Message message;
-    private MessageEndpoint endpoint;
-    private AmazonSQS client;
-    private String url;
-    
-    public SQSWork(AmazonSQS client, MessageEndpointFactory factory, Method m, Message message, String url) {
-        this.factory = factory;
-        this.m = m;
-        this.message = message;
-        this.client = client;
-        this.url = url;
+    private MQTTManagedConnectionFactory factory;
+    private ConnectionManager cm;
+
+    MQTTConnectionFactoryImpl(MQTTManagedConnectionFactory aThis, ConnectionManager cxManager) {
+        this.factory = aThis;
+        cm = cxManager;
     }
 
     @Override
-    public void release() {
-        if (endpoint != null) {
-            endpoint.release();
-        }
-    }
-
-    @Override
-    public void run() {
-        try {
-            endpoint = factory.createEndpoint(null);
-            endpoint.beforeDelivery(m);
-            if (message != null) {
-                m.invoke(endpoint, message);
+    public MQTTConnection getConnection() {
+        if (cm != null) {
+            try {
+                return (MQTTConnection) cm.allocateConnection(factory, null);
+            } catch (ResourceException ex) {
+                Logger.getLogger(MQTTConnectionFactoryImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
-            client.deleteMessage(new DeleteMessageRequest().withQueueUrl(url).withReceiptHandle(message.getReceiptHandle()));
-            endpoint.afterDelivery();
-        } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ResourceException ex) {
-            Logger.getLogger(AmazonSQSResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            if (endpoint != null) {
-                endpoint.release();                
+        } else {
+            try {
+                return (MQTTConnection) factory.createManagedConnection(null, null);
+            } catch (ResourceException ex) {
+                Logger.getLogger(MQTTConnectionFactoryImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        return null;    
     }
     
 }

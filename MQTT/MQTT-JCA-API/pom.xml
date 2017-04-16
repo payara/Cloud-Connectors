@@ -7,11 +7,11 @@
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <groupId>fish.payara.cloud.connectors.amazonsqs</groupId>
-    <artifactId>AmazonSQSJCAAPI</artifactId>
+    <groupId>fish.payara.cloud.connectors.mqtt</groupId>
+    <artifactId>MQTT-JCA-API</artifactId>
     <packaging>jar</packaging>
-   <name>Amazon SQS JCA Adpater API</name>
-    <description>API classes for the Amazon SQS JCA Adapter</description>
+    <name>MQTT JCA Adapter API</name>
+    <description>API classes for the MQTT JCA Adapter</description>
     <url>http://www.payara.fish</url>
     <licenses>
         <license>
@@ -39,18 +39,9 @@
     </issueManagement>
     <dependencies>
         <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-bom</artifactId>
-            <version>1.11.118</version>
-            <type>pom</type>
-            <scope>import</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-sqs</artifactId>
-            <version>1.11.118</version>
-            <type>jar</type>
-            <scope>provided</scope>
+            <groupId>org.eclipse.paho</groupId>
+            <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+            <version>1.1.1</version>
         </dependency>
         <dependency>
             <groupId>javax</groupId>

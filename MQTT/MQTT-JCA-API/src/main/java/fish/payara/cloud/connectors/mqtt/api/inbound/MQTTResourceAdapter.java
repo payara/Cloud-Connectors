@@ -37,65 +37,80 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.cloud.connectors.amazonsqs.api.inbound;
+package fish.payara.cloud.connectors.mqtt.api.inbound;
 
-import com.amazonaws.services.sqs.AmazonSQS;
-import com.amazonaws.services.sqs.model.DeleteMessageRequest;
-import com.amazonaws.services.sqs.model.Message;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.resource.ResourceException;
-import javax.resource.spi.endpoint.MessageEndpoint;
+import javax.resource.spi.ActivationSpec;
+import javax.resource.spi.BootstrapContext;
+import javax.resource.spi.Connector;
+import javax.resource.spi.ResourceAdapter;
+import javax.resource.spi.ResourceAdapterInternalException;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
-import javax.resource.spi.work.Work;
+import javax.transaction.xa.XAResource;
 
 /**
  *
  * @author Steve Millidge (Payara Foundation)
  */
-public class SQSWork implements Work {
+@Connector( 
+        displayName = "MQTT Resource Adapter",
+        vendorName = "Payara Services Limited",
+        version = "1.0"
+)
+public class MQTTResourceAdapter implements ResourceAdapter {
+
+    private static final Logger LOGGER = Logger.getLogger(MQTTResourceAdapter.class.getName());
+    private final Map<MessageEndpointFactory, MQTTSubscriber> registeredFactories;
+    private BootstrapContext context;
+
+    public MQTTResourceAdapter() {
+        registeredFactories = new HashMap<>();
+    }
     
-    private final MessageEndpointFactory factory;
-    private final Method m;
-    private final Message message;
-    private MessageEndpoint endpoint;
-    private AmazonSQS client;
-    private String url;
-    
-    public SQSWork(AmazonSQS client, MessageEndpointFactory factory, Method m, Message message, String url) {
-        this.factory = factory;
-        this.m = m;
-        this.message = message;
-        this.client = client;
-        this.url = url;
+    @Override
+    public void start(BootstrapContext ctx) throws ResourceAdapterInternalException {
+        context = ctx;
     }
 
     @Override
-    public void release() {
-        if (endpoint != null) {
-            endpoint.release();
+    public void stop() {
+        for (MQTTSubscriber value : registeredFactories.values()) {
+            try {
+                value.close();
+            } catch (ResourceException ex) {
+                Logger.getLogger(MQTTResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
     @Override
-    public void run() {
-        try {
-            endpoint = factory.createEndpoint(null);
-            endpoint.beforeDelivery(m);
-            if (message != null) {
-                m.invoke(endpoint, message);
-            }
-            client.deleteMessage(new DeleteMessageRequest().withQueueUrl(url).withReceiptHandle(message.getReceiptHandle()));
-            endpoint.afterDelivery();
-        } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ResourceException ex) {
-            Logger.getLogger(AmazonSQSResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            if (endpoint != null) {
-                endpoint.release();                
+    public void endpointActivation(MessageEndpointFactory endpointFactory, ActivationSpec spec) throws ResourceException {
+        // build a client and associate with the factory
+        MQTTSubscriber subscriber = new MQTTSubscriber(endpointFactory, spec, context.getWorkManager());
+        registeredFactories.put(endpointFactory, subscriber);
+        subscriber.subscribe();
+    }
+
+    @Override
+    public void endpointDeactivation(MessageEndpointFactory endpointFactory, ActivationSpec spec) {
+        MQTTSubscriber subs = registeredFactories.get(endpointFactory);
+        if (subs != null) {
+            try {
+                subs.close();
+            } catch (ResourceException ex) {
+                Logger.getLogger(MQTTResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        registeredFactories.remove(endpointFactory);
+    }
+
+    @Override
+    public XAResource[] getXAResources(ActivationSpec[] specs) throws ResourceException {
+        return null;
     }
     
 }

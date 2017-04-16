@@ -7,10 +7,10 @@
     <packaging>jar</packaging>
     <name>Apache Kafka JCA API</name>
     <description>API for Apache Kafka JCA connector</description>
-    <url>http://www.payara.org</url>
+    <url>http://www.payara.fish</url>
     <licenses>
         <license>
-            <name>GPL Version 2 with Classpath Exception</name>
+            <name>CDDL Version 1.1</name>
             <url>https://github.com/payara/Payara/blob/master/LICENSE.txt</url>
         </license>
     </licenses>

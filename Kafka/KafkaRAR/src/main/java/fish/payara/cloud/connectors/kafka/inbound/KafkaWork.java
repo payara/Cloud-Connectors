@@ -90,9 +90,12 @@ public class KafkaWork implements Work {
                 m.invoke(endpoint, records);                
             }
             endpoint.afterDelivery();
-            endpoint.release();
         } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ResourceException ex) {
             Logger.getLogger(KafkaResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            if (endpoint != null) {
+                endpoint.release();                
+            }
         }
     }
 

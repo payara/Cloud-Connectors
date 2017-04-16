@@ -37,65 +37,50 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.cloud.connectors.amazonsqs.api.inbound;
+package fish.payara.cloud.connectors.kafka.example;
 
-import com.amazonaws.services.sqs.AmazonSQS;
-import com.amazonaws.services.sqs.model.DeleteMessageRequest;
-import com.amazonaws.services.sqs.model.Message;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.resource.ResourceException;
-import javax.resource.spi.endpoint.MessageEndpoint;
-import javax.resource.spi.endpoint.MessageEndpointFactory;
-import javax.resource.spi.work.Work;
+import fish.payara.cloud.connectors.kafka.api.KafkaListener;
+import fish.payara.cloud.connectors.kafka.api.OnRecord;
+import fish.payara.cloud.connectors.kafka.api.OnRecords;
+import javax.ejb.ActivationConfigProperty;
+import javax.ejb.MessageDriven;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
 
 /**
+ * Example Apache Kafka MDB
  *
  * @author Steve Millidge (Payara Foundation)
  */
-public class SQSWork implements Work {
+@MessageDriven(activationConfig = {
+    @ActivationConfigProperty(propertyName = "clientId", propertyValue = "testClient"),
+    @ActivationConfigProperty(propertyName = "groupIdConfig", propertyValue = "testGroup"),
+    @ActivationConfigProperty(propertyName = "topics", propertyValue = "test,test2"),
+    @ActivationConfigProperty(propertyName = "bootstrapServersConfig", propertyValue = "localhost:9092"),    
+    @ActivationConfigProperty(propertyName = "autoCommitInterval", propertyValue = "100"),    
+    @ActivationConfigProperty(propertyName = "retryBackoff", propertyValue = "1000"),    
+    @ActivationConfigProperty(propertyName = "keyDeserializer", propertyValue = "org.apache.kafka.common.serialization.StringDeserializer"),    
+    @ActivationConfigProperty(propertyName = "valueDeserializer", propertyValue = "org.apache.kafka.common.serialization.StringDeserializer"),    
+    @ActivationConfigProperty(propertyName = "pollInterval", propertyValue = "3000"),    
+})
+public class KafkaMDB implements KafkaListener {
     
-    private final MessageEndpointFactory factory;
-    private final Method m;
-    private final Message message;
-    private MessageEndpoint endpoint;
-    private AmazonSQS client;
-    private String url;
+    public KafkaMDB() {
+    }
     
-    public SQSWork(AmazonSQS client, MessageEndpointFactory factory, Method m, Message message, String url) {
-        this.factory = factory;
-        this.m = m;
-        this.message = message;
-        this.client = client;
-        this.url = url;
+    @OnRecords( matchOtherMethods = true)
+    public void getMessageTest2(ConsumerRecords records) {
+        System.out.println("Bulk processing called with " + records.count() + " records");
     }
-
-    @Override
-    public void release() {
-        if (endpoint != null) {
-            endpoint.release();
-        }
+    
+    @OnRecord( topics={"test"})
+    public void getMessageTest(ConsumerRecord record) {
+        System.out.println("Got record on topic test " + record);
     }
-
-    @Override
-    public void run() {
-        try {
-            endpoint = factory.createEndpoint(null);
-            endpoint.beforeDelivery(m);
-            if (message != null) {
-                m.invoke(endpoint, message);
-            }
-            client.deleteMessage(new DeleteMessageRequest().withQueueUrl(url).withReceiptHandle(message.getReceiptHandle()));
-            endpoint.afterDelivery();
-        } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ResourceException ex) {
-            Logger.getLogger(AmazonSQSResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            if (endpoint != null) {
-                endpoint.release();                
-            }
-        }
+    
+    @OnRecord( topics={"test2"})
+    public void getMessageTest2(ConsumerRecord record) {
+        System.out.println("Got record on topic test2 " + record);
     }
     
 }

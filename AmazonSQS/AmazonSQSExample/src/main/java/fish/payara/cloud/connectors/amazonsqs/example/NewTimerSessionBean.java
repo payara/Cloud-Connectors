@@ -1,3 +1,5 @@
+package fish.payara.cloud.connectors.amazonsqs.example;
+
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
@@ -37,65 +39,46 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.cloud.connectors.amazonsqs.api.inbound;
 
-import com.amazonaws.services.sqs.AmazonSQS;
-import com.amazonaws.services.sqs.model.DeleteMessageRequest;
-import com.amazonaws.services.sqs.model.Message;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.resource.ResourceException;
-import javax.resource.spi.endpoint.MessageEndpoint;
-import javax.resource.spi.endpoint.MessageEndpointFactory;
-import javax.resource.spi.work.Work;
+
+import com.amazonaws.services.sqs.model.SendMessageRequest;
+import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnection;
+import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory;
+import java.util.Date;
+import javax.annotation.Resource;
+import javax.ejb.Schedule;
+import javax.ejb.Stateless;
+import javax.resource.ConnectionFactoryDefinition;
+import javax.resource.spi.TransactionSupport.TransactionSupportLevel;
 
 /**
  *
  * @author Steve Millidge (Payara Foundation)
  */
-public class SQSWork implements Work {
-    
-    private final MessageEndpointFactory factory;
-    private final Method m;
-    private final Message message;
-    private MessageEndpoint endpoint;
-    private AmazonSQS client;
-    private String url;
-    
-    public SQSWork(AmazonSQS client, MessageEndpointFactory factory, Method m, Message message, String url) {
-        this.factory = factory;
-        this.m = m;
-        this.message = message;
-        this.client = client;
-        this.url = url;
-    }
+@ConnectionFactoryDefinition(name = "java:comp/env/SQSConnectionFactory", 
+  description = "SQS Conn Factory", 
+  interfaceName = "fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory", 
+  resourceAdapter = "AmazonSQSRAR-1.0.0-SNAPSHOT", 
+  minPoolSize = 2, maxPoolSize = 2,
+  transactionSupport = TransactionSupportLevel.NoTransaction,
+  properties = {"awsAccessKeyId=${ENV=accessKey}",
+                "awsSecretKey=${ENV=secretKey}",
+                "region=eu-west-2"})
+@Stateless
+public class NewTimerSessionBean {
 
-    @Override
-    public void release() {
-        if (endpoint != null) {
-            endpoint.release();
-        }
-    }
-
-    @Override
-    public void run() {
-        try {
-            endpoint = factory.createEndpoint(null);
-            endpoint.beforeDelivery(m);
-            if (message != null) {
-                m.invoke(endpoint, message);
-            }
-            client.deleteMessage(new DeleteMessageRequest().withQueueUrl(url).withReceiptHandle(message.getReceiptHandle()));
-            endpoint.afterDelivery();
-        } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ResourceException ex) {
-            Logger.getLogger(AmazonSQSResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            if (endpoint != null) {
-                endpoint.release();                
-            }
-        }
+    @Resource(lookup="java:comp/env/SQSConnectionFactory")
+    AmazonSQSConnectionFactory factory;
+    
+    @Schedule(second = "*/1", hour="*", minute="*")   
+    public void myTimer() {
+        try (AmazonSQSConnection connection = factory.getConnection()) {
+        connection.sendMessage(new SendMessageRequest("https://sqs.eu-west-2.amazonaws.com/282006333273/CloudConnectorTest", "Hello World"));
+        } catch (Exception e) {}
     }
     
+    @Schedule(second = "*/1", hour="*", minute="*")   
+    public void myTimer2() {
+        System.out.println("Second test method");
+    }
 }
