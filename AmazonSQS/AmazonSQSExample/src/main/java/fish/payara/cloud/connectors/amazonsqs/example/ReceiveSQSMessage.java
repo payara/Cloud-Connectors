@@ -55,7 +55,7 @@ import javax.ejb.EJB;
 @MessageDriven(activationConfig = {
     @ActivationConfigProperty(propertyName = "awsAccessKeyId", propertyValue = "${ENV=accessKey}"),
     @ActivationConfigProperty(propertyName = "awsSecretKey", propertyValue = "${ENV=secretKey}"),
-    @ActivationConfigProperty(propertyName = "queueURL", propertyValue = "https://sqs.eu-west-2.amazonaws.com/282006333273/CloudConnectorTest"),   
+    @ActivationConfigProperty(propertyName = "queueURL", propertyValue = "${ENV=queueURL}"),   
     @ActivationConfigProperty(propertyName = "pollInterval", propertyValue = "3"),    
     @ActivationConfigProperty(propertyName = "region", propertyValue = "eu-west-2")    
 })
