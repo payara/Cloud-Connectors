@@ -208,5 +208,4 @@ public class MQTTManagedConnectionFactory implements ManagedConnectionFactory, S
     public PrintWriter getLogWriter() throws ResourceException {
         return logWriter;
     }
-
 }
