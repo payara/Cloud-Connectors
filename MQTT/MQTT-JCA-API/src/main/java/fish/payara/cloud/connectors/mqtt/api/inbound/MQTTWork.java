@@ -97,10 +97,11 @@ public class MQTTWork implements Work {
                 endpoint.afterDelivery();
             }
         } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ResourceException ex) {
-            Logger.getLogger(MQTTWork.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MQTTWork.class.getName()).log(Level.SEVERE, null, ex);      
+        } finally {
             if (endpoint != null) {
                 endpoint.release();                
-            }       
+            } 
         }
     }
     
