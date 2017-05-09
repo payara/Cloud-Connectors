@@ -8,7 +8,6 @@ import fish.payara.cloud.connectors.mqtt.api.MQTTConnection;
 import fish.payara.cloud.connectors.mqtt.api.MQTTConnectionFactory;
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
-import javax.ejb.LocalBean;
 import javax.ejb.Schedule;
 import javax.resource.ConnectionFactoryDefinition;
 import javax.resource.spi.TransactionSupport;
@@ -23,7 +22,8 @@ import javax.resource.spi.TransactionSupport;
   resourceAdapter = "MQTTRAR-1.0.0-SNAPSHOT", 
   minPoolSize = 2, 
   maxPoolSize = 2,
-  transactionSupport = TransactionSupport.TransactionSupportLevel.NoTransaction)
+  transactionSupport = TransactionSupport.TransactionSupportLevel.NoTransaction,
+  properties = {"cleanSession=true"})
 @Stateless
 public class TimerSend {
 
@@ -31,10 +31,10 @@ public class TimerSend {
     MQTTConnectionFactory factory;
 
     
-    @Schedule(second = "*/1", hour="*", minute="*")   
+    @Schedule(second = "*/1", hour="*", minute="*", persistent = false)   
     public void sendMessage() {
         try (MQTTConnection conn = factory.getConnection()) {
-            conn.publish("test", "Hello World".getBytes(), 0, true);
+            conn.publish("test", "{\"test\": \"Hello World\"}".getBytes(), 0, false);
         } catch (Exception e) {
             
         }

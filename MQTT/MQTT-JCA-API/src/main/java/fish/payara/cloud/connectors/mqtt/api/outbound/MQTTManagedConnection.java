@@ -116,6 +116,7 @@ public class MQTTManagedConnection implements ManagedConnection, MQTTConnection 
     @Override
     public void destroy() throws ResourceException {
         try {
+            theClient.disconnect();
             theClient.close();
         } catch (MqttException ex) {
             throw new ResourceException("Unable to close the MQTT client connection", ex);

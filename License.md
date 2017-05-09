@@ -1,4 +1,4 @@
-/*
+*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2017 Payara Foundation and/or its affiliates. All rights reserved.
@@ -37,40 +37,3 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.cloud.connectors.amazonsqs.example;
-
-import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSListener;
-import javax.ejb.ActivationConfigProperty;
-import javax.ejb.MessageDriven;
-import com.amazonaws.services.sqs.model.Message;
-import com.amazonaws.services.sqs.model.MessageAttributeValue;
-import fish.payara.cloud.connectors.amazonsqs.api.OnSQSMessage;
-import java.util.Map;
-
-/**
- *
- * @author Steve Millidge (Payara Foundation)
- */
-@MessageDriven(activationConfig = {
-    @ActivationConfigProperty(propertyName = "awsAccessKeyId", propertyValue = "${ENV=accessKey}"),
-    @ActivationConfigProperty(propertyName = "awsSecretKey", propertyValue = "${ENV=secretKey}"),
-    @ActivationConfigProperty(propertyName = "queueURL", propertyValue = "${ENV=queueURL}"),   
-    @ActivationConfigProperty(propertyName = "pollInterval", propertyValue = "3"),    
-    @ActivationConfigProperty(propertyName = "region", propertyValue = "eu-west-2")    
-})
-public class ReceiveSQSMessage implements AmazonSQSListener {
-
-    @OnSQSMessage
-    public void receiveMessage(Message message) {
-        System.out.println("Got message " + message.getBody());
-        Map<String,MessageAttributeValue> mattrs = message.getMessageAttributes();
-        for (String key : mattrs.keySet()) {
-            System.out.println("Got Message attribute " + key + "," + mattrs.get(key).getStringValue());
-        }
-        
-        Map<String,String> attrs = message.getAttributes();
-        for (String key : attrs.keySet()) {
-            System.out.println("Got attribute " + key + "," + attrs.get(key));
-        }
-    }
-}
