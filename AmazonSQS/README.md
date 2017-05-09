@@ -33,17 +33,18 @@ To receive messages you must implement the AmazonSQSListener interface.
 Also you must set the ActivationConfigProperty values suitable for your MDB. 
 
 Valid properties are below. On Payara all properties can be replaced via System properties using the syntax `${system.property.name}` or environment variables using the syntax `${ENV=evironment.property.name}` or password aliases using the syntax `${ALIAS=alias.name}`;
-Config Property Name | Type | Default | Notes
----------------------|------|---------|------
-awsAccessKeyId | String | None | Must be set to the access key of your AWS account
-awsSecretKey | String | None | Must be set to the secret key of your AWS account
-queueURL | String | None | Must be set to the URL for an SQS queue
-region | String | None | Must be set to the AWS region name of your queue
-maxMessages | Integer | 10 | The maximum number of messages to download on a poll
-initialPollDelay | Integer | 1 | The delay (in seconds) before polling the queue after MDB activation
-pollInterval | Integer | 3 | How often should the adapter poll for messages (in seconds)
-messageAttributeNames | String | All | The list of message attribute names that should be fetched with the message
-attributeNames | String| All | The list of attribute names that should be fetched with the message
+
+|Config Property Name | Type | Default | Notes
+|---------------------|------|---------|------
+|awsAccessKeyId | String | None | Must be set to the access key of your AWS account
+|awsSecretKey | String | None | Must be set to the secret key of your AWS account
+|queueURL | String | None | Must be set to the URL for an SQS queue
+|region | String | None | Must be set to the AWS region name of your queue
+|maxMessages | Integer | 10 | The maximum number of messages to download on a poll
+|initialPollDelay | Integer | 1 | The delay (in seconds) before polling the queue after MDB activation
+|pollInterval | Integer | 3 | How often should the adapter poll for messages (in seconds)
+|messageAttributeNames | String | All | The list of message attribute names that should be fetched with the message
+|attributeNames | String| All | The list of attribute names that should be fetched with the message
 
 Your MDB should contain one method annotated with `@OnSQSMessage` and that method should take a single parameter of type `com.amazonaws.services.sqs.model.Message`
 
