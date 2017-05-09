@@ -46,9 +46,9 @@ Valid properties are below. On Payara all properties can be replaced via System 
 |retryBackoff| Long | 100 | The amount of time to wait before attempting a retry (ms)
 |reconnectBackoff| Long | 100 | The amount of time to wait before attempting a reconnection (ms)
 
-Your MDB should contain one method annotated with `@OnRecord` and that method should take a single parameter of type `ConsumerRecord`. A specific set of topics to receive messages for can be spefied `@OnRecord(topics={"test"})`
+Your MDB should contain one method annotated with `@OnRecord` and that method should take a single parameter of type `ConsumerRecord`. A specific set of topics to receive messages for can be specified `@OnRecord(topics={"test"})`
 
-Your MDB 0can also receive messages in a batch using the @OnRecords annotation. 
+Your MDB can also receive messages in a batch using the @OnRecords annotation. 
 
 A full skeleton MDB is shown below
 ```java
