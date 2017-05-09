@@ -105,6 +105,7 @@ public class MQTTSubscriber implements IMqttMessageListener {
 
     void close() throws ResourceException {
         try {
+            client.disconnect();
             client.close();
         } catch (MqttException ex) {
             throw new ResourceException("Unable to close the MQTT client", ex);
