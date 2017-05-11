@@ -4,7 +4,7 @@
     <parent>
         <groupId>fish.payara.cloud.connectors</groupId>
         <artifactId>CloudConnectors</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>0.1.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <groupId>fish.payara.cloud.connectors.mqtt</groupId>
