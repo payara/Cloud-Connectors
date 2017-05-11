@@ -85,7 +85,11 @@ public class MQTTManagedConnection implements ManagedConnection, MQTTConnection 
             persistence = new MqttDefaultFilePersistence(cf.getPersistenceDirectory());
         }
         try {
-            theClient = new MqttClient("tcp://localhost:1883", MqttClient.generateClientId(),persistence);
+            String clientId = cf.getClientId();
+            if (clientId == null) {
+                clientId = MqttClient.generateClientId();
+            }
+            theClient = new MqttClient("tcp://localhost:1883", clientId,persistence);
             MqttConnectOptions options = new MqttConnectOptions();
             options.setAutomaticReconnect(cf.getAutomaticReconnect());
             options.setCleanSession(cf.getCleanSession());

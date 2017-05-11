@@ -96,6 +96,9 @@ public class MQTTManagedConnectionFactory implements ManagedConnectionFactory, S
     
     @ConfigProperty(type = String.class, description = "The password for the connection")
     String password;
+    
+    @ConfigProperty(type = String.class, description = "Client ID")
+    String clientId;
 
     public Boolean getFilePersistance() {
         return filePersistance;
@@ -178,6 +181,16 @@ public class MQTTManagedConnectionFactory implements ManagedConnectionFactory, S
     public void setPassword(String password) {
         this.password = password;
     }    
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+    
+    
 
     @Override
     public Object createConnectionFactory(ConnectionManager cxManager) throws ResourceException {
