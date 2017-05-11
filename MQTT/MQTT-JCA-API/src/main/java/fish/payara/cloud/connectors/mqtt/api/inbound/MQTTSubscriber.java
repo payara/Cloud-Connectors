@@ -70,7 +70,11 @@ public class MQTTSubscriber implements IMqttMessageListener {
             topic = aspec.getTopicFilter();
             qos = aspec.getQos();
             try {
-                client = new MqttClient("tcp://localhost:1883",MqttClient.generateClientId());
+                String clientId = aspec.getClientId();
+                if (clientId == null) {
+                    clientId = MqttClient.generateClientId();
+                }
+                client = new MqttClient("tcp://localhost:1883",clientId);
                 MqttConnectOptions options = new MqttConnectOptions();
                 options.setServerURIs(aspec.getServerURIs().split(","));
                 options.setAutomaticReconnect(aspec.getAutomaticReconnect());
