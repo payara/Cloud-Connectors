@@ -10,6 +10,7 @@ Currently we have JCA adapters for;
 * Apache Kafka - sending messages using a Connection Factory and receiving messages via an MDB
 * Amazon SQS - sending messages using a Connection Factory and receiving messages via an MDB
 * MQTT - sending messages using a Connection Factory and receiving messages via an MDB
+* Azure Service Bus - Sending and receiving messages to/from Azure Service Bus Queues using ConnectionFactory via MDB
 
 ## Why Use JCA
 

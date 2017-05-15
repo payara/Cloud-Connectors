@@ -43,7 +43,7 @@
         <module>MQTT/MQTTRAR</module>
         <module>MQTT/MQTTExample</module>
         <module>AzureServiceBus/AzureSBJCAAPI</module>
-        <module>AzureSBRAR</module>
+        <module>AzureServiceBus/AzureSBRAR</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
