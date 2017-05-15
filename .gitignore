@@ -21,3 +21,6 @@ hs_err_pid*
 /Kafka/KafkaExample/target/
 /AmazonSQS/AmazonSQSExample/target/
 /MQTT/MQTTExample/target/
+/AzureServiceBus/AzureSBJCAAPI/target/
+/AzureServiceBus/AzureSBExample/target/
+/AzureSBRAR/target/

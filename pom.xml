@@ -42,6 +42,8 @@
         <module>MQTT/MQTT-JCA-API</module>
         <module>MQTT/MQTTRAR</module>
         <module>MQTT/MQTTExample</module>
+        <module>AzureServiceBus/AzureSBJCAAPI</module>
+        <module>AzureSBRAR</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
