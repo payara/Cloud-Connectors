@@ -10,7 +10,7 @@ To use the JCA adapter the KafkaRAR-<version>.rar should be deployed to your app
 To deploy the JCA adapter on Payara Micro use the following commands.
 
 ```shell
-java -jar payara-micro.jar --deploy KafkaRAR-1.0.0-SNAPSHOT.rar KafkaExample-1.0.0-SNAPSHOT.jar
+java -jar payara-micro.jar --deploy KafkaRAR-0.1.0-SNAPSHOT.rar KafkaExample-0.1.0-SNAPSHOT.jar
 ```
 
 ## Inbound MDB
@@ -103,7 +103,7 @@ An example annotation defined connection factory is shown below;
 @ConnectionFactoryDefinition(name = "java:comp/env/KafkaConnectionFactory", 
   description = "Kafka Conn Factory", 
   interfaceName = "fish.payara.cloud.connectors.kafka.KafkaConnectionFactory", 
-  resourceAdapter = "KafkaRAR-1.0.0-SNAPSHOT", 
+  resourceAdapter = "KafkaRAR-0.1.0-SNAPSHOT", 
   minPoolSize = 2, 
   maxPoolSize = 2,
   transactionSupport = TransactionSupportLevel.NoTransaction,
