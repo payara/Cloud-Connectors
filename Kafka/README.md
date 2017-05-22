@@ -14,7 +14,7 @@ java -jar payara-micro.jar --deploy KafkaRAR-0.1.0-SNAPSHOT.rar KafkaExample-0.1
 ```
 
 ## Inbound MDB
-The KafkaExample module shows an example MDB that receives messages from a queue.
+The KafkaExample module shows an example MDB that receives messages from a Kafka topic.
 To receive messages you must implement the KafkaListener interface. 
 ```java
     public class KafkaMDB implements KafkaListener  
@@ -87,7 +87,7 @@ public class KafkaMDB implements KafkaListener {
 ```
 
 ## Outbound messages sending
-It is also possible to send messages to the queue using a defined connection factory. 
+It is also possible to send messages to the Kafka topic using a defined connection factory. 
 A full example of this is shown below;
 ```java
         try (KafkaConnection conn = factory.createConnection()) {
