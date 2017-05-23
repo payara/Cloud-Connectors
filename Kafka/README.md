@@ -10,7 +10,7 @@ To use the JCA adapter the KafkaRAR-<version>.rar should be deployed to your app
 To deploy the JCA adapter on Payara Micro use the following commands.
 
 ```shell
-java -jar payara-micro.jar --deploy KafkaRAR-0.1.0-SNAPSHOT.rar KafkaExample-0.1.0-SNAPSHOT.jar
+java -jar payara-micro.jar --deploy KafkaRAR-0.1.0-SNAPSHOT.rar --deploy KafkaExample-0.1.0-SNAPSHOT.jar
 ```
 
 ## Inbound MDB
