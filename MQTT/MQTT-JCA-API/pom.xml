@@ -3,12 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>fish.payara.cloud.connectors</groupId>
-        <artifactId>CloudConnectors</artifactId>
+        <artifactId>cloud-connectors</artifactId>
         <version>0.1.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <groupId>fish.payara.cloud.connectors.mqtt</groupId>
-    <artifactId>MQTT-JCA-API</artifactId>
+    <artifactId>mqtt-jca-api</artifactId>
     <packaging>jar</packaging>
     <name>MQTT JCA Adapter API</name>
     <description>API classes for the MQTT JCA Adapter</description>
@@ -34,7 +34,7 @@
         <tag>master</tag>
     </scm>
     <issueManagement>
-        <system>GITHub</system>
+        <system>GitHub</system>
         <url>https://github.com/payara/Cloud-Connectors/issues</url>
     </issueManagement>
     <dependencies>

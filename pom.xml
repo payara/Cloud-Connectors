@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>fish.payara.cloud.connectors</groupId>
-    <artifactId>CloudConnectors</artifactId>
+    <artifactId>cloud-connectors</artifactId>
     <version>0.1.0</version>
     <packaging>pom</packaging>
     <name>Payara Cloud Connectors</name>
@@ -29,12 +29,12 @@
         <tag>master</tag>
     </scm>
     <issueManagement>
-        <system>GITHub</system>
+        <system>GitHub</system>
         <url>https://github.com/payara/Cloud-Connectors/issues</url>
     </issueManagement>
     <modules>
+        <module>Kafka/KafkaJCAAPI</module>
         <module>Kafka/KafkaRAR</module>
-        <module>Kafka/KafkaRARPackaging</module>
         <module>Kafka/KafkaExample</module>
         <module>AmazonSQS/AmazonSQSJCAAPI</module>
         <module>AmazonSQS/AmazonSQSRAR</module>

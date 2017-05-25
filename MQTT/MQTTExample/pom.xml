@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>fish.payara.cloud.connectors</groupId>
-    <artifactId>MQTTExample</artifactId>
+    <artifactId>mqtt-example</artifactId>
     <version>0.1.0</version>
     <packaging>ejb</packaging>
 
@@ -17,7 +17,7 @@
     <dependencies>
         <dependency>
             <groupId>fish.payara.cloud.connectors.mqtt</groupId>
-            <artifactId>MQTT-JCA-API</artifactId>
+            <artifactId>mqtt-jca-api</artifactId>
             <version>0.1.0</version>
             <type>jar</type>
             <scope>provided</scope>

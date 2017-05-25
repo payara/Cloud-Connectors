@@ -2,41 +2,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>fish.payara.cloud.connectors.kafka</groupId>
-    <artifactId>KafkaRARAPI</artifactId>
+    <artifactId>kafka-rar</artifactId>
     <version>0.1.0</version>
-    <packaging>jar</packaging>
-    <name>Apache Kafka JCA API</name>
-    <description>API for Apache Kafka JCA connector</description>
-    <url>http://www.payara.fish</url>
-    <licenses>
-        <license>
-            <name>CDDL Version 1.1</name>
-            <url>https://github.com/payara/Payara/blob/master/LICENSE.txt</url>
-        </license>
-    </licenses>
-    <developers>
-    <developer>
-        <id>smillidge</id>
-        <name>Steve Millidge</name>
-        <organization>Payara Foundation</organization>
-        <organizationUrl>http://www.payara.org</organizationUrl>
-    </developer>
-    </developers>
-    <scm>
-        <connection>scm:git:git:github.com/payara/Cloud-Connectors.git</connection>
-        <developerConnection>git@github.com:payara/Cloud-Connectors.git</developerConnection>
-        <url>https://github.com/payara/Cloud-Connectors</url>
-        <tag>master</tag>
-    </scm>
-    <issueManagement>
-        <system>GITHub</system>
-        <url>https://github.com/payara/Cloud-Connectors/issues</url>
-    </issueManagement>
+    <packaging>rar</packaging>
     <dependencies>
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
             <version>0.9.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>kafka-rar-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>javax</groupId>
@@ -48,7 +26,5 @@
     </dependencies>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 </project>

@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>fish.payara.cloud.connectors</groupId>
-        <artifactId>CloudConnectors</artifactId>
+        <artifactId>cloud-connectors</artifactId>
         <version>0.1.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>AzureSBJCAAPI</artifactId>
+    <artifactId>azure-sb-jca-api</artifactId>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>

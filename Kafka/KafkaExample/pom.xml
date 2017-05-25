@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>fish.payara.cloud.connectors.kafka</groupId>
-    <artifactId>KafkaExample</artifactId>
+    <artifactId>kafka-example</artifactId>
     <version>0.1.0</version>
     <packaging>ejb</packaging>
 
@@ -17,7 +17,7 @@
     <dependencies>
         <dependency>
             <groupId>fish.payara.cloud.connectors.kafka</groupId>
-            <artifactId>KafkaRARAPI</artifactId>
+            <artifactId>kafka-jca-api</artifactId>
             <version>0.1.0</version>
             <type>jar</type>
             <scope>provided</scope>

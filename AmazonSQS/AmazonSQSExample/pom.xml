@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>fish.payara.cloud.connectors.amazonsqs</groupId>
-    <artifactId>AmazonSQSExample</artifactId>
+    <artifactId>amazon-sqs-example</artifactId>
     <version>0.1.0</version>
     <packaging>ejb</packaging>
 
@@ -17,7 +17,7 @@
     <dependencies>
         <dependency>
             <groupId>fish.payara.cloud.connectors.amazonsqs</groupId>
-            <artifactId>AmazonSQSJCAAPI</artifactId>
+            <artifactId>amazon-sqs-jca-api</artifactId>
             <version>0.1.0</version>
             <type>jar</type>
             <scope>provided</scope>
