@@ -39,7 +39,7 @@
         <module>AmazonSQS/AmazonSQSJCAAPI</module>
         <module>AmazonSQS/AmazonSQSRAR</module>
         <module>AmazonSQS/AmazonSQSExample</module>
-        <module>MQTT/MQTT-JCA-API</module>
+        <module>MQTT/MQTTJCAAPI</module>
         <module>MQTT/MQTTRAR</module>
         <module>MQTT/MQTTExample</module>
         <module>AzureServiceBus/AzureSBJCAAPI</module>

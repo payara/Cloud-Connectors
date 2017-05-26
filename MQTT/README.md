@@ -2,7 +2,7 @@
 
 These modules form the basis of the MQTT JCA connector. The code is in three modules
 * MQTTExample is an EJB jar module that shows a Timer Bean which sends a message periodically to an MQTT topic and an MDB that receives the message
-* MQTT-JCA-API is the bulk of the JCA code and the jar file which must be used as a provided dependency for any code using the JCA module
+* MQTTJCAAPI is the bulk of the JCA code and the jar file which must be used as a provided dependency for any code using the JCA module
 * MQTTRAR is a maven module that assembles the rar file. The rar file should be deployed to your container.
 
 To use the JCA adapter the MQTTRAR-<version>.rar should be deployed to your application server.
