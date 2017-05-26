@@ -17,7 +17,7 @@
             <version>0.8.0</version>
         </dependency>
         <dependency>
-            <groupId>fish.payara.cloud.connectors</groupId>
+            <groupId>fish.payara.cloud.connectors.azuresb</groupId>
             <artifactId>azure-sb-jca-api</artifactId>
             <version>0.1.0</version>
         </dependency>
