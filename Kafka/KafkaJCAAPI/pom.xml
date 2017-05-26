@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>fish.payara.cloud.connectors</groupId>
-    <artifactId>cloud-connectors</artifactId>
+    <groupId>fish.payara.cloud.connectors.kafka</groupId>
+    <artifactId>kafka-jca-api</artifactId>
     <version>0.1.0</version>
-    <packaging>pom</packaging>
-    <name>Payara Cloud Connectors</name>
-    <description>Project for JCA modules that connect to various cloud services</description>
-    <url>http://www.payara.org</url>
+    <packaging>jar</packaging>
+    <name>Apache Kafka JCA API</name>
+    <description>API for Apache Kafka JCA connector</description>
+    <url>http://www.payara.fish</url>
     <licenses>
         <license>
-            <name>GPL Version 2 with Classpath Exception</name>
+            <name>CDDL Version 1.1</name>
             <url>https://github.com/payara/Payara/blob/master/LICENSE.txt</url>
         </license>
     </licenses>
@@ -32,20 +32,23 @@
         <system>GitHub</system>
         <url>https://github.com/payara/Cloud-Connectors/issues</url>
     </issueManagement>
-    <modules>
-        <module>Kafka/KafkaJCAAPI</module>
-        <module>Kafka/KafkaRAR</module>
-        <module>Kafka/KafkaExample</module>
-        <module>AmazonSQS/AmazonSQSJCAAPI</module>
-        <module>AmazonSQS/AmazonSQSRAR</module>
-        <module>AmazonSQS/AmazonSQSExample</module>
-        <module>MQTT/MQTTJCAAPI</module>
-        <module>MQTT/MQTTRAR</module>
-        <module>MQTT/MQTTExample</module>
-        <module>AzureServiceBus/AzureSBJCAAPI</module>
-        <module>AzureServiceBus/AzureSBRAR</module>
-    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>0.9.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <version>7.0</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 </project>
