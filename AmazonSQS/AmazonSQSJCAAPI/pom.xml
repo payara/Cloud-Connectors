@@ -10,7 +10,7 @@
     <groupId>fish.payara.cloud.connectors.amazonsqs</groupId>
     <artifactId>amazon-sqs-jca-api</artifactId>
     <packaging>jar</packaging>
-   <name>Amazon SQS JCA Adapter API</name>
+    <name>Amazon SQS JCA Adapter API</name>
     <description>API classes for the Amazon SQS JCA Adapter</description>
     <url>http://www.payara.fish</url>
     <licenses>

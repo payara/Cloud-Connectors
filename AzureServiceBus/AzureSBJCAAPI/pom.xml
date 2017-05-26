@@ -10,6 +10,33 @@
     <groupId>fish.payara.cloud.connectors.azuresb</groupId>
     <artifactId>azure-sb-jca-api</artifactId>
     <packaging>jar</packaging>
+    <name>Azure Service Bus JCA Adapter API</name>
+    <description>API classes for the Azure Service Bus JCA Adapter</description>
+    <url>http://www.payara.fish</url>
+    <licenses>
+        <license>
+            <name>CDDL Version 1.1</name>
+            <url>https://github.com/payara/Payara/blob/master/LICENSE.txt</url>
+        </license>
+    </licenses>
+    <developers>
+    <developer>
+        <id>smillidge</id>
+        <name>Steve Millidge</name>
+        <organization>Payara Foundation</organization>
+        <organizationUrl>http://www.payara.org</organizationUrl>
+    </developer>
+    </developers>
+    <scm>
+        <connection>scm:git:git:github.com/payara/Cloud-Connectors.git</connection>
+        <developerConnection>git@github.com:payara/Cloud-Connectors.git</developerConnection>
+        <url>https://github.com/payara/Cloud-Connectors</url>
+        <tag>master</tag>
+    </scm>
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/payara/Cloud-Connectors/issues</url>
+    </issueManagement>
     <dependencies>
         <dependency>
             <groupId>com.microsoft.azure</groupId>
