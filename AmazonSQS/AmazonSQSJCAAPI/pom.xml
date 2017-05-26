@@ -34,7 +34,7 @@
         <tag>master</tag>
     </scm>
     <issueManagement>
-        <system>GITHub</system>
+        <system>GitHub</system>
         <url>https://github.com/payara/Cloud-Connectors/issues</url>
     </issueManagement>
     <dependencies>
