@@ -13,7 +13,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>kafka-rar-api</artifactId>
+            <artifactId>kafka-jca-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
