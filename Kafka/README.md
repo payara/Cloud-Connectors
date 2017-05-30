@@ -10,11 +10,11 @@ To use the JCA adapter the KafkaRAR-<version>.rar should be deployed to your app
 To deploy the JCA adapter on Payara Micro use the following commands.
 
 ```shell
-java -jar payara-micro.jar --deploy KafkaRAR-0.1.0-SNAPSHOT.rar --deploy KafkaExample-0.1.0-SNAPSHOT.jar
+java -jar payara-micro.jar --deploy kafka-rar-0.1.0.rar --deploy kafka-example-0.1.0.jar
 ```
 
 ## Inbound MDB
-The KafkaExample module shows an example MDB that receives messages from a queue.
+The KafkaExample module shows an example MDB that receives messages from a Kafka topic.
 To receive messages you must implement the KafkaListener interface. 
 ```java
     public class KafkaMDB implements KafkaListener  
@@ -87,7 +87,7 @@ public class KafkaMDB implements KafkaListener {
 ```
 
 ## Outbound messages sending
-It is also possible to send messages to the queue using a defined connection factory. 
+It is also possible to send messages to the Kafka topic using a defined connection factory. 
 A full example of this is shown below;
 ```java
         try (KafkaConnection conn = factory.createConnection()) {
@@ -103,7 +103,7 @@ An example annotation defined connection factory is shown below;
 @ConnectionFactoryDefinition(name = "java:comp/env/KafkaConnectionFactory", 
   description = "Kafka Conn Factory", 
   interfaceName = "fish.payara.cloud.connectors.kafka.KafkaConnectionFactory", 
-  resourceAdapter = "KafkaRAR-0.1.0-SNAPSHOT", 
+  resourceAdapter = "kafka-rar-0.1.0", 
   minPoolSize = 2, 
   maxPoolSize = 2,
   transactionSupport = TransactionSupportLevel.NoTransaction,
