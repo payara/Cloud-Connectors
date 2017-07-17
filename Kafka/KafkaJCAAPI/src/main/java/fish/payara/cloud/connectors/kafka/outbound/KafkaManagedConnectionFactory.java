@@ -53,6 +53,8 @@ import javax.resource.spi.ConnectionRequestInfo;
 import javax.resource.spi.ManagedConnection;
 import javax.resource.spi.ManagedConnectionFactory;
 import javax.security.auth.Subject;
+
+import fish.payara.cloud.connectors.kafka.tools.AdditionalPropertiesParser;
 import org.apache.kafka.clients.producer.ProducerConfig;
 
 /**
@@ -65,72 +67,76 @@ import org.apache.kafka.clients.producer.ProducerConfig;
         connectionImpl = KafkaConnectionImpl.class
 )
 public class KafkaManagedConnectionFactory implements ManagedConnectionFactory, Serializable {
-    
+
     private final Properties producerProperties;
-    
+    private AdditionalPropertiesParser additionalPropertiesParser;
+
     @ConfigProperty(defaultValue = "localhost:9092", description = "Kafka Servers to Connect to", type = String.class)
     private String bootstrapServersConfig;
-    
+
     @ConfigProperty(defaultValue = "KafkaJCAClient", description = "Client ID of the Producer", type = String.class)
     private String clientId;
-    
+
     @ConfigProperty(defaultValue = "org.apache.kafka.common.serialization.StringSerializer", type = String.class, description = "Serializer class for key")
     private String valueSerializer;
-    
+
     @ConfigProperty(defaultValue = "org.apache.kafka.common.serialization.StringSerializer", type = String.class, description = "Serializer class for value")
     private String keySerializer;
-    
+
     @ConfigProperty( type = Long.class, defaultValue = "33554432", description = "The total bytes the producer can use to buffer messages")
     private Long bufferMemory;
 
     @ConfigProperty(type = String.class, description = "The number of acks the producer requires", defaultValue = "1")
     private String acks;
-    
+
     @ConfigProperty(type = Integer.class, description = "The number of retries if there is a transient error", defaultValue = "0")
     private Integer retries;
 
     @ConfigProperty(type = Long.class, description = "The producer will attempt to batch records together into fewer requests whenever multiple records are being sent to the same partition", defaultValue = "16384")
     private Long batchSize;
-    
+
     @ConfigProperty(type = Long.class, defaultValue = "0", description = "The producer groups together any records that arrive in between request transmissions into a single batched request. ")
     private Long lingerMS;
 
     @ConfigProperty(type = Long.class, defaultValue = "60000", description = "How long can send block ")
-    private Long maxBlockMS;    
+    private Long maxBlockMS;
 
     @ConfigProperty(type = Long.class, defaultValue = "1048576", description = "Maximum size of request (bytes)")
     private Long maxRequestSize;
-    
+
     @ConfigProperty(type = Integer.class, defaultValue = "32768", description = "Receive Buffer (bytes)")
-    private Integer receiveBufferBytes;    
+    private Integer receiveBufferBytes;
 
     @ConfigProperty(type = Integer.class, defaultValue = "30000", description = "Request Timeout (ms)")
-    private Integer requestTimeout;    
-    
+    private Integer requestTimeout;
+
     @ConfigProperty(type = String.class, description = "Compression type of data sent", defaultValue = "none")
     private String compression;
-    
+
     @ConfigProperty(type = Long.class, description = "Close Idle Kafka Connections", defaultValue = "540000")
     private Long connectionsMaxIdle;
-    
+
     @ConfigProperty(type = Integer.class, defaultValue = "5", description = "Maximum unacknowledged requests to send before blocking")
-    private Integer maxInflightConnections;  
-    
+    private Integer maxInflightConnections;
+
     @ConfigProperty(type = Long.class, description = "Period of time before a refresh of Metadata (ms)", defaultValue = "300000")
     private Long metadataMaxAge;
-    
+
     @ConfigProperty(type = Long.class, description = "The amount of time to wait before attempting a retry (ms)", defaultValue = "100")
     private Long retryBackoff;
-    
+
     @ConfigProperty(type = Long.class, description = "The amount of time to wait before attempting a reconnection (ms)", defaultValue = "100")
     private Long reconnectBackoff;
-    
+
+    @ConfigProperty(type = String.class, description = "Additional properties to be passed to the KafkaConnection.")
+    private String additionalProperties;
+
     private PrintWriter writer;
 
     public KafkaManagedConnectionFactory() {
         producerProperties = new Properties();
     }
-    
+
     public String getBootstrapServersConfig() {
         return bootstrapServersConfig;
     }
@@ -155,7 +161,7 @@ public class KafkaManagedConnectionFactory implements ManagedConnectionFactory, 
 
     public void setValueSerializer(String valueDeserializer) {
         this.valueSerializer = valueDeserializer;
-        producerProperties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueDeserializer);        
+        producerProperties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueDeserializer);
     }
 
     public String getKeySerializer() {
@@ -164,7 +170,7 @@ public class KafkaManagedConnectionFactory implements ManagedConnectionFactory, 
 
     public void setKeySerializer(String keyDeserializer) {
         this.keySerializer = keyDeserializer;
-        producerProperties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keyDeserializer);        
+        producerProperties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keyDeserializer);
     }
 
     public Long getBufferMemory() {
@@ -306,6 +312,15 @@ public class KafkaManagedConnectionFactory implements ManagedConnectionFactory, 
         producerProperties.setProperty(ProducerConfig.RECONNECT_BACKOFF_MS_CONFIG, Long.toString(reconnectBackoff));
     }
 
+    public String getAdditionalProperties() {
+        return additionalProperties;
+    }
+
+    public void setAdditionalProperties(String additionalProperties) {
+        this.additionalProperties = additionalProperties;
+        this.additionalPropertiesParser = new AdditionalPropertiesParser(additionalProperties);
+    }
+
     public PrintWriter getWriter() {
         return writer;
     }
@@ -313,8 +328,6 @@ public class KafkaManagedConnectionFactory implements ManagedConnectionFactory, 
     public void setWriter(PrintWriter writer) {
         this.writer = writer;
     }
-    
-    
 
     @Override
     public Object createConnectionFactory(ConnectionManager cxManager) throws ResourceException {
@@ -328,7 +341,11 @@ public class KafkaManagedConnectionFactory implements ManagedConnectionFactory, 
 
     @Override
     public ManagedConnection createManagedConnection(Subject subject, ConnectionRequestInfo cxRequestInfo) throws ResourceException {
-        return new KafkaManagedConnection(producerProperties);
+        Properties properties =
+                additionalPropertiesParser == null
+                        ? producerProperties
+                        : AdditionalPropertiesParser.merge(producerProperties,  additionalPropertiesParser.parse());
+        return new KafkaManagedConnection(properties);
     }
 
     @Override
@@ -346,5 +363,4 @@ public class KafkaManagedConnectionFactory implements ManagedConnectionFactory, 
         return writer;
     }
 
- 
 }

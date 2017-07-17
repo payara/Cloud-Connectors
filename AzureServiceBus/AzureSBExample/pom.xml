@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>fish.payara.cloud.connectors</groupId>
-    <artifactId>AzureSBExample</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <groupId>fish.payara.cloud.connectors.azuresb</groupId>
+    <artifactId>azure-sb-example</artifactId>
+    <version>0.2.0-SNAPSHOT</version>
     <packaging>ejb</packaging>
 
     <name>AzureSBExample</name>
@@ -16,9 +16,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>fish.payara.cloud.connectors</groupId>
-            <artifactId>AzureSBJCAAPI</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
+            <groupId>fish.payara.cloud.connectors.azuresb</groupId>
+            <artifactId>azure-sb-jca-api</artifactId>
+            <version>0.2.0-SNAPSHOT</version>
             <type>jar</type>
 
             <scope>provided</scope>

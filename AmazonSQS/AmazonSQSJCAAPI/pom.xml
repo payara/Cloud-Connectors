@@ -3,14 +3,14 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>fish.payara.cloud.connectors</groupId>
-        <artifactId>CloudConnectors</artifactId>
-        <version>0.1.0-SNAPSHOT</version>
+        <artifactId>cloud-connectors</artifactId>
+        <version>0.2.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <groupId>fish.payara.cloud.connectors.amazonsqs</groupId>
-    <artifactId>AmazonSQSJCAAPI</artifactId>
+    <artifactId>amazon-sqs-jca-api</artifactId>
     <packaging>jar</packaging>
-   <name>Amazon SQS JCA Adpater API</name>
+    <name>Amazon SQS JCA Adapter API</name>
     <description>API classes for the Amazon SQS JCA Adapter</description>
     <url>http://www.payara.fish</url>
     <licenses>
@@ -34,7 +34,7 @@
         <tag>master</tag>
     </scm>
     <issueManagement>
-        <system>GITHub</system>
+        <system>GitHub</system>
         <url>https://github.com/payara/Cloud-Connectors/issues</url>
     </issueManagement>
     <dependencies>

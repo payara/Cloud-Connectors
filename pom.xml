@@ -2,8 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>fish.payara.cloud.connectors</groupId>
-    <artifactId>CloudConnectors</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <artifactId>cloud-connectors</artifactId>
+    <version>0.2.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Payara Cloud Connectors</name>
     <description>Project for JCA modules that connect to various cloud services</description>
@@ -29,21 +29,21 @@
         <tag>master</tag>
     </scm>
     <issueManagement>
-        <system>GITHub</system>
+        <system>GitHub</system>
         <url>https://github.com/payara/Cloud-Connectors/issues</url>
     </issueManagement>
     <modules>
+        <module>Kafka/KafkaJCAAPI</module>
         <module>Kafka/KafkaRAR</module>
-        <module>Kafka/KafkaRARPackaging</module>
         <module>Kafka/KafkaExample</module>
         <module>AmazonSQS/AmazonSQSJCAAPI</module>
         <module>AmazonSQS/AmazonSQSRAR</module>
         <module>AmazonSQS/AmazonSQSExample</module>
-        <module>MQTT/MQTT-JCA-API</module>
+        <module>MQTT/MQTTJCAAPI</module>
         <module>MQTT/MQTTRAR</module>
         <module>MQTT/MQTTExample</module>
         <module>AzureServiceBus/AzureSBJCAAPI</module>
-        <module>AzureSBRAR</module>
+        <module>AzureServiceBus/AzureSBRAR</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

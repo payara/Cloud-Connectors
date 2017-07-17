@@ -20,7 +20,7 @@ The example uses a number of environment variables for connecting to your Amazon
 These environment variables must be set before running the example
 
 ```shell
-java -jar payara-micro.jar --deploy AmazonSQSRAR-1.0.0-SNAPSHOT.rar AmazonSQSExample-1.0.0-SNAPSHOT.jar
+java -jar payara-micro.jar --deploy amazon-sqs-rar-0.2.0-SNAPSHOT.rar amazon-sqs-example-0.2.0-SNAPSHOT.jar
 ```
 
 ## Inbound MDB
@@ -41,10 +41,10 @@ Valid properties are below. On Payara all properties can be replaced via System 
 |queueURL | String | None | Must be set to the URL for an SQS queue
 |region | String | None | Must be set to the AWS region name of your queue
 |maxMessages | Integer | 10 | The maximum number of messages to download on a poll
-|initialPollDelay | Integer | 1 | The delay (in seconds) before polling the queue after MDB activation
-|pollInterval | Integer | 3 | How often should the adapter poll for messages (in seconds)
-|messageAttributeNames | String | All | The list of message attribute names that should be fetched with the message
-|attributeNames | String| All | The list of attribute names that should be fetched with the message
+|initialPollDelay | Integer | 1 | The delay (in seconds) before polling the queue after MDB activation (MDB only)
+|pollInterval | Integer | 3 | How often should the adapter poll for messages (in seconds) (MDB Only)
+|messageAttributeNames | String | All | The list of message attribute names that should be fetched with the message (MDB Only)
+|attributeNames | String| All | The list of attribute names that should be fetched with the message (MDB Only)
 
 Your MDB should contain one method annotated with `@OnSQSMessage` and that method should take a single parameter of type `com.amazonaws.services.sqs.model.Message`
 
@@ -82,7 +82,7 @@ An example annotation defined connection factory is shown below;
 @ConnectionFactoryDefinition(name = "java:comp/env/SQSConnectionFactory", 
   description = "SQS Conn Factory", 
   interfaceName = "fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory", 
-  resourceAdapter = "AmazonSQSRAR-1.0.0-SNAPSHOT", 
+  resourceAdapter = "amazon-sqs-rar-0.2.0-SNAPSHOT", 
   minPoolSize = 2, 
   maxPoolSize = 2,
   transactionSupport = TransactionSupportLevel.NoTransaction,
