@@ -37,44 +37,33 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.cloud.connectors.kafka.example;
+package fish.payara.cloud.connectors.kafka.rest.example;
 
-import fish.payara.cloud.connectors.kafka.api.KafkaConnection;
-import fish.payara.cloud.connectors.kafka.api.KafkaConnectionFactory;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.Resource;
-import javax.ejb.Schedule;
-import javax.ejb.Stateless;
-import javax.resource.ConnectionFactoryDefinition;
-import javax.resource.spi.TransactionSupport.TransactionSupportLevel;
-import org.apache.kafka.clients.producer.ProducerRecord;
+import java.util.Set;
+import javax.ws.rs.core.Application;
 
 /**
  *
  * @author Steve Millidge (Payara Foundation)
  */
-@ConnectionFactoryDefinition(name = "java:comp/env/KafkaConnectionFactory", 
-  description = "Kafka Conn Factory", 
-  interfaceName = "fish.payara.cloud.connectors.kafka.KafkaConnectionFactory", 
-  resourceAdapter = "kafka-rar-0.2.0-SNAPSHOT", 
-  minPoolSize = 2, 
-  maxPoolSize = 2,
-  transactionSupport = TransactionSupportLevel.NoTransaction,
-  properties = {})
-@Stateless
-public class SendSQSMessage {
-    
-    @Resource(lookup="java:comp/env/KafkaConnectionFactory")
-    KafkaConnectionFactory factory;
-    
-    @Schedule(second = "*/1", hour="*", minute="*")
-    public void sendMessage() throws Exception {
+@javax.ws.rs.ApplicationPath("/kafka")
+public class ApplicationConfig extends Application {
 
-        try (KafkaConnection conn = factory.createConnection()) {
-            conn.send(new ProducerRecord("test","hello","world"));
-        } catch (Exception ex) {
-            Logger.getLogger(SendSQSMessage.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    @Override
+    public Set<Class<?>> getClasses() {
+        Set<Class<?>> resources = new java.util.HashSet<>();
+        addRestResourceClasses(resources);
+        return resources;
     }
+
+    /**
+     * Do not modify addRestResourceClasses() method.
+     * It is automatically populated with
+     * all resources defined in the project.
+     * If required, comment out calling this method in getClasses().
+     */
+    private void addRestResourceClasses(Set<Class<?>> resources) {
+        resources.add(fish.payara.cloud.connectors.kafka.rest.example.KafkaQueueResource.class);
+    }
+    
 }
