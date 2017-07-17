@@ -72,19 +72,15 @@ public class KafkaManagedConnection implements ManagedConnection, KafkaConnectio
     private final List<ConnectionEventListener> listeners;
     private final HashSet<KafkaConnectionImpl> connectionHandles;
     private PrintWriter writer;
-    private Properties prodProperties;
 
-    KafkaManagedConnection(Properties props) {
+    KafkaManagedConnection(KafkaProducer producer) {
         listeners = new LinkedList<>();
         connectionHandles = new HashSet<>();
-        prodProperties = props;
+        this.producer = producer;
     }
 
     @Override
     public Object getConnection(Subject subject, ConnectionRequestInfo cxRequestInfo) throws ResourceException {
-        if (producer == null) {
-            producer = new KafkaProducer(prodProperties);
-        }
         KafkaConnectionImpl conn = new KafkaConnectionImpl(this);
         connectionHandles.add(conn);
         return conn;
@@ -92,8 +88,6 @@ public class KafkaManagedConnection implements ManagedConnection, KafkaConnectio
 
     @Override
     public void destroy() throws ResourceException {
-        producer.close();
-        producer = null;
     }
 
     @Override
