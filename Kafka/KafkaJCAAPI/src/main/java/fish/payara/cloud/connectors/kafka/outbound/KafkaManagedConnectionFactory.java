@@ -55,6 +55,7 @@ import javax.resource.spi.ManagedConnectionFactory;
 import javax.security.auth.Subject;
 
 import fish.payara.cloud.connectors.kafka.tools.AdditionalPropertiesParser;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 
 /**
@@ -131,7 +132,10 @@ public class KafkaManagedConnectionFactory implements ManagedConnectionFactory, 
     @ConfigProperty(type = String.class, description = "Additional properties to be passed to the KafkaConnection.")
     private String additionalProperties;
 
-    private PrintWriter writer;
+    transient private PrintWriter writer;
+    
+    transient private KafkaProducer producer;
+
 
     public KafkaManagedConnectionFactory() {
         producerProperties = new Properties();
@@ -331,11 +335,25 @@ public class KafkaManagedConnectionFactory implements ManagedConnectionFactory, 
 
     @Override
     public Object createConnectionFactory(ConnectionManager cxManager) throws ResourceException {
+        Properties properties =
+                additionalPropertiesParser == null
+                        ? producerProperties
+                        : AdditionalPropertiesParser.merge(producerProperties,  additionalPropertiesParser.parse());
+        if (producer == null) {
+            producer = new KafkaProducer(properties);
+        }
         return new KafkaConnectionFactoryImpl(this,cxManager);
     }
 
     @Override
     public Object createConnectionFactory() throws ResourceException {
+        Properties properties =
+                additionalPropertiesParser == null
+                        ? producerProperties
+                        : AdditionalPropertiesParser.merge(producerProperties,  additionalPropertiesParser.parse());
+        if (producer == null) {
+            producer = new KafkaProducer(properties);
+        }
         return new KafkaConnectionFactoryImpl(this, null);
     }
 
@@ -345,7 +363,7 @@ public class KafkaManagedConnectionFactory implements ManagedConnectionFactory, 
                 additionalPropertiesParser == null
                         ? producerProperties
                         : AdditionalPropertiesParser.merge(producerProperties,  additionalPropertiesParser.parse());
-        return new KafkaManagedConnection(properties);
+        return new KafkaManagedConnection(producer);
     }
 
     @Override
