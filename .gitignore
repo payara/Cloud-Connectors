@@ -25,3 +25,4 @@ hs_err_pid*
 /AzureServiceBus/AzureSBExample/target/
 /AzureServiceBus/AzureSBRAR/target/
 /Kafka/kafka-rest-example/target/
+target/
