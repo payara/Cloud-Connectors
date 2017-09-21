@@ -74,28 +74,33 @@ class SQSPoller extends TimerTask {
 
     @Override
     public void run() {
-        ReceiveMessageRequest rmr = new ReceiveMessageRequest(spec.getQueueURL());
-        rmr.setMaxNumberOfMessages(spec.getMaxMessages());
-        rmr.setVisibilityTimeout(spec.getVisibilityTimeout());
-        rmr.setWaitTimeSeconds(spec.getPollInterval()-1);
-        rmr.setAttributeNames(Arrays.asList(spec.getAttributeNames().split(",")));
-        rmr.setMessageAttributeNames(Arrays.asList(spec.getMessageAttributeNames().split(",")));
-        ReceiveMessageResult rmResult = client.receiveMessage(rmr);
-        if (!rmResult.getMessages().isEmpty()) {
-            
-            Class<?> mdbClass = factory.getEndpointClass();
-            for (Message message : rmResult.getMessages()) {
-                for (Method m : mdbClass.getMethods()) {
-                    if (m.isAnnotationPresent(OnSQSMessage.class) && m.getParameterCount() == 1 && m.getParameterTypes()[0].equals(Message.class)) {
-                        try {
-                            ctx.getWorkManager().scheduleWork(new SQSWork(client, factory, m, message,spec.getQueueURL()));
-                        } catch (WorkException ex) {
-                            Logger.getLogger(AmazonSQSResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
+        try {
+            ReceiveMessageRequest rmr = new ReceiveMessageRequest(spec.getQueueURL());
+            rmr.setMaxNumberOfMessages(spec.getMaxMessages());
+            rmr.setVisibilityTimeout(spec.getVisibilityTimeout());
+            rmr.setWaitTimeSeconds(spec.getPollInterval()-1);
+            rmr.setAttributeNames(Arrays.asList(spec.getAttributeNames().split(",")));
+            rmr.setMessageAttributeNames(Arrays.asList(spec.getMessageAttributeNames().split(",")));
+            ReceiveMessageResult rmResult = client.receiveMessage(rmr);
+            if (!rmResult.getMessages().isEmpty()) {
+
+                Class<?> mdbClass = factory.getEndpointClass();
+                for (Message message : rmResult.getMessages()) {
+                    for (Method m : mdbClass.getMethods()) {
+                        if (m.isAnnotationPresent(OnSQSMessage.class) && m.getParameterCount() == 1 && m.getParameterTypes()[0].equals(Message.class)) {
+                            try {
+                                ctx.getWorkManager().scheduleWork(new SQSWork(client, factory, m, message,spec.getQueueURL()));
+                            } catch (WorkException ex) {
+                                Logger.getLogger(AmazonSQSResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                         }
                     }
+
                 }
-                
             }
+        } catch (IllegalStateException ise) {
+            // Fix #29 ensure Illegal State Exception doesn't blow up the timer
+            Logger.getLogger(AmazonSQSResourceAdapter.class.getName()).log(Level.WARNING, "Poller caught an Illegal State Exception", ise);
         }
     }
 
