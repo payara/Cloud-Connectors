@@ -44,6 +44,7 @@
         <module>MQTT/MQTTExample</module>
         <module>MQTT/MQTTSendExample</module>
         <module>MQTT/MQTTReceiveExample</module>
+        <module>MQTT/MQTTSendJAXRS</module>
         <module>AzureServiceBus/AzureSBJCAAPI</module>
         <module>AzureServiceBus/AzureSBRAR</module>
     </modules>

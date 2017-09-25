@@ -44,7 +44,6 @@ import fish.payara.cloud.connectors.mqtt.api.MQTTConnectionFactory;
 import java.util.Date;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
-import javax.ejb.Schedule;
 import javax.ejb.Stateless;
 import javax.resource.ConnectionFactoryDefinition;
 import javax.resource.spi.TransactionSupport;
