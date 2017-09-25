@@ -39,25 +39,38 @@
  */
 package fish.payara.cloud.connectors.mqtt.example;
 
-import fish.payara.cloud.connectors.mqtt.api.MQTTListener;
-import fish.payara.cloud.connectors.mqtt.api.OnMQTTMessage;
+import fish.payara.cloud.connectors.mqtt.api.MQTTConnection;
+import fish.payara.cloud.connectors.mqtt.api.MQTTConnectionFactory;
+import java.util.Date;
 import java.util.logging.Logger;
-import javax.ejb.ActivationConfigProperty;
-import javax.ejb.MessageDriven;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
+import javax.annotation.Resource;
+import javax.ejb.Schedule;
+import javax.ejb.Stateless;
+import javax.resource.ConnectionFactoryDefinition;
+import javax.resource.spi.TransactionSupport;
 
-/**
- *
- * @author Steve Millidge (Payara Foundation)
- */
-@MessageDriven(activationConfig = {
-    @ActivationConfigProperty(propertyName = "topicFilter", propertyValue = "test")    
-})
-public class MQTTReceiveMessage implements MQTTListener {
+@ConnectionFactoryDefinition(name = "java:comp/env/MQTTConnectionFactory", 
+  description = "MQTT Conn Factory", 
+  interfaceName = "fish.payara.cloud.connectors.mqtt.api.MQTTConnectionFactory", 
+  resourceAdapter = "mqtt-rar-0.2.0-SNAPSHOT", 
+  minPoolSize = 2, 
+  maxPoolSize = 10,
+  transactionSupport = TransactionSupport.TransactionSupportLevel.NoTransaction,
+  properties = {"cleanSession=true"})
+@Stateless
+public class MQTTSendMessage {
 
-    @OnMQTTMessage
-    public void messageArrived(String topic, MqttMessage message) {
-        Logger.getAnonymousLogger().info("Received message on topic " + topic + " " + new String(message.getPayload()));
+    @Resource(lookup="java:comp/env/MQTTConnectionFactory")
+    MQTTConnectionFactory factory;
+ 
+    public void sendMessage(String messageToSend) {
+        try (MQTTConnection conn = factory.getConnection()) {
+            Logger.getAnonymousLogger().info("Sending Message at " + new Date());
+            conn.publish("test", messageToSend.getBytes(), 0, false);
+        } catch (Exception e) {
+            
+        }
     }
-    
+
 }
+
