@@ -19,7 +19,7 @@ import javax.resource.spi.TransactionSupport;
 @ConnectionFactoryDefinition(name = "java:comp/env/MQTTConnectionFactory", 
   description = "MQTT Conn Factory", 
   interfaceName = "fish.payara.cloud.connectors.mqtt.api.MQTTConnectionFactory", 
-  resourceAdapter = "mqtt-rar-0.2.0", 
+  resourceAdapter = "mqtt-rar-0.3.0-SNAPSHOT", 
   minPoolSize = 2, 
   maxPoolSize = 2,
   transactionSupport = TransactionSupport.TransactionSupportLevel.NoTransaction,
