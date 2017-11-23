@@ -56,7 +56,7 @@ import javax.resource.spi.TransactionSupport.TransactionSupportLevel;
 @ConnectionFactoryDefinition(name = "java:comp/env/AzureSBConnectionFactory",
         description = "Azure SB Conn Factory",
         interfaceName = "fish.payara.cloud.connectors.azuresb.api.AzureSBConnectionFactory",
-        resourceAdapter = "azure-sb-rar-0.2.0",
+        resourceAdapter = "azure-sb-rar-0.3.0-SNAPSHOT",
         minPoolSize = 2, maxPoolSize = 2,
         transactionSupport = TransactionSupportLevel.NoTransaction,
         properties = {"nameSpace=payara",
