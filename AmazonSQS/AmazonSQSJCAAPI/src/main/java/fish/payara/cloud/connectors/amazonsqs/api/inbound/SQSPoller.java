@@ -101,6 +101,8 @@ class SQSPoller extends TimerTask {
         } catch (IllegalStateException ise) {
             // Fix #29 ensure Illegal State Exception doesn't blow up the timer
             Logger.getLogger(AmazonSQSResourceAdapter.class.getName()).log(Level.WARNING, "Poller caught an Illegal State Exception", ise);
+        } catch(Exception e) {
+            Logger.getLogger(AmazonSQSResourceAdapter.class.getName()).log(Level.WARNING, "Poller caught an Unexpected Exception", e);            
         }
     }
 
