@@ -55,7 +55,7 @@ import java.util.Map;
     @ActivationConfigProperty(propertyName = "awsAccessKeyId", propertyValue = "${ENV=accessKey}"),
     @ActivationConfigProperty(propertyName = "awsSecretKey", propertyValue = "${ENV=secretKey}"),
     @ActivationConfigProperty(propertyName = "queueURL", propertyValue = "${ENV=queueURL}"),   
-    @ActivationConfigProperty(propertyName = "pollInterval", propertyValue = "3"),    
+    @ActivationConfigProperty(propertyName = "pollInterval", propertyValue = "1000"),    
     @ActivationConfigProperty(propertyName = "region", propertyValue = "eu-west-2")    
 })
 public class ReceiveSQSMessage implements AmazonSQSListener {

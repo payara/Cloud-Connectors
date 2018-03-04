@@ -76,9 +76,4 @@ public class NewTimerSessionBean {
         connection.sendMessage(new SendMessageRequest("https://sqs.eu-west-2.amazonaws.com/282006333273/CloudConnectorTest", "Hello World"));
         } catch (Exception e) {}
     }
-    
-    @Schedule(second = "*/1", hour="*", minute="*")   
-    public void myTimer2() {
-        System.out.println("Second test method");
-    }
 }
