@@ -59,7 +59,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
  */
 class KafkaPoller extends TimerTask {
 
-    private KafkaConsumer consumer;
+    private KafkaConsumer<Object, Object> consumer;
     KafkaActivationSpec kSpec;
     BootstrapContext context;
     private MessageEndpointFactory endpointFactory;
@@ -68,7 +68,7 @@ class KafkaPoller extends TimerTask {
         this.kSpec = kSpec;
         this.context = context;
         this.endpointFactory = endpointFactory;
-        consumer = new KafkaConsumer(kSpec.getConsumerProperties());
+        consumer = new KafkaConsumer<Object, Object>(kSpec.getConsumerProperties());
         consumer.subscribe(Arrays.asList(kSpec.getTopics().split(",")));
     }
 

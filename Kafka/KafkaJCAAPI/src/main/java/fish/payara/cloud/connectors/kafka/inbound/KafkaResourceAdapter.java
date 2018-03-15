@@ -66,7 +66,8 @@ import javax.transaction.xa.XAResource;
 )
 public class KafkaResourceAdapter implements ResourceAdapter, Serializable{
     
-    private static final Logger LOGGER = Logger.getLogger(KafkaResourceAdapter.class.getName());
+	private static final long serialVersionUID = -4463229712071957619L;
+	private static final Logger LOGGER = Logger.getLogger(KafkaResourceAdapter.class.getName());
     private BootstrapContext context;
     private final Map<MessageEndpointFactory, KafkaPoller> registeredFactories;
     private Timer poller;
@@ -87,7 +88,7 @@ public class KafkaResourceAdapter implements ResourceAdapter, Serializable{
         }
     }
 
-    @Override
+	@Override
     public void stop() {
         LOGGER.info("Kafka Resource Adapter Stopped");
         // go through all the registered factories and stop 
@@ -121,4 +122,39 @@ public class KafkaResourceAdapter implements ResourceAdapter, Serializable{
         return null;
     }
     
+    /* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((context == null) ? 0 : context.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof KafkaResourceAdapter)) {
+			return false;
+		}
+		KafkaResourceAdapter other = (KafkaResourceAdapter) obj;
+		if (context == null) {
+			if (other.context != null) {
+				return false;
+			}
+		} else if (!context.equals(other.context)) {
+			return false;
+		}
+		return true;
+	}
 }

@@ -72,13 +72,13 @@ class KafkaConnectionImpl implements KafkaConnection {
     }
 
     @Override
-    public Future<RecordMetadata> send(ProducerRecord record) throws ResourceException {
+    public Future<RecordMetadata> send(ProducerRecord<?, ?> record) throws ResourceException {
         checkValidity();
         return realConn.send(record);
     }
 
     @Override
-    public Future<RecordMetadata> send(ProducerRecord record, Callback callback) throws ResourceException {
+    public Future<RecordMetadata> send(ProducerRecord<?, ?> record, Callback callback) throws ResourceException {
         checkValidity();
         return realConn.send(record, callback);
     }

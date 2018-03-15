@@ -39,13 +39,12 @@
  */
 package fish.payara.cloud.connectors.kafka.outbound;
 
-import fish.payara.cloud.connectors.kafka.api.KafkaConnection;
 import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.Future;
+
 import javax.resource.NotSupportedException;
 import javax.resource.ResourceException;
 import javax.resource.spi.ConnectionEvent;
@@ -56,11 +55,14 @@ import javax.resource.spi.ManagedConnection;
 import javax.resource.spi.ManagedConnectionMetaData;
 import javax.security.auth.Subject;
 import javax.transaction.xa.XAResource;
+
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.PartitionInfo;
+
+import fish.payara.cloud.connectors.kafka.api.KafkaConnection;
 
 /**
  *
@@ -68,12 +70,12 @@ import org.apache.kafka.common.PartitionInfo;
  */
 public class KafkaManagedConnection implements ManagedConnection, KafkaConnection {
     
-    private KafkaProducer producer;
+    private KafkaProducer<?, ?> producer;
     private final List<ConnectionEventListener> listeners;
     private final HashSet<KafkaConnectionImpl> connectionHandles;
     private PrintWriter writer;
 
-    KafkaManagedConnection(KafkaProducer producer) {
+    KafkaManagedConnection(KafkaProducer<?, ?> producer) {
         listeners = new LinkedList<>();
         connectionHandles = new HashSet<>();
         this.producer = producer;
@@ -142,14 +144,16 @@ public class KafkaManagedConnection implements ManagedConnection, KafkaConnectio
         return writer;
     }
 
-    @Override
-    public Future<RecordMetadata> send(ProducerRecord record) {
-        return producer.send(record);
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+    public Future<RecordMetadata> send(ProducerRecord<?, ?> record) {
+        return producer.send((ProducerRecord)record);
     }
 
-    @Override
-    public Future<RecordMetadata> send(ProducerRecord record, Callback callback) {
-        return producer.send(record,callback);
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+    public Future<RecordMetadata> send(ProducerRecord<?, ?> record, Callback callback) {
+        return producer.send((ProducerRecord)record,callback);
     }
 
     @Override

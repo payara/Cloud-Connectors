@@ -59,16 +59,16 @@ public class KafkaWork implements Work {
     private MessageEndpoint endpoint;
     private final MessageEndpointFactory factory;
     private final Method m;
-    private ConsumerRecord record;
-    private ConsumerRecords records;
+    private ConsumerRecord<?, ?> record;
+    private ConsumerRecords<?, ?> records;
 
-    public KafkaWork(MessageEndpointFactory factory, Method m, ConsumerRecord record) {
+    public KafkaWork(MessageEndpointFactory factory, Method m, ConsumerRecord<?, ?> record) {
         this.factory = factory;
         this.m = m;
         this.record = record;
     }
     
-    public KafkaWork(MessageEndpointFactory factory, Method m, ConsumerRecords records) {
+    public KafkaWork(MessageEndpointFactory factory, Method m, ConsumerRecords<?, ?> records) {
         this.factory = factory;
         this.m = m;
         this.records = records;

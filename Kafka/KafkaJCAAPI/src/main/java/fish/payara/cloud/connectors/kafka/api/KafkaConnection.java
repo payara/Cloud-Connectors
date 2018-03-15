@@ -53,9 +53,9 @@ import org.apache.kafka.common.PartitionInfo;
  */
 public interface KafkaConnection extends AutoCloseable {
     
-    public Future<RecordMetadata> send(ProducerRecord record) throws ResourceException;
+    public Future<RecordMetadata> send(ProducerRecord<?, ?> record) throws ResourceException;
     
-    public Future<RecordMetadata> send(ProducerRecord record, Callback callback) throws ResourceException;
+    public Future<RecordMetadata> send(ProducerRecord<?, ?> record, Callback callback) throws ResourceException;
     
     public void flush() throws ResourceException;
     

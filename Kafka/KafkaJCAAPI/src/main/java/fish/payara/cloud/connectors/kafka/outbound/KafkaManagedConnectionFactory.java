@@ -69,7 +69,9 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 )
 public class KafkaManagedConnectionFactory implements ManagedConnectionFactory, Serializable {
 
-    private final Properties producerProperties;
+
+	private static final long serialVersionUID = 6526129596378966626L;
+	private final Properties producerProperties;
     private AdditionalPropertiesParser additionalPropertiesParser;
 
     @ConfigProperty(defaultValue = "localhost:9092", description = "Kafka Servers to Connect to", type = String.class)
@@ -134,7 +136,7 @@ public class KafkaManagedConnectionFactory implements ManagedConnectionFactory, 
 
     transient private PrintWriter writer;
     
-    transient private KafkaProducer producer;
+    transient private KafkaProducer<?, ?> producer;
 
 
     public KafkaManagedConnectionFactory() {
@@ -340,7 +342,7 @@ public class KafkaManagedConnectionFactory implements ManagedConnectionFactory, 
                         ? producerProperties
                         : AdditionalPropertiesParser.merge(producerProperties,  additionalPropertiesParser.parse());
         if (producer == null) {
-            producer = new KafkaProducer(properties);
+            producer = new KafkaProducer<Object, Object>(properties);
         }
         return new KafkaConnectionFactoryImpl(this,cxManager);
     }
@@ -352,14 +354,15 @@ public class KafkaManagedConnectionFactory implements ManagedConnectionFactory, 
                         ? producerProperties
                         : AdditionalPropertiesParser.merge(producerProperties,  additionalPropertiesParser.parse());
         if (producer == null) {
-            producer = new KafkaProducer(properties);
+            producer = new KafkaProducer<Object, Object>(properties);
         }
         return new KafkaConnectionFactoryImpl(this, null);
     }
 
     @Override
     public ManagedConnection createManagedConnection(Subject subject, ConnectionRequestInfo cxRequestInfo) throws ResourceException {
-        Properties properties =
+        @SuppressWarnings("unused")
+		Properties properties =
                 additionalPropertiesParser == null
                         ? producerProperties
                         : AdditionalPropertiesParser.merge(producerProperties,  additionalPropertiesParser.parse());
@@ -367,7 +370,7 @@ public class KafkaManagedConnectionFactory implements ManagedConnectionFactory, 
     }
 
     @Override
-    public ManagedConnection matchManagedConnections(Set connectionSet, Subject subject, ConnectionRequestInfo cxRequestInfo) throws ResourceException {
+    public ManagedConnection matchManagedConnections(@SuppressWarnings("rawtypes") Set connectionSet, Subject subject, ConnectionRequestInfo cxRequestInfo) throws ResourceException {
         return (ManagedConnection) connectionSet.toArray()[0];
     }
 
@@ -381,4 +384,207 @@ public class KafkaManagedConnectionFactory implements ManagedConnectionFactory, 
         return writer;
     }
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((acks == null) ? 0 : acks.hashCode());
+		result = prime * result + ((additionalProperties == null) ? 0 : additionalProperties.hashCode());
+		result = prime * result + ((additionalPropertiesParser == null) ? 0 : additionalPropertiesParser.hashCode());
+		result = prime * result + ((batchSize == null) ? 0 : batchSize.hashCode());
+		result = prime * result + ((bootstrapServersConfig == null) ? 0 : bootstrapServersConfig.hashCode());
+		result = prime * result + ((bufferMemory == null) ? 0 : bufferMemory.hashCode());
+		result = prime * result + ((clientId == null) ? 0 : clientId.hashCode());
+		result = prime * result + ((compression == null) ? 0 : compression.hashCode());
+		result = prime * result + ((connectionsMaxIdle == null) ? 0 : connectionsMaxIdle.hashCode());
+		result = prime * result + ((keySerializer == null) ? 0 : keySerializer.hashCode());
+		result = prime * result + ((lingerMS == null) ? 0 : lingerMS.hashCode());
+		result = prime * result + ((maxBlockMS == null) ? 0 : maxBlockMS.hashCode());
+		result = prime * result + ((maxInflightConnections == null) ? 0 : maxInflightConnections.hashCode());
+		result = prime * result + ((maxRequestSize == null) ? 0 : maxRequestSize.hashCode());
+		result = prime * result + ((metadataMaxAge == null) ? 0 : metadataMaxAge.hashCode());
+		result = prime * result + ((producerProperties == null) ? 0 : producerProperties.hashCode());
+		result = prime * result + ((receiveBufferBytes == null) ? 0 : receiveBufferBytes.hashCode());
+		result = prime * result + ((reconnectBackoff == null) ? 0 : reconnectBackoff.hashCode());
+		result = prime * result + ((requestTimeout == null) ? 0 : requestTimeout.hashCode());
+		result = prime * result + ((retries == null) ? 0 : retries.hashCode());
+		result = prime * result + ((retryBackoff == null) ? 0 : retryBackoff.hashCode());
+		result = prime * result + ((valueSerializer == null) ? 0 : valueSerializer.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof KafkaManagedConnectionFactory)) {
+			return false;
+		}
+		KafkaManagedConnectionFactory other = (KafkaManagedConnectionFactory) obj;
+		if (acks == null) {
+			if (other.acks != null) {
+				return false;
+			}
+		} else if (!acks.equals(other.acks)) {
+			return false;
+		}
+		if (additionalProperties == null) {
+			if (other.additionalProperties != null) {
+				return false;
+			}
+		} else if (!additionalProperties.equals(other.additionalProperties)) {
+			return false;
+		}
+		if (additionalPropertiesParser == null) {
+			if (other.additionalPropertiesParser != null) {
+				return false;
+			}
+		} else if (!additionalPropertiesParser.equals(other.additionalPropertiesParser)) {
+			return false;
+		}
+		if (batchSize == null) {
+			if (other.batchSize != null) {
+				return false;
+			}
+		} else if (!batchSize.equals(other.batchSize)) {
+			return false;
+		}
+		if (bootstrapServersConfig == null) {
+			if (other.bootstrapServersConfig != null) {
+				return false;
+			}
+		} else if (!bootstrapServersConfig.equals(other.bootstrapServersConfig)) {
+			return false;
+		}
+		if (bufferMemory == null) {
+			if (other.bufferMemory != null) {
+				return false;
+			}
+		} else if (!bufferMemory.equals(other.bufferMemory)) {
+			return false;
+		}
+		if (clientId == null) {
+			if (other.clientId != null) {
+				return false;
+			}
+		} else if (!clientId.equals(other.clientId)) {
+			return false;
+		}
+		if (compression == null) {
+			if (other.compression != null) {
+				return false;
+			}
+		} else if (!compression.equals(other.compression)) {
+			return false;
+		}
+		if (connectionsMaxIdle == null) {
+			if (other.connectionsMaxIdle != null) {
+				return false;
+			}
+		} else if (!connectionsMaxIdle.equals(other.connectionsMaxIdle)) {
+			return false;
+		}
+		if (keySerializer == null) {
+			if (other.keySerializer != null) {
+				return false;
+			}
+		} else if (!keySerializer.equals(other.keySerializer)) {
+			return false;
+		}
+		if (lingerMS == null) {
+			if (other.lingerMS != null) {
+				return false;
+			}
+		} else if (!lingerMS.equals(other.lingerMS)) {
+			return false;
+		}
+		if (maxBlockMS == null) {
+			if (other.maxBlockMS != null) {
+				return false;
+			}
+		} else if (!maxBlockMS.equals(other.maxBlockMS)) {
+			return false;
+		}
+		if (maxInflightConnections == null) {
+			if (other.maxInflightConnections != null) {
+				return false;
+			}
+		} else if (!maxInflightConnections.equals(other.maxInflightConnections)) {
+			return false;
+		}
+		if (maxRequestSize == null) {
+			if (other.maxRequestSize != null) {
+				return false;
+			}
+		} else if (!maxRequestSize.equals(other.maxRequestSize)) {
+			return false;
+		}
+		if (metadataMaxAge == null) {
+			if (other.metadataMaxAge != null) {
+				return false;
+			}
+		} else if (!metadataMaxAge.equals(other.metadataMaxAge)) {
+			return false;
+		}
+		if (producerProperties == null) {
+			if (other.producerProperties != null) {
+				return false;
+			}
+		} else if (!producerProperties.equals(other.producerProperties)) {
+			return false;
+		}
+		if (receiveBufferBytes == null) {
+			if (other.receiveBufferBytes != null) {
+				return false;
+			}
+		} else if (!receiveBufferBytes.equals(other.receiveBufferBytes)) {
+			return false;
+		}
+		if (reconnectBackoff == null) {
+			if (other.reconnectBackoff != null) {
+				return false;
+			}
+		} else if (!reconnectBackoff.equals(other.reconnectBackoff)) {
+			return false;
+		}
+		if (requestTimeout == null) {
+			if (other.requestTimeout != null) {
+				return false;
+			}
+		} else if (!requestTimeout.equals(other.requestTimeout)) {
+			return false;
+		}
+		if (retries == null) {
+			if (other.retries != null) {
+				return false;
+			}
+		} else if (!retries.equals(other.retries)) {
+			return false;
+		}
+		if (retryBackoff == null) {
+			if (other.retryBackoff != null) {
+				return false;
+			}
+		} else if (!retryBackoff.equals(other.retryBackoff)) {
+			return false;
+		}
+		if (valueSerializer == null) {
+			if (other.valueSerializer != null) {
+				return false;
+			}
+		} else if (!valueSerializer.equals(other.valueSerializer)) {
+			return false;
+		}
+		return true;
+	}
 }

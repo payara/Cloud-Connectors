@@ -57,7 +57,8 @@ import javax.resource.spi.ManagedConnectionFactory;
  */
 class KafkaConnectionFactoryImpl implements KafkaConnectionFactory, Serializable, Referenceable {
     
-    private KafkaManagedConnectionFactory cf;
+	private static final long serialVersionUID = -6496069074616504433L;
+	private KafkaManagedConnectionFactory cf;
     private ConnectionManager cm;
     private Reference reference;
     private String name;
@@ -106,11 +107,72 @@ class KafkaConnectionFactoryImpl implements KafkaConnectionFactory, Serializable
 
     private class DummyConnectionManager implements ConnectionManager {
 
-        @Override
+		private static final long serialVersionUID = -6822941508391412101L;
+
+		@Override
         public Object allocateConnection(ManagedConnectionFactory mcf, ConnectionRequestInfo cxRequestInfo) throws ResourceException {
             return mcf.createManagedConnection(null, cxRequestInfo);
         }
         
     }
     
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((cf == null) ? 0 : cf.hashCode());
+		result = prime * result + ((cm == null) ? 0 : cm.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((reference == null) ? 0 : reference.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof KafkaConnectionFactoryImpl)) {
+			return false;
+		}
+		KafkaConnectionFactoryImpl other = (KafkaConnectionFactoryImpl) obj;
+		if (cf == null) {
+			if (other.cf != null) {
+				return false;
+			}
+		} else if (!cf.equals(other.cf)) {
+			return false;
+		}
+		if (cm == null) {
+			if (other.cm != null) {
+				return false;
+			}
+		} else if (!cm.equals(other.cm)) {
+			return false;
+		}
+		if (name == null) {
+			if (other.name != null) {
+				return false;
+			}
+		} else if (!name.equals(other.name)) {
+			return false;
+		}
+		if (reference == null) {
+			if (other.reference != null) {
+				return false;
+			}
+		} else if (!reference.equals(other.reference)) {
+			return false;
+		}
+		return true;
+	}
 }
