@@ -112,5 +112,14 @@ public class MQTTResourceAdapter implements ResourceAdapter {
     public XAResource[] getXAResources(ActivationSpec[] specs) throws ResourceException {
         return null;
     }
-    
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

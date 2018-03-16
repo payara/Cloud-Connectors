@@ -141,7 +141,15 @@ public class AzureSBManagedConnectionFactory implements ManagedConnectionFactory
     public void setServiceBusRootUri(String serviceBusRootUri) {
         this.serviceBusRootUri = serviceBusRootUri;
     }
-    
-    
-    
+
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

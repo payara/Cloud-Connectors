@@ -43,6 +43,7 @@ import fish.payara.cloud.connectors.kafka.api.KafkaConnectionFactory;
 import fish.payara.cloud.connectors.kafka.api.KafkaConnection;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import javax.resource.ResourceException;
@@ -381,4 +382,13 @@ public class KafkaManagedConnectionFactory implements ManagedConnectionFactory, 
         return writer;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }
