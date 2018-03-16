@@ -26,3 +26,7 @@ hs_err_pid*
 /AzureServiceBus/AzureSBRAR/target/
 /Kafka/kafka-rest-example/target/
 target/
+
+#IntelliJ IDEA
+*.iml
+.idea/

@@ -41,6 +41,7 @@ package fish.payara.cloud.connectors.kafka.inbound;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -121,4 +122,13 @@ public class KafkaResourceAdapter implements ResourceAdapter, Serializable{
         return null;
     }
     
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }
