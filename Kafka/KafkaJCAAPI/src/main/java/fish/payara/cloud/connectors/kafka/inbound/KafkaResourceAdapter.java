@@ -41,6 +41,7 @@ package fish.payara.cloud.connectors.kafka.inbound;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -120,5 +121,20 @@ public class KafkaResourceAdapter implements ResourceAdapter, Serializable{
     public XAResource[] getXAResources(ActivationSpec[] specs) throws ResourceException {
         return null;
     }
-    
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        KafkaResourceAdapter that = (KafkaResourceAdapter) o;
+        return Objects.equals(context, that.context) &&
+                Objects.equals(registeredFactories, that.registeredFactories) &&
+                Objects.equals(poller, that.poller);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(context, registeredFactories, poller);
+    }
 }
