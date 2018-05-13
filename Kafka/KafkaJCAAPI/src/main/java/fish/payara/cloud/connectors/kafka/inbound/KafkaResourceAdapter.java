@@ -124,17 +124,11 @@ public class KafkaResourceAdapter implements ResourceAdapter, Serializable{
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        KafkaResourceAdapter that = (KafkaResourceAdapter) o;
-        return Objects.equals(context, that.context) &&
-                Objects.equals(registeredFactories, that.registeredFactories) &&
-                Objects.equals(poller, that.poller);
+       return super.equals(o);
     }
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(context, registeredFactories, poller);
+        return super.hashCode();
     }
 }
