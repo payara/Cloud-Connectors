@@ -41,6 +41,7 @@ package fish.payara.cloud.connectors.kafka.inbound;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.resource.ResourceException;
@@ -57,6 +58,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 public class KafkaWork implements Work {
 
     private MessageEndpoint endpoint;
+    private final ReentrantLock releaseEndpointLock = new ReentrantLock();
     private final MessageEndpointFactory factory;
     private final Method m;
     private ConsumerRecord record;
@@ -76,7 +78,20 @@ public class KafkaWork implements Work {
     
     @Override
     public void release() {
-        endpoint.release();
+        releaseEndpoint();
+    }
+
+    private void releaseEndpoint() {
+        releaseEndpointLock.lock();
+        try {
+            if (endpoint != null) {
+                endpoint.release();
+                endpoint = null;
+            }
+        }
+        finally {
+            releaseEndpointLock.unlock();
+        }
     }
 
     @Override
@@ -93,9 +108,7 @@ public class KafkaWork implements Work {
         } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ResourceException ex) {
             Logger.getLogger(KafkaResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
-            if (endpoint != null) {
-                endpoint.release();                
-            }
+            releaseEndpoint();
         }
     }
 
