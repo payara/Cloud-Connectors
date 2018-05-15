@@ -120,5 +120,14 @@ public class KafkaResourceAdapter implements ResourceAdapter, Serializable{
     public XAResource[] getXAResources(ActivationSpec[] specs) throws ResourceException {
         return null;
     }
-    
+
+    @Override
+    public boolean equals(Object o) {
+       return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }
