@@ -48,9 +48,6 @@ import javax.resource.spi.Activation;
 import javax.resource.spi.ActivationSpec;
 import javax.resource.spi.InvalidPropertyException;
 import javax.resource.spi.ResourceAdapter;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Properties;
 
 /**
@@ -59,37 +56,11 @@ import java.util.Properties;
 @Activation(messageListeners = KafkaListener.class)
 public class KafkaActivationSpec implements ActivationSpec {
 
-    private static final String[] PROPERTIES = {
-            "autoCommitInterval",
-            "bootstrapServersConfig",
-            "clientId",
-            "enableAutoCommit",
-            "groupIdConfig",
-            "valueDeserializer",
-            "keyDeserializer",
-            "topics",
-            "pollInterval",
-            "initialPollDelay",
-            "fetchMinBytes",
-            "fetchMaxBytes",
-            "heartbeatInterval",
-            "maxPartitionFetchBytes",
-            "sessionTimeout",
-            "autoOffsetReset",
-            "connectionsMaxIdle",
-            "receiveBuffer",
-            "requestTimeout",
-            "checkCRCs",
-            "fetchMaxWait",
-            "metadataMaxAge",
-            "reconnectBackoff",
-            "retryBackoff",
-            "additionalProperties"
-    };
-
     private final Properties consumerProperties;
     private AdditionalPropertiesParser additionalPropertiesParser;
+
     private ResourceAdapter ra;
+
     private Long autoCommitInterval;
     private String bootstrapServersConfig;
     private String clientId;
@@ -115,47 +86,9 @@ public class KafkaActivationSpec implements ActivationSpec {
     private Long reconnectBackoff;
     private Long retryBackoff;
     private String additionalProperties;
-    private String systemPropertyPrefix;
 
     public KafkaActivationSpec() {
         consumerProperties = new Properties();
-    }
-
-    public String getSystemPropertyPrefix() {
-        return systemPropertyPrefix;
-    }
-
-    public void setSystemPropertyPrefix(String systemPropertyPrefix) {
-        this.systemPropertyPrefix = systemPropertyPrefix;
-        try {
-            for (String name : PROPERTIES) {
-                String value = System.getProperty(systemPropertyPrefix + "." + name);
-
-                if (value != null) {
-                    final Field field = KafkaActivationSpec.class.getDeclaredField(name);
-                    final Method setter = KafkaActivationSpec.class.getMethod(
-                            "set" + name.substring(0, 1).toUpperCase() + name.substring(1),
-                            field.getType());
-
-                    setter.invoke(this, objectToType(value, field.getType()));
-                }
-            }
-        } catch (NoSuchFieldException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            throw new IllegalArgumentException("Failed parsing system properties: ", e);
-        }
-    }
-
-    private Object objectToType(String value, Class<?> type) {
-        if (Long.class.equals(type))
-            return Long.getLong(value);
-
-        if (Integer.class.equals(type))
-            return Integer.getInteger(value);
-
-        if (Boolean.class.equals(type))
-            return Boolean.getBoolean(value);
-
-        return value;
     }
 
     @Override
@@ -256,8 +189,8 @@ public class KafkaActivationSpec implements ActivationSpec {
 
     public Properties getConsumerProperties() {
         return additionalPropertiesParser == null
-                ? consumerProperties
-                : AdditionalPropertiesParser.merge(consumerProperties, additionalPropertiesParser.parse());
+                    ? consumerProperties
+                    : AdditionalPropertiesParser.merge(consumerProperties, additionalPropertiesParser.parse());
     }
 
     public String getTopics() {
