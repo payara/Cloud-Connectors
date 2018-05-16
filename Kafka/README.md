@@ -86,6 +86,48 @@ public class KafkaMDB implements KafkaListener {
 }
 ```
 
+### Inbound configuration via system properties
+ 
+ Sometimes you wish to have some properties like *bootstrapServersConfig* configurable via
+ the application server admin console instead of having them hardcoded in you software.
+ Unfortunatelly the JCA specification is not really helpful here. But we can use a relatively 
+ simple trick and map our ActivationConfigProperties to system properties.
+ Every application server has means for configuring system properties mostly via the
+ administration interface.
+ 
+ If you wish to use this feature, then you need to provide an additional @ActivationConfigProperty 
+ called *systemPropertyPrefix*. If you set this property, then the Connector will check if
+ there any ActivationConfigProperty is available in the system properties and use it if so.
+ 
+ The name of the system property is *\<prefix\>.\<property\>*.
+ 
+ Our previous example might also set following system properties:
+ 
+ | System property name             | Value
+ |----------------------------------|-------
+ | my-kafka.bootstrapServersConfig  | localhost:9092
+ 
+ And rewrite our MDB to:
+
+```java
+@MessageDriven(activationConfig = {
+    @ActivationConfigProperty(propertyName = "clientId", propertyValue = "testClient"),
+    @ActivationConfigProperty(propertyName = "groupIdConfig", propertyValue = "testGroup"),
+    @ActivationConfigProperty(propertyName = "topics", propertyValue = "test,test2"),
+    @ActivationConfigProperty(propertyName = "autoCommitInterval", propertyValue = "100"),    
+    @ActivationConfigProperty(propertyName = "retryBackoff", propertyValue = "1000"),    
+    @ActivationConfigProperty(propertyName = "keyDeserializer", propertyValue = "org.apache.kafka.common.serialization.StringDeserializer"),    
+    @ActivationConfigProperty(propertyName = "valueDeserializer", propertyValue = "org.apache.kafka.common.serialization.StringDeserializer"),    
+    @ActivationConfigProperty(propertyName = "pollInterval", propertyValue = "3000"),    
+    @ActivationConfigProperty(propertyName = "systemPropertyPrefix", propertyValue = "my-kafka"),    
+})
+public class KafkaMDB implements KafkaListener {
+}
+``` 
+
+Now the URL of our Kafka Cluster can be configured via Application Server administration console.
+Just don't forget to reload your application after you have changed the properties.
+
 ## Outbound messages sending
 It is also possible to send messages to the Kafka topic using a defined connection factory. 
 A full example of this is shown below;
