@@ -41,6 +41,7 @@ package fish.payara.cloud.connectors.kafka.inbound;
 
 import fish.payara.cloud.connectors.kafka.api.KafkaListener;
 import fish.payara.cloud.connectors.kafka.tools.AdditionalPropertiesParser;
+import fish.payara.cloud.connectors.kafka.tools.SystemPropertiesParser;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 
 import javax.resource.ResourceException;
@@ -48,9 +49,6 @@ import javax.resource.spi.Activation;
 import javax.resource.spi.ActivationSpec;
 import javax.resource.spi.InvalidPropertyException;
 import javax.resource.spi.ResourceAdapter;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Properties;
 
 /**
@@ -59,7 +57,7 @@ import java.util.Properties;
 @Activation(messageListeners = KafkaListener.class)
 public class KafkaActivationSpec implements ActivationSpec {
 
-    private static final String[] PROPERTIES = {
+    private final SystemPropertiesParser systemPropertiesParser = new SystemPropertiesParser(
             "autoCommitInterval",
             "bootstrapServersConfig",
             "clientId",
@@ -84,8 +82,7 @@ public class KafkaActivationSpec implements ActivationSpec {
             "metadataMaxAge",
             "reconnectBackoff",
             "retryBackoff",
-            "additionalProperties"
-    };
+            "additionalProperties");
 
     private final Properties consumerProperties;
     private AdditionalPropertiesParser additionalPropertiesParser;
@@ -127,35 +124,7 @@ public class KafkaActivationSpec implements ActivationSpec {
 
     public void setSystemPropertyPrefix(String systemPropertyPrefix) {
         this.systemPropertyPrefix = systemPropertyPrefix;
-        try {
-            for (String name : PROPERTIES) {
-                String value = System.getProperty(systemPropertyPrefix + "." + name);
-
-                if (value != null) {
-                    final Field field = KafkaActivationSpec.class.getDeclaredField(name);
-                    final Method setter = KafkaActivationSpec.class.getMethod(
-                            "set" + name.substring(0, 1).toUpperCase() + name.substring(1),
-                            field.getType());
-
-                    setter.invoke(this, objectToType(value, field.getType()));
-                }
-            }
-        } catch (NoSuchFieldException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            throw new IllegalArgumentException("Failed parsing system properties: ", e);
-        }
-    }
-
-    private Object objectToType(String value, Class<?> type) {
-        if (Long.class.equals(type))
-            return Long.getLong(value);
-
-        if (Integer.class.equals(type))
-            return Integer.getInteger(value);
-
-        if (Boolean.class.equals(type))
-            return Boolean.getBoolean(value);
-
-        return value;
+        systemPropertiesParser.applySystemProperties(this, systemPropertyPrefix);
     }
 
     @Override
