@@ -12,12 +12,13 @@ public class SystemPropertiesParserTest {
     public static final String INT_PROPERTY = "intProperty";
     public static final String PREFIX = "prefix";
     public static final String UNKNOWN_PROPERTY = "unknown";
+    private static final String BOOL_PROPERTY = "boolProperty";
     private SystemPropertiesParser parser;
     private TestObject testObject;
 
     @BeforeMethod
     public void setUp() {
-        parser = new SystemPropertiesParser(LONG_PROPERTY, STRING_PROPERTY, INT_PROPERTY);
+        parser = new SystemPropertiesParser(LONG_PROPERTY, STRING_PROPERTY, INT_PROPERTY, BOOL_PROPERTY);
         testObject = new TestObject();
     }
 
@@ -26,6 +27,7 @@ public class SystemPropertiesParserTest {
         System.clearProperty(PREFIX + "." + LONG_PROPERTY);
         System.clearProperty(PREFIX + "."+ STRING_PROPERTY);
         System.clearProperty(PREFIX + "."+ INT_PROPERTY);
+        System.clearProperty(PREFIX + "."+ BOOL_PROPERTY);
     }
 
     @Test
@@ -49,6 +51,13 @@ public class SystemPropertiesParserTest {
         assertEquals(testObject.getIntProperty(), Integer.valueOf(15));
     }
 
+    @Test
+    public void checkBoolProperty() {
+        System.setProperty(PREFIX + "." + BOOL_PROPERTY, Boolean.TRUE.toString());
+        parser.applySystemProperties(testObject, PREFIX);
+        assertEquals(testObject.getBoolProperty(), Boolean.TRUE);
+    }
+
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void invalidValueType() {
         System.setProperty(PREFIX + "." + INT_PROPERTY, "Hello");
@@ -65,6 +74,7 @@ public class SystemPropertiesParserTest {
         private Long longProperty;
         private String stringProperty;
         private Integer intProperty;
+        private Boolean boolProperty;
 
         public Long getLongProperty() {
             return longProperty;
@@ -88,6 +98,14 @@ public class SystemPropertiesParserTest {
 
         public void setIntProperty(Integer intProperty) {
             this.intProperty = intProperty;
+        }
+
+        public Boolean getBoolProperty() {
+            return boolProperty;
+        }
+
+        public void setBoolProperty(Boolean boolProperty) {
+            this.boolProperty = boolProperty;
         }
     }
 }

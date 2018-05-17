@@ -82,7 +82,7 @@ public class SystemPropertiesParser {
             return Integer.parseInt(value);
 
         if (Boolean.class.equals(type))
-            return Boolean.getBoolean(value);
+            return Boolean.parseBoolean(value);
 
         return value;
     }
