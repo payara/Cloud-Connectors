@@ -32,21 +32,21 @@ public class SystemPropertiesParserTest {
     public void checkLongProperty() {
         System.setProperty(PREFIX + "." + LONG_PROPERTY, Long.toString(10L));
         parser.applySystemProperties(testObject, PREFIX);
-        assertEquals(Long.valueOf(10L), testObject.getLongProperty());
+        assertEquals(testObject.getLongProperty(), Long.valueOf(10L));
     }
 
     @Test
     public void checkStringProperty() {
         System.setProperty(PREFIX + "." + STRING_PROPERTY, "ABC");
         parser.applySystemProperties(testObject, PREFIX);
-        assertEquals("ABC", testObject.getStringProperty());
+        assertEquals(testObject.getStringProperty(), "ABC");
     }
 
     @Test
     public void checkIntProperty() {
         System.setProperty(PREFIX + "." + INT_PROPERTY, Integer.toString(15));
         parser.applySystemProperties(testObject, PREFIX);
-        assertEquals(Integer.valueOf(15), testObject.getIntProperty());
+        assertEquals(testObject.getIntProperty(), Integer.valueOf(15));
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)

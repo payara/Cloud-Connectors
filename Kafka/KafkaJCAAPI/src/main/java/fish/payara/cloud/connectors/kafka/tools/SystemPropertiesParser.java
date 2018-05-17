@@ -34,10 +34,10 @@ public class SystemPropertiesParser {
 
     private Object objectToType(String value, Class<?> type) {
         if (Long.class.equals(type))
-            return Long.getLong(value);
+            return Long.parseLong(value);
 
         if (Integer.class.equals(type))
-            return Integer.getInteger(value);
+            return Integer.parseInt(value);
 
         if (Boolean.class.equals(type))
             return Boolean.getBoolean(value);
