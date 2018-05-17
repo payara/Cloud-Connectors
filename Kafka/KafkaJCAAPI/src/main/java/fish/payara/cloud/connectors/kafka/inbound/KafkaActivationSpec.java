@@ -41,6 +41,7 @@ package fish.payara.cloud.connectors.kafka.inbound;
 
 import fish.payara.cloud.connectors.kafka.api.KafkaListener;
 import fish.payara.cloud.connectors.kafka.tools.AdditionalPropertiesParser;
+import fish.payara.cloud.connectors.kafka.tools.SystemPropertiesParser;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 
 import javax.resource.ResourceException;
@@ -56,11 +57,36 @@ import java.util.Properties;
 @Activation(messageListeners = KafkaListener.class)
 public class KafkaActivationSpec implements ActivationSpec {
 
+    private final SystemPropertiesParser systemPropertiesParser = new SystemPropertiesParser(
+            "autoCommitInterval",
+            "bootstrapServersConfig",
+            "clientId",
+            "enableAutoCommit",
+            "groupIdConfig",
+            "valueDeserializer",
+            "keyDeserializer",
+            "topics",
+            "pollInterval",
+            "initialPollDelay",
+            "fetchMinBytes",
+            "fetchMaxBytes",
+            "heartbeatInterval",
+            "maxPartitionFetchBytes",
+            "sessionTimeout",
+            "autoOffsetReset",
+            "connectionsMaxIdle",
+            "receiveBuffer",
+            "requestTimeout",
+            "checkCRCs",
+            "fetchMaxWait",
+            "metadataMaxAge",
+            "reconnectBackoff",
+            "retryBackoff",
+            "additionalProperties");
+
     private final Properties consumerProperties;
     private AdditionalPropertiesParser additionalPropertiesParser;
-
     private ResourceAdapter ra;
-
     private Long autoCommitInterval;
     private String bootstrapServersConfig;
     private String clientId;
@@ -86,9 +112,19 @@ public class KafkaActivationSpec implements ActivationSpec {
     private Long reconnectBackoff;
     private Long retryBackoff;
     private String additionalProperties;
+    private String systemPropertyPrefix;
 
     public KafkaActivationSpec() {
         consumerProperties = new Properties();
+    }
+
+    public String getSystemPropertyPrefix() {
+        return systemPropertyPrefix;
+    }
+
+    public void setSystemPropertyPrefix(String systemPropertyPrefix) {
+        this.systemPropertyPrefix = systemPropertyPrefix;
+        systemPropertiesParser.applySystemProperties(this, systemPropertyPrefix);
     }
 
     @Override
