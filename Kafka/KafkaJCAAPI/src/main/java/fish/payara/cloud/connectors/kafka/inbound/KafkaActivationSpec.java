@@ -41,6 +41,7 @@ package fish.payara.cloud.connectors.kafka.inbound;
 
 import fish.payara.cloud.connectors.kafka.api.KafkaListener;
 import fish.payara.cloud.connectors.kafka.tools.AdditionalPropertiesParser;
+import fish.payara.cloud.connectors.kafka.tools.SystemPropertiesParser;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 
 import javax.resource.ResourceException;
