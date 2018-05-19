@@ -44,6 +44,7 @@ import com.amazonaws.services.sqs.model.DeleteMessageRequest;
 import com.amazonaws.services.sqs.model.Message;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.resource.ResourceException;
@@ -61,8 +62,9 @@ public class SQSWork implements Work {
     private final Method m;
     private final Message message;
     private MessageEndpoint endpoint;
-    private AmazonSQS client;
-    private String url;
+    private final AmazonSQS client;
+    private final String url;
+    private final ReentrantLock releaseEndpointLock = new ReentrantLock();
     
     public SQSWork(AmazonSQS client, MessageEndpointFactory factory, Method m, Message message, String url) {
         this.factory = factory;
@@ -70,13 +72,6 @@ public class SQSWork implements Work {
         this.message = message;
         this.client = client;
         this.url = url;
-    }
-
-    @Override
-    public void release() {
-        if (endpoint != null) {
-            endpoint.release();
-        }
     }
 
     @Override
@@ -97,5 +92,24 @@ public class SQSWork implements Work {
             }
         }
     }
+    
+    
+    @Override
+    public void release() {
+        releaseEndpoint();
+    }
+    
+    private void releaseEndpoint() {
+        releaseEndpointLock.lock();
+        try {
+            if (endpoint != null) {
+                endpoint.release();
+                endpoint = null;
+            }
+        }
+        finally {
+           releaseEndpointLock.unlock();
+        }
+     }  
     
 }

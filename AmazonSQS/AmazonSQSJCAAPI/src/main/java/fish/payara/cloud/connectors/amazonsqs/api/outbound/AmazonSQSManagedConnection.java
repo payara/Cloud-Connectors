@@ -179,8 +179,10 @@ public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSC
     
     void removeHandle(AmazonSQSConnection connection) {
         connectionHandles.remove(connection);
+        ConnectionEvent event = new ConnectionEvent(this, ConnectionEvent.CONNECTION_CLOSED);
+        event.setConnectionHandle(connection);
         for (ConnectionEventListener listener : listeners) {
-            listener.connectionClosed(new ConnectionEvent(this,ConnectionEvent.CONNECTION_CLOSED));
+            listener.connectionClosed(event);
         }
     }
 

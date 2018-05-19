@@ -43,6 +43,7 @@ import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnection;
 import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.Set;
 import javax.resource.ResourceException;
 import javax.resource.spi.ConfigProperty;
@@ -134,5 +135,40 @@ public class AmazonSQSManagedConnectionFactory implements ManagedConnectionFacto
     public PrintWriter getLogWriter() throws ResourceException {
         return logger;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + Objects.hashCode(this.awsSecretKey);
+        hash = 97 * hash + Objects.hashCode(this.awsAccessKeyId);
+        hash = 97 * hash + Objects.hashCode(this.region);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final AmazonSQSManagedConnectionFactory other = (AmazonSQSManagedConnectionFactory) obj;
+        if (!Objects.equals(this.awsSecretKey, other.awsSecretKey)) {
+            return false;
+        }
+        if (!Objects.equals(this.awsAccessKeyId, other.awsAccessKeyId)) {
+            return false;
+        }
+        if (!Objects.equals(this.region, other.region)) {
+            return false;
+        }
+        return true;
+    }
+    
+    
     
 }

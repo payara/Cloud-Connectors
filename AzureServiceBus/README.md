@@ -10,6 +10,8 @@ To use the JCA adapter the AzureSBRAR-<version>.rar should be deployed to your a
 To deploy the JCA adapter on Payara Micro use the following commands.
 
 ```shell
+export sasKey=<yoursaskey>
+export nameSpace=<your-name-space>
 java -jar payara-micro.jar --deploy azure-sb-rar-0.3.0-SNAPSHOT.rar azure-sb-example-0.3.0-SNAPSHOT.jar
 ```
 

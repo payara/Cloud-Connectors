@@ -42,6 +42,7 @@ package fish.payara.cloud.connectors.mqtt.api.inbound;
 import fish.payara.cloud.connectors.mqtt.api.OnMQTTMessage;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.resource.ResourceException;
@@ -60,18 +61,13 @@ public class MQTTWork implements Work {
     private final MqttMessage message;
     private final MessageEndpointFactory factory;
     private MessageEndpoint endpoint;
+    private final ReentrantLock releaseEndpointLock = new ReentrantLock();
+
 
     MQTTWork(String topic, MqttMessage mm, MessageEndpointFactory factory) {
         this.topic = topic;
         this.message = mm;
         this.factory = factory;
-    }
-
-    @Override
-    public void release() {
-        if (endpoint != null) {
-            endpoint.release();
-        }
     }
 
     @Override
@@ -104,5 +100,24 @@ public class MQTTWork implements Work {
             } 
         }
     }
+    
+    @Override
+    public void release() {
+        releaseEndpoint();
+    }
+    
+    private void releaseEndpoint() {
+        releaseEndpointLock.lock();
+        try {
+            if (endpoint != null) {
+                endpoint.release();
+                endpoint = null;
+            }
+        }
+        finally {
+           releaseEndpointLock.unlock();
+        }
+     }  
+
     
 }

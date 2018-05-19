@@ -182,10 +182,12 @@ public class AzureSBManagedConnection implements ManagedConnection, AzureSBConne
     }
     
     
-    void removeHandle(AzureSBConnectionImpl aThis) {
-        connectionHandles.remove(aThis);
+    void removeHandle(AzureSBConnectionImpl handle) {
+        connectionHandles.remove(handle);
+        ConnectionEvent event = new ConnectionEvent(this, ConnectionEvent.CONNECTION_CLOSED);
+        event.setConnectionHandle(handle);
         for (ConnectionEventListener listener : listeners) {
-            listener.connectionClosed(new ConnectionEvent(this,ConnectionEvent.CONNECTION_CLOSED));
+            listener.connectionClosed(event);
         }
     }
     
