@@ -39,8 +39,6 @@
  */
 package fish.payara.cloud.connectors.azuresb.api;
 
-import com.microsoft.windowsazure.services.servicebus.models.BrokeredMessage;
-
 /**
  *
  * @author Steve Millidge (Payara Foundation)

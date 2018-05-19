@@ -39,14 +39,18 @@
  */
 package fish.payara.cloud.connectors.azuresb.api.outbound;
 
+import com.microsoft.azure.servicebus.ClientSettings;
+import com.microsoft.azure.servicebus.IMessage;
+import com.microsoft.azure.servicebus.QueueClient;
+import com.microsoft.azure.servicebus.ReceiveMode;
+import com.microsoft.azure.servicebus.primitives.RetryPolicy;
+import com.microsoft.azure.servicebus.primitives.ServiceBusException;
+import com.microsoft.azure.servicebus.security.SharedAccessSignatureTokenProvider;
 import com.microsoft.windowsazure.Configuration;
 import com.microsoft.windowsazure.exception.ServiceException;
-import com.microsoft.windowsazure.services.servicebus.ServiceBusConfiguration;
-import com.microsoft.windowsazure.services.servicebus.ServiceBusContract;
-import com.microsoft.windowsazure.services.servicebus.ServiceBusService;
-import com.microsoft.windowsazure.services.servicebus.models.BrokeredMessage;
 import fish.payara.cloud.connectors.azuresb.api.AzureSBConnection;
 import java.io.PrintWriter;
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -74,13 +78,17 @@ public class AzureSBManagedConnection implements ManagedConnection, AzureSBConne
     private PrintWriter logWriter;
     private final Set<ConnectionEventListener> listeners;
     private final List<AzureSBConnection> connectionHandles = new LinkedList<>();
-    private ServiceBusContract sbConnector;
+    private QueueClient sbConnector;
     
     AzureSBManagedConnection(AzureSBManagedConnectionFactory aThis, Subject subject, ConnectionRequestInfo cxRequestInfo) {
         cf = aThis;
         listeners = new HashSet<>();
-        Configuration configureWithSASAuthentication = ServiceBusConfiguration.configureWithSASAuthentication(cf.getNameSpace(), cf.getSasKeyName(), cf.getSasKey(), cf.getServiceBusRootUri());
-        sbConnector = ServiceBusService.create(configureWithSASAuthentication);
+        SharedAccessSignatureTokenProvider tokenProvider = new SharedAccessSignatureTokenProvider(cf.getSasKeyName(), cf.getSasKey(), 60);
+        try {
+            sbConnector = new QueueClient(cf.getNameSpace(),cf.getQueueName(),new ClientSettings(tokenProvider, RetryPolicy.getDefault(), Duration.ofSeconds(cf.getTimeOut())),ReceiveMode.RECEIVEANDDELETE);
+        } catch (InterruptedException | ServiceBusException ex) {
+            Logger.getLogger(AzureSBManagedConnection.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
     }
 
@@ -164,10 +172,10 @@ public class AzureSBManagedConnection implements ManagedConnection, AzureSBConne
     }
 
     @Override
-    public void sendMessage(String queueName, BrokeredMessage message) throws ResourceException {
+    public void sendMessage(IMessage message) throws ResourceException {
         try {
-            sbConnector.sendMessage(queueName, message);
-        } catch (ServiceException ex) {
+            sbConnector.send(message);
+        } catch (InterruptedException | ServiceBusException ex) {
             throw new ResourceException(ex);
         }
     }

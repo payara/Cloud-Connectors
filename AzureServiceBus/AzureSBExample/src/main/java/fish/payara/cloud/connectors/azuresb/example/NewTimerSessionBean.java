@@ -39,10 +39,9 @@ package fish.payara.cloud.connectors.azuresb.example;
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-import com.microsoft.windowsazure.services.servicebus.models.BrokeredMessage;
+import com.microsoft.azure.servicebus.Message;
 import fish.payara.cloud.connectors.azuresb.api.AzureSBConnection;
 import fish.payara.cloud.connectors.azuresb.api.AzureSBConnectionFactory;
-import java.util.Date;
 import javax.annotation.Resource;
 import javax.ejb.Schedule;
 import javax.ejb.Stateless;
@@ -61,7 +60,8 @@ import javax.resource.spi.TransactionSupport.TransactionSupportLevel;
         transactionSupport = TransactionSupportLevel.NoTransaction,
         properties = {"nameSpace=${ENV=nameSpace}",
             "sasKeyName=RootManageSharedAccessKey",
-            "sasKey=${ENV=sasKey}"
+            "sasKey=${ENV=sasKey}",
+            "queueName=testq"
         })
 @Stateless
 public class NewTimerSessionBean {
@@ -72,9 +72,10 @@ public class NewTimerSessionBean {
     @Schedule(second = "*/1", hour = "*", minute = "*")
     public void myTimer() {
         try (AzureSBConnection connection = factory.getConnection()) {
-            connection.sendMessage("testq", new BrokeredMessage("Hello World"));
+            connection.sendMessage(new Message("Hello World"));
             System.out.println("Sent message");
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

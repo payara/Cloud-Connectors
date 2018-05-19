@@ -34,7 +34,7 @@ Valid properties for the connection factory and MDBs are below. On Payara all pr
 |queueName | String | none | The Queue Name (MDB property only)
 |initialPollDelay | Integer | 1 | The Initial Poll Delay (in s) before the Adapter starts polling for messages after deployment (MDB Property Only)
 |pollInterval | Integer | 1 | The Poll interval (in s). This is how often the MDB polls for new messages (MDB Property Only)
-|pollTimeout  | Integer | 1 | The Poll Timeout (in s). This is hopw long the MDB should wait for messages in a single poll (MDB Property Only)
+|pollTimeout  | Integer | 1 | The Poll Timeout (in s). This is how long the MDB should wait for messages in a single poll (MDB Property Only)
 
 Your MDB should contain one method annotated with `@OnAzureSBMessage` and that method should take a single parameter of type `BrokeredMessage`. 
 
