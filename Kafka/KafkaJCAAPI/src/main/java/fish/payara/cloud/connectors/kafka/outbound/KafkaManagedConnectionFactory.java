@@ -43,6 +43,7 @@ import fish.payara.cloud.connectors.kafka.api.KafkaConnectionFactory;
 import fish.payara.cloud.connectors.kafka.api.KafkaConnection;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import javax.resource.ResourceException;
@@ -381,4 +382,37 @@ public class KafkaManagedConnectionFactory implements ManagedConnectionFactory, 
         return writer;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        KafkaManagedConnectionFactory that = (KafkaManagedConnectionFactory) o;
+        return Objects.equals(producerProperties, that.producerProperties) &&
+                Objects.equals(bootstrapServersConfig, that.bootstrapServersConfig) &&
+                Objects.equals(clientId, that.clientId) &&
+                Objects.equals(valueSerializer, that.valueSerializer) &&
+                Objects.equals(keySerializer, that.keySerializer) &&
+                Objects.equals(bufferMemory, that.bufferMemory) &&
+                Objects.equals(acks, that.acks) &&
+                Objects.equals(retries, that.retries) &&
+                Objects.equals(batchSize, that.batchSize) &&
+                Objects.equals(lingerMS, that.lingerMS) &&
+                Objects.equals(maxBlockMS, that.maxBlockMS) &&
+                Objects.equals(maxRequestSize, that.maxRequestSize) &&
+                Objects.equals(receiveBufferBytes, that.receiveBufferBytes) &&
+                Objects.equals(requestTimeout, that.requestTimeout) &&
+                Objects.equals(compression, that.compression) &&
+                Objects.equals(connectionsMaxIdle, that.connectionsMaxIdle) &&
+                Objects.equals(maxInflightConnections, that.maxInflightConnections) &&
+                Objects.equals(metadataMaxAge, that.metadataMaxAge) &&
+                Objects.equals(retryBackoff, that.retryBackoff) &&
+                Objects.equals(reconnectBackoff, that.reconnectBackoff) &&
+                Objects.equals(additionalProperties, that.additionalProperties);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(producerProperties, bootstrapServersConfig, clientId, valueSerializer, keySerializer, bufferMemory, acks, retries, batchSize, lingerMS, maxBlockMS, maxRequestSize, receiveBufferBytes, requestTimeout, compression, connectionsMaxIdle, maxInflightConnections, metadataMaxAge, retryBackoff, reconnectBackoff, additionalProperties);
+    }
 }

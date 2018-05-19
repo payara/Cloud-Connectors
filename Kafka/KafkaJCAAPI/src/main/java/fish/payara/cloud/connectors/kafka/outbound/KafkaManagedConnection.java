@@ -40,27 +40,22 @@
 package fish.payara.cloud.connectors.kafka.outbound;
 
 import fish.payara.cloud.connectors.kafka.api.KafkaConnection;
-import java.io.PrintWriter;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
-import java.util.concurrent.Future;
-import javax.resource.NotSupportedException;
-import javax.resource.ResourceException;
-import javax.resource.spi.ConnectionEvent;
-import javax.resource.spi.ConnectionEventListener;
-import javax.resource.spi.ConnectionRequestInfo;
-import javax.resource.spi.LocalTransaction;
-import javax.resource.spi.ManagedConnection;
-import javax.resource.spi.ManagedConnectionMetaData;
-import javax.security.auth.Subject;
-import javax.transaction.xa.XAResource;
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.PartitionInfo;
+
+import javax.resource.NotSupportedException;
+import javax.resource.ResourceException;
+import javax.resource.spi.*;
+import javax.security.auth.Subject;
+import javax.transaction.xa.XAResource;
+import java.io.PrintWriter;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Future;
 
 /**
  *
@@ -170,8 +165,10 @@ public class KafkaManagedConnection implements ManagedConnection, KafkaConnectio
     
     void remove(KafkaConnectionImpl conn) {
         connectionHandles.remove(conn);
+        ConnectionEvent event = new ConnectionEvent(this, ConnectionEvent.CONNECTION_CLOSED);
+        event.setConnectionHandle(conn);
         for (ConnectionEventListener listener : listeners) {
-            listener.connectionClosed(new ConnectionEvent(this,ConnectionEvent.CONNECTION_CLOSED));
+            listener.connectionClosed(event);
         }
     }
     
