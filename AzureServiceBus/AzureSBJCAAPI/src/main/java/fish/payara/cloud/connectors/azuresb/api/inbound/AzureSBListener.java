@@ -77,6 +77,7 @@ public class AzureSBListener implements IMessageHandler {
         ClientSettings settings = new ClientSettings(tokenProvider, RetryPolicy.getDefault(), Duration.ofSeconds(asbSpec.getPollTimeout()));
         try {
             client = new QueueClient(asbSpec.getNameSpace(), asbSpec.getQueueName(), settings, ReceiveMode.RECEIVEANDDELETE);
+            client.setPrefetchCount(activationSpec.getPreFetchCount());
         } catch (InterruptedException | ServiceBusException ex) {
             Logger.getLogger(AzureSBListener.class.getName()).log(Level.SEVERE, "Error creating listener for queue " + activationSpec.getQueueName(), ex);
             throw new ResourceException(ex);

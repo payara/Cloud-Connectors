@@ -41,6 +41,7 @@ package fish.payara.cloud.connectors.azuresb.api.outbound;
 
 import com.microsoft.azure.servicebus.IMessage;
 import fish.payara.cloud.connectors.azuresb.api.AzureSBConnection;
+import java.util.Collection;
 import javax.resource.ResourceException;
 
 /**
@@ -59,6 +60,8 @@ public class AzureSBConnectionImpl implements AzureSBConnection {
     public void sendMessage(IMessage message) throws ResourceException {
         myConn.sendMessage(message);
     }
+    
+    
 
     @Override
     public void close() throws Exception {
@@ -67,6 +70,11 @@ public class AzureSBConnectionImpl implements AzureSBConnection {
 
     void setRealConnection(AzureSBManagedConnection aThis) {
         myConn = aThis;
+    }
+
+    @Override
+    public void sendBatch(Collection<IMessage> messages) throws ResourceException {
+        myConn.sendBatch(messages);
     }
     
 }

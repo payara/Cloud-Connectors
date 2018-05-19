@@ -51,6 +51,7 @@ import com.microsoft.windowsazure.exception.ServiceException;
 import fish.payara.cloud.connectors.azuresb.api.AzureSBConnection;
 import java.io.PrintWriter;
 import java.time.Duration;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -196,6 +197,17 @@ public class AzureSBManagedConnection implements ManagedConnection, AzureSBConne
         event.setConnectionHandle(handle);
         for (ConnectionEventListener listener : listeners) {
             listener.connectionClosed(event);
+        }
+    }
+
+    @Override
+    public void sendBatch(Collection<IMessage> messages) throws ResourceException {
+        try {
+            sbConnector.sendBatch(messages);
+        } catch (InterruptedException | ServiceBusException ex) {
+            Logger.getLogger(AzureSBManagedConnection.class.getName()).log(Level.SEVERE, "Problem Sending Messages", ex);
+            throw new ResourceException(ex);
+            
         }
     }
     

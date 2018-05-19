@@ -39,9 +39,11 @@ package fish.payara.cloud.connectors.azuresb.example;
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+import com.microsoft.azure.servicebus.IMessage;
 import com.microsoft.azure.servicebus.Message;
 import fish.payara.cloud.connectors.azuresb.api.AzureSBConnection;
 import fish.payara.cloud.connectors.azuresb.api.AzureSBConnectionFactory;
+import java.util.LinkedList;
 import javax.annotation.Resource;
 import javax.ejb.Schedule;
 import javax.ejb.Stateless;
@@ -72,7 +74,11 @@ public class NewTimerSessionBean {
     @Schedule(second = "*/1", hour = "*", minute = "*")
     public void myTimer() {
         try (AzureSBConnection connection = factory.getConnection()) {
-            connection.sendMessage(new Message("Hello World"));
+            LinkedList<IMessage> messages = new LinkedList<>();
+            for (int i = 0; i < 10; i++) {
+                messages.add(new Message("Hello World " + i));
+            }
+            connection.sendBatch(messages);
             System.out.println("Sent message");
         } catch (Exception e) {
             e.printStackTrace();
