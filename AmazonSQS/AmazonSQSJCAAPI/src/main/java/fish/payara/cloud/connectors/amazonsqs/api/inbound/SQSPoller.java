@@ -78,7 +78,7 @@ class SQSPoller extends TimerTask {
             ReceiveMessageRequest rmr = new ReceiveMessageRequest(spec.getQueueURL());
             rmr.setMaxNumberOfMessages(spec.getMaxMessages());
             rmr.setVisibilityTimeout(spec.getVisibilityTimeout());
-            rmr.setWaitTimeSeconds(spec.getPollInterval()-1);
+            rmr.setWaitTimeSeconds(spec.getPollInterval()/1000);
             rmr.setAttributeNames(Arrays.asList(spec.getAttributeNames().split(",")));
             rmr.setMessageAttributeNames(Arrays.asList(spec.getMessageAttributeNames().split(",")));
             ReceiveMessageResult rmResult = client.receiveMessage(rmr);

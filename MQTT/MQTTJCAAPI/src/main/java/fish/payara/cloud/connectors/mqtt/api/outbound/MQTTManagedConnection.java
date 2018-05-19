@@ -204,10 +204,12 @@ public class MQTTManagedConnection implements ManagedConnection, MQTTConnection 
         }
     }
 
-    void removeHandle(MQTTConnectionImpl aThis) {
-        connectionHandles.remove(aThis);
+    void removeHandle(MQTTConnectionImpl handle) {
+        connectionHandles.remove(handle);
+        ConnectionEvent event = new ConnectionEvent(this, ConnectionEvent.CONNECTION_CLOSED);
+        event.setConnectionHandle(handle);
         for (ConnectionEventListener listener : listeners) {
-            listener.connectionClosed(new ConnectionEvent(this,ConnectionEvent.CONNECTION_CLOSED));
+            listener.connectionClosed(event);
         }
     }
 

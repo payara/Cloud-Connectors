@@ -42,7 +42,7 @@ Valid properties are below. On Payara all properties can be replaced via System 
 |region | String | None | Must be set to the AWS region name of your queue
 |maxMessages | Integer | 10 | The maximum number of messages to download on a poll
 |initialPollDelay | Integer | 1 | The delay (in milliseconds) before polling the queue after MDB activation (MDB only)
-|pollInterval | Integer | 3 | How often should the adapter poll for messages (in milliseconds) (MDB Only)
+|pollInterval | Integer | 1000 | How often should the adapter poll for messages (in milliseconds) (MDB Only)
 |messageAttributeNames | String | All | The list of message attribute names that should be fetched with the message (MDB Only)
 |attributeNames | String| All | The list of attribute names that should be fetched with the message (MDB Only)
 

@@ -42,6 +42,7 @@ package fish.payara.cloud.connectors.azuresb.api.inbound;
 import com.microsoft.windowsazure.services.servicebus.models.BrokeredMessage;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.resource.ResourceException;
@@ -59,18 +60,12 @@ public class AzureSBWork implements Work {
     private final Method m;
     private final BrokeredMessage bm;
     private MessageEndpoint endpoint;
-
+    private final ReentrantLock releaseEndpointLock = new ReentrantLock();
+    
     public AzureSBWork(MessageEndpointFactory factory, Method m, BrokeredMessage bm) {
         this.factory = factory;
         this.m = m;
         this.bm = bm;
-    }
-
-    @Override
-    public void release() {
-        if (endpoint != null) {
-            endpoint.release();
-        }
     }
 
     @Override
@@ -90,4 +85,22 @@ public class AzureSBWork implements Work {
             }
         }
     }
+    
+    @Override
+    public void release() {
+        releaseEndpoint();
+    }
+    
+    private void releaseEndpoint() {
+        releaseEndpointLock.lock();
+        try {
+            if (endpoint != null) {
+                endpoint.release();
+                endpoint = null;
+            }
+        }
+        finally {
+           releaseEndpointLock.unlock();
+        }
+     }  
 }

@@ -51,7 +51,7 @@ import javax.ejb.MessageDriven;
  */
 
 @MessageDriven(activationConfig = {
-    @ActivationConfigProperty(propertyName = "nameSpace", propertyValue = "payara"),    
+    @ActivationConfigProperty(propertyName = "nameSpace", propertyValue = "${ENV=nameSpace}"),    
     @ActivationConfigProperty(propertyName = "sasKeyName", propertyValue = "RootManageSharedAccessKey"),   
     @ActivationConfigProperty(propertyName = "sasKey", propertyValue = "${ENV=sasKey}"),   
     @ActivationConfigProperty(propertyName = "queueName", propertyValue = "testq")    

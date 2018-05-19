@@ -43,6 +43,7 @@ import fish.payara.cloud.connectors.azuresb.api.AzureSBConnection;
 import fish.payara.cloud.connectors.azuresb.api.AzureSBConnectionFactory;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.Set;
 import javax.resource.ResourceException;
 import javax.resource.spi.ConfigProperty;
@@ -140,6 +141,43 @@ public class AzureSBManagedConnectionFactory implements ManagedConnectionFactory
 
     public void setServiceBusRootUri(String serviceBusRootUri) {
         this.serviceBusRootUri = serviceBusRootUri;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + Objects.hashCode(this.nameSpace);
+        hash = 97 * hash + Objects.hashCode(this.sasKeyName);
+        hash = 97 * hash + Objects.hashCode(this.sasKey);
+        hash = 97 * hash + Objects.hashCode(this.serviceBusRootUri);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final AzureSBManagedConnectionFactory other = (AzureSBManagedConnectionFactory) obj;
+        if (!Objects.equals(this.nameSpace, other.nameSpace)) {
+            return false;
+        }
+        if (!Objects.equals(this.sasKeyName, other.sasKeyName)) {
+            return false;
+        }
+        if (!Objects.equals(this.sasKey, other.sasKey)) {
+            return false;
+        }
+        if (!Objects.equals(this.serviceBusRootUri, other.serviceBusRootUri)) {
+            return false;
+        }
+        return true;
     }
     
     
