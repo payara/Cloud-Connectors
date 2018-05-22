@@ -73,7 +73,7 @@ public class NewTimerSessionBean {
     @Schedule(second = "*/1", hour="*", minute="*")   
     public void myTimer() {
         try (AmazonSQSConnection connection = factory.getConnection()) {
-        connection.sendMessage(new SendMessageRequest("https://sqs.eu-west-2.amazonaws.com/282006333273/CloudConnectorTest", "Hello World"));
+        connection.sendMessage(new SendMessageRequest(System.getenv("queueURL"), "Hello World"));
         } catch (Exception e) {}
     }
 }

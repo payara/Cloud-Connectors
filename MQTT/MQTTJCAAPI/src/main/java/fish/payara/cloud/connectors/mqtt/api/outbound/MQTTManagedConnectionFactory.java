@@ -43,6 +43,7 @@ import fish.payara.cloud.connectors.mqtt.api.MQTTConnection;
 import fish.payara.cloud.connectors.mqtt.api.MQTTConnectionFactory;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.Set;
 import javax.resource.ResourceException;
 import javax.resource.spi.ConfigProperty;
@@ -221,4 +222,71 @@ public class MQTTManagedConnectionFactory implements ManagedConnectionFactory, S
     public PrintWriter getLogWriter() throws ResourceException {
         return logWriter;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 41 * hash + Objects.hashCode(this.serverURIs);
+        hash = 41 * hash + Objects.hashCode(this.cleanSession);
+        hash = 41 * hash + Objects.hashCode(this.automaticReconnect);
+        hash = 41 * hash + Objects.hashCode(this.filePersistance);
+        hash = 41 * hash + Objects.hashCode(this.persistenceDirectory);
+        hash = 41 * hash + Objects.hashCode(this.connectionTimeout);
+        hash = 41 * hash + Objects.hashCode(this.maxInflight);
+        hash = 41 * hash + Objects.hashCode(this.keepAliveInterval);
+        hash = 41 * hash + Objects.hashCode(this.userName);
+        hash = 41 * hash + Objects.hashCode(this.password);
+        hash = 41 * hash + Objects.hashCode(this.clientId);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final MQTTManagedConnectionFactory other = (MQTTManagedConnectionFactory) obj;
+        if (!Objects.equals(this.serverURIs, other.serverURIs)) {
+            return false;
+        }
+        if (!Objects.equals(this.persistenceDirectory, other.persistenceDirectory)) {
+            return false;
+        }
+        if (!Objects.equals(this.userName, other.userName)) {
+            return false;
+        }
+        if (!Objects.equals(this.password, other.password)) {
+            return false;
+        }
+        if (!Objects.equals(this.clientId, other.clientId)) {
+            return false;
+        }
+        if (!Objects.equals(this.cleanSession, other.cleanSession)) {
+            return false;
+        }
+        if (!Objects.equals(this.automaticReconnect, other.automaticReconnect)) {
+            return false;
+        }
+        if (!Objects.equals(this.filePersistance, other.filePersistance)) {
+            return false;
+        }
+        if (!Objects.equals(this.connectionTimeout, other.connectionTimeout)) {
+            return false;
+        }
+        if (!Objects.equals(this.maxInflight, other.maxInflight)) {
+            return false;
+        }
+        if (!Objects.equals(this.keepAliveInterval, other.keepAliveInterval)) {
+            return false;
+        }
+        return true;
+    }
+    
+    
 }

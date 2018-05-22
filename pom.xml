@@ -47,6 +47,7 @@
         <module>MQTT/MQTTSendJAXRS</module>
         <module>AzureServiceBus/AzureSBJCAAPI</module>
         <module>AzureServiceBus/AzureSBRAR</module>
+        <module>AzureServiceBus/AzureSBExample</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

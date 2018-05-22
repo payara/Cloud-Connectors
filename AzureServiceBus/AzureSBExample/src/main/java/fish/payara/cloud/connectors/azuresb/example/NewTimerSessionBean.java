@@ -59,7 +59,7 @@ import javax.resource.spi.TransactionSupport.TransactionSupportLevel;
         resourceAdapter = "azure-sb-rar-0.3.0-SNAPSHOT",
         minPoolSize = 2, maxPoolSize = 2,
         transactionSupport = TransactionSupportLevel.NoTransaction,
-        properties = {"nameSpace=payara",
+        properties = {"nameSpace=${ENV=nameSpace}",
             "sasKeyName=RootManageSharedAccessKey",
             "sasKey=${ENV=sasKey}"
         })

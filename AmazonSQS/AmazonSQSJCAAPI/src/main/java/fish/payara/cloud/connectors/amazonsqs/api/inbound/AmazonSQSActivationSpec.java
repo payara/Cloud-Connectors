@@ -64,7 +64,7 @@ public class AmazonSQSActivationSpec implements ActivationSpec, AWSCredentialsPr
     private Integer maxMessages = 10;
     private Integer visibilityTimeout = 30;
     private Integer initialPollDelay = 1;
-    private Integer pollInterval = 3;
+    private Integer pollInterval = 1000;
     private String messageAttributeNames = "All";
     private String attributeNames = "All";
     

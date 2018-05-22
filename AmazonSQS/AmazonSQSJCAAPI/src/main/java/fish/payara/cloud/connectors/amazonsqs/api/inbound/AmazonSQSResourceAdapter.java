@@ -41,6 +41,7 @@ package fish.payara.cloud.connectors.amazonsqs.api.inbound;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -120,5 +121,17 @@ public class AmazonSQSResourceAdapter implements ResourceAdapter, Serializable {
     public XAResource[] getXAResources(ActivationSpec[] specs) throws ResourceException {
         return null;
     }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+    
+
     
 }
