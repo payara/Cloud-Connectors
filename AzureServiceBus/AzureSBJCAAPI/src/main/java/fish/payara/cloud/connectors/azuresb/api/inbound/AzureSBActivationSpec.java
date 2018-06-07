@@ -66,13 +66,9 @@ public class AzureSBActivationSpec implements ActivationSpec {
 
     @ConfigProperty(defaultValue = "", type = String.class, description = "The Queue Name")
     private String queueName;
-    
-    
-    @ConfigProperty(defaultValue = "1", type = Integer.class, description = "The Initial Poll Delay (in s)")
-    private Integer initialPollDelay = 1;
-    
-    @ConfigProperty(defaultValue = "1", type = Integer.class, description = "The Poll Interval (in s)")   
-    private Integer pollInterval = 1;
+
+    @ConfigProperty(defaultValue = "10", type = Integer.class, description = "The Prefetch Count")   
+    private Integer preFetchCount = 10;
     
     @ConfigProperty(defaultValue = "1", type = Integer.class, description = "The Poll Timeout (in s)")   
     private Integer pollTimeout = 1;
@@ -145,20 +141,12 @@ public class AzureSBActivationSpec implements ActivationSpec {
         this.queueName = queueName;
     }
 
-    public Integer getInitialPollDelay() {
-        return initialPollDelay;
+    public Integer getPreFetchCount() {
+        return preFetchCount;
     }
 
-    public void setInitialPollDelay(Integer initialPollDelay) {
-        this.initialPollDelay = initialPollDelay;
-    }
-
-    public Integer getPollInterval() {
-        return pollInterval;
-    }
-
-    public void setPollInterval(Integer pollInterval) {
-        this.pollInterval = pollInterval;
+    public void setPreFetchCount(Integer preFetchCount) {
+        this.preFetchCount = preFetchCount;
     }
 
     public String getServiceBusRootUri() {

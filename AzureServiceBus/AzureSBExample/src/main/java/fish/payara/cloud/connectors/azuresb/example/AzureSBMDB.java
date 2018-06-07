@@ -39,7 +39,7 @@
  */
 package fish.payara.cloud.connectors.azuresb.example;
 
-import com.microsoft.windowsazure.services.servicebus.models.BrokeredMessage;
+import com.microsoft.azure.servicebus.IMessage;
 import fish.payara.cloud.connectors.azuresb.api.AzureSBListener;
 import fish.payara.cloud.connectors.azuresb.api.OnAzureSBMessage;
 import javax.ejb.ActivationConfigProperty;
@@ -59,8 +59,8 @@ import javax.ejb.MessageDriven;
 public class AzureSBMDB implements AzureSBListener {
 
     @OnAzureSBMessage
-    public void receiveMessage(BrokeredMessage message) {
-        System.out.println("Received Message " + message.getBody());
+    public void receiveMessage(IMessage message) {
+        System.out.println("Received Message " + new String(message.getBody()));
     }
     
 }

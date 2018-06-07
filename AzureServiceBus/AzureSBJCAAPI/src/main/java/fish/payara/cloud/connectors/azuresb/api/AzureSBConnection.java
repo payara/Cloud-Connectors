@@ -39,7 +39,8 @@
  */
 package fish.payara.cloud.connectors.azuresb.api;
 
-import com.microsoft.windowsazure.services.servicebus.models.BrokeredMessage;
+import com.microsoft.azure.servicebus.IMessage;
+import java.util.Collection;
 import javax.resource.ResourceException;
 
 /**
@@ -48,6 +49,8 @@ import javax.resource.ResourceException;
  */
 public interface AzureSBConnection extends AutoCloseable {
     
-    public void sendMessage (String queueName, BrokeredMessage message) throws ResourceException;
+    public void sendMessage (IMessage message) throws ResourceException;
+    
+    public void sendBatch(Collection<IMessage> messages) throws ResourceException;
     
 }
