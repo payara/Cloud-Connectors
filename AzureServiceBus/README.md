@@ -15,7 +15,7 @@ To deploy the JCA adapter on Payara Micro use the following commands.
 ```shell
 export sasKey=<yoursaskey>
 export nameSpace=<your-name-space>
-java -jar payara-micro.jar --deploy azure-sb-rar-0.3.0-SNAPSHOT.rar azure-sb-example-0.3.0-SNAPSHOT.jar
+java -jar payara-micro.jar --deploy azure-sb-rar-0.3.0.rar azure-sb-example-0.3.0.jar
 ```
 
 ## Inbound MDB
@@ -80,7 +80,7 @@ An example annotation defined connection factory is shown below;
 @ConnectionFactoryDefinition(name = "java:comp/env/AzureSBConnectionFactory",
         description = "Azure SB Conn Factory",
         interfaceName = "fish.payara.cloud.connectors.azuresb.api.AzureSBConnectionFactory",
-        resourceAdapter = "azure-sb-rar-0.3.0-SNAPSHOT",
+        resourceAdapter = "azure-sb-rar-0.3.0",
         minPoolSize = 2, maxPoolSize = 2,
         transactionSupport = TransactionSupportLevel.NoTransaction,
         properties = {"nameSpace=${ENV=nameSpace}",
