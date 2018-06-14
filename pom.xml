@@ -15,12 +15,12 @@
         </license>
     </licenses>
     <developers>
-    <developer>
-        <id>smillidge</id>
-        <name>Steve Millidge</name>
-        <organization>Payara Foundation</organization>
-        <organizationUrl>http://www.payara.org</organizationUrl>
-    </developer>
+        <developer>
+            <id>smillidge</id>
+            <name>Steve Millidge</name>
+            <organization>Payara Foundation</organization>
+            <organizationUrl>http://www.payara.org</organizationUrl>
+        </developer>
     </developers>
     <scm>
         <connection>scm:git:git:github.com/payara/Cloud-Connectors.git</connection>
@@ -52,4 +52,69 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+    
+    <profiles>
+        <profile>
+            <!-- Required extras for deployment to Maven central. -->
+            <id>release</id>
+            <build>
+                <plugins>
+                    <!-- Generate Sources JAR -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.0.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- Generate Javadoc JAR -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.0.1</version>
+                        <configuration>
+                            <javadocVersion>${javadoc.version}</javadocVersion>
+                            <notimestamp>true</notimestamp>
+                            <splitindex>true</splitindex>
+                            <doctitle>Arquillian connector</doctitle>
+                            <links>
+                                <link>https://docs.oracle.com/javaee/${javaee.version}/api/</link>
+                            </links>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    
+                    <!-- Sign the files using GPG -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
