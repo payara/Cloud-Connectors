@@ -43,6 +43,7 @@ import fish.payara.cloud.connectors.kafka.api.OnRecord;
 import fish.payara.cloud.connectors.kafka.api.OnRecords;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.ConcurrentModificationException;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -125,7 +126,11 @@ class KafkaPoller extends TimerTask {
     
     void stop() {
         if (consumer != null) {
-            consumer.close();
+            try {
+                consumer.close();
+            } catch (ConcurrentModificationException ex) {
+                Logger.getLogger(KafkaResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 }
