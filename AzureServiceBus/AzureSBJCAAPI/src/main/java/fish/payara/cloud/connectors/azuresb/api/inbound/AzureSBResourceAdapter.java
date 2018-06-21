@@ -66,7 +66,7 @@ import javax.transaction.xa.XAResource;
 public class AzureSBResourceAdapter implements ResourceAdapter{
 
     private static final Logger LOGGER = Logger.getLogger(AzureSBResourceAdapter.class.getName());
-    private final Map<MessageEndpointFactory, AzureSBPoller> registeredFactories;
+    private final Map<MessageEndpointFactory, AzureSBListener> registeredFactories;
     private BootstrapContext context;
     private Timer poller;
 
@@ -79,12 +79,6 @@ public class AzureSBResourceAdapter implements ResourceAdapter{
     public void start(BootstrapContext ctx) throws ResourceAdapterInternalException {
         LOGGER.info("Azure Service Bus Resource Adapter Started..");
         context = ctx;
-        try {
-            poller = context.createTimer();
-        } catch (UnavailableException ex) {
-            LOGGER.log(Level.SEVERE, "Unable to create Poller", ex);
-            throw new ResourceAdapterInternalException(ex);
-        }
     }
 
     @Override
@@ -92,8 +86,8 @@ public class AzureSBResourceAdapter implements ResourceAdapter{
         LOGGER.info("Azure SB Resource Adapter Stopped");
         // go through all the registered factories and stop 
         poller.cancel();
-        for (AzureSBPoller value : registeredFactories.values()) {
-            value.stop();
+        for (AzureSBListener value : registeredFactories.values()) {
+            value.close();
         }
     }
 
@@ -101,9 +95,9 @@ public class AzureSBResourceAdapter implements ResourceAdapter{
     public void endpointActivation(MessageEndpointFactory endpointFactory, ActivationSpec spec) throws ResourceException {
         if (spec instanceof AzureSBActivationSpec) {
             AzureSBActivationSpec sqsSpec = (AzureSBActivationSpec) spec;
-            AzureSBPoller sqsTask = new AzureSBPoller(sqsSpec,context,endpointFactory);
-            registeredFactories.put(endpointFactory, sqsTask);
-            poller.schedule(sqsTask, sqsSpec.getInitialPollDelay(), sqsSpec.getPollInterval());
+            AzureSBListener sbListener = new AzureSBListener(sqsSpec,context,endpointFactory);
+            registeredFactories.put(endpointFactory, sbListener);
+            sbListener.subscribe();
         } else {
             LOGGER.log(Level.WARNING, "Got endpoint activation for an ActivationSpec of unknown class {0}", spec.getClass().getName());
         } 
@@ -111,9 +105,8 @@ public class AzureSBResourceAdapter implements ResourceAdapter{
 
     @Override
     public void endpointDeactivation(MessageEndpointFactory endpointFactory, ActivationSpec spec) {
-        AzureSBPoller sqsTask = registeredFactories.get(endpointFactory);
-        sqsTask.stop();
-        sqsTask.cancel();
+        AzureSBListener sqsTask = registeredFactories.get(endpointFactory);
+        sqsTask.close();
     }
 
     @Override

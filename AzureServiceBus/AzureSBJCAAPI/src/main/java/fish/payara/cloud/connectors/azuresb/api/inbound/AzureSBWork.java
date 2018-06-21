@@ -39,7 +39,8 @@
  */
 package fish.payara.cloud.connectors.azuresb.api.inbound;
 
-import com.microsoft.windowsazure.services.servicebus.models.BrokeredMessage;
+import com.microsoft.azure.servicebus.IMessage;
+import fish.payara.cloud.connectors.azuresb.api.OnAzureSBMessage;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.concurrent.locks.ReentrantLock;
@@ -49,6 +50,7 @@ import javax.resource.ResourceException;
 import javax.resource.spi.endpoint.MessageEndpoint;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
 import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
 
 /**
  *
@@ -57,27 +59,34 @@ import javax.resource.spi.work.Work;
 public class AzureSBWork implements Work {
 
     private final MessageEndpointFactory factory;
-    private final Method m;
-    private final BrokeredMessage bm;
+    private final IMessage message;
     private MessageEndpoint endpoint;
     private final ReentrantLock releaseEndpointLock = new ReentrantLock();
+    private Method method = null;
     
-    public AzureSBWork(MessageEndpointFactory factory, Method m, BrokeredMessage bm) {
+    public AzureSBWork(MessageEndpointFactory factory, IMessage message) {
         this.factory = factory;
-        this.m = m;
-        this.bm = bm;
-    }
+        this.message = message;
+        Class<?> mdbClass = factory.getEndpointClass();
+        for (Method m : mdbClass.getMethods()) {
+            if (m.isAnnotationPresent(OnAzureSBMessage.class) && m.getParameterCount() == 1 && m.getParameterTypes()[0].equals(IMessage.class)) {
+                method = m;
+                break;
+            }
+        }
+     }
 
     @Override
     public void run() {
+
         try {
             endpoint = factory.createEndpoint(null);
-            endpoint.beforeDelivery(m);
-            if (bm != null) {
-                m.invoke(endpoint, bm);
+            endpoint.beforeDelivery(method);
+            if (message != null) {
+                method.invoke(endpoint, message);
             }
             endpoint.afterDelivery();
-        } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ResourceException ex) {
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | ResourceException | NoSuchMethodException ex) {
             Logger.getLogger(AzureSBWork.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             if (endpoint != null) {

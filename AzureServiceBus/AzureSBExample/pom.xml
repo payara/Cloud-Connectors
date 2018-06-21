@@ -4,7 +4,7 @@
 
     <groupId>fish.payara.cloud.connectors.azuresb</groupId>
     <artifactId>azure-sb-example</artifactId>
-    <version>0.3.0-SNAPSHOT</version>
+    <version>0.4.0-SNAPSHOT</version>
     <packaging>ejb</packaging>
 
     <name>AzureSBExample</name>
@@ -18,10 +18,16 @@
         <dependency>
             <groupId>fish.payara.cloud.connectors.azuresb</groupId>
             <artifactId>azure-sb-jca-api</artifactId>
-            <version>0.3.0-SNAPSHOT</version>
+            <version>0.4.0-SNAPSHOT</version>
             <type>jar</type>
 
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.azure</groupId>
+            <artifactId>azure-servicebus</artifactId>
+            <version>1.2.5</version>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>javax</groupId>
