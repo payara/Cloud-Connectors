@@ -41,39 +41,52 @@ package fish.payara.cloud.connectors.kafka.inbound;
 
 import fish.payara.cloud.connectors.kafka.api.OnRecord;
 import fish.payara.cloud.connectors.kafka.api.OnRecords;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.resource.spi.BootstrapContext;
-import javax.resource.spi.endpoint.MessageEndpointFactory;
-import javax.resource.spi.work.WorkException;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+
+import javax.resource.spi.BootstrapContext;
+import javax.resource.spi.endpoint.MessageEndpointFactory;
+import javax.resource.spi.work.WorkException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.TimerTask;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Steve Millidge (Payara Foundation)
  */
-class KafkaPoller extends TimerTask {
+class KafkaPoller implements Runnable {
 
     private KafkaConsumer consumer;
     KafkaActivationSpec kSpec;
     BootstrapContext context;
     private MessageEndpointFactory endpointFactory;
+    private final ScheduledExecutorService executor;
 
     KafkaPoller(KafkaActivationSpec kSpec, BootstrapContext context, MessageEndpointFactory endpointFactory) {
         this.kSpec = kSpec;
         this.context = context;
         this.endpointFactory = endpointFactory;
-        consumer = new KafkaConsumer(kSpec.getConsumerProperties());
-        consumer.subscribe(Arrays.asList(kSpec.getTopics().split(",")));
+        executor = Executors.newSingleThreadScheduledExecutor((task) -> new Thread(task, "kafka-poller-" + kSpec.getClientId()));
+        executor.schedule(() -> {
+            consumer = new KafkaConsumer(kSpec.getConsumerProperties());
+            consumer.subscribe(Arrays.asList(kSpec.getTopics().split(",")));
+            executor.scheduleAtFixedRate(this, kSpec.getInitialPollDelay(), kSpec.getPollInterval(), TimeUnit.MILLISECONDS);
+        }, 0L, TimeUnit.MILLISECONDS);
     }
 
     @Override
     public void run() {
+        if (consumer == null)
+            return;
+
         ConsumerRecords<Object, Object> records = consumer.poll(kSpec.getPollInterval());
         
         // if we got noting just return
@@ -125,7 +138,15 @@ class KafkaPoller extends TimerTask {
     
     void stop() {
         if (consumer != null) {
-            consumer.close();
+            try {
+                executor.schedule(() -> {
+                    consumer.close();
+                    consumer = null;
+                }, 0L, TimeUnit.MILLISECONDS).get();
+                executor.shutdown();
+            } catch (InterruptedException | ExecutionException ex) {
+                Logger.getLogger(KafkaResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 }

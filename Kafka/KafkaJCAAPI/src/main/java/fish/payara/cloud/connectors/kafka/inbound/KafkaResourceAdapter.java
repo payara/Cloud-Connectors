@@ -39,21 +39,14 @@
  */
 package fish.payara.cloud.connectors.kafka.inbound;
 
-import java.io.Serializable;
-import java.util.Map;
-import java.util.Timer;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.resource.ResourceException;
-import javax.resource.spi.ActivationSpec;
-import javax.resource.spi.BootstrapContext;
-import javax.resource.spi.Connector;
-import javax.resource.spi.ResourceAdapter;
-import javax.resource.spi.ResourceAdapterInternalException;
-import javax.resource.spi.UnavailableException;
+import javax.resource.spi.*;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
 import javax.transaction.xa.XAResource;
+import java.io.Serializable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 /**
  *
@@ -69,7 +62,6 @@ public class KafkaResourceAdapter implements ResourceAdapter, Serializable{
     private static final Logger LOGGER = Logger.getLogger(KafkaResourceAdapter.class.getName());
     private BootstrapContext context;
     private final Map<MessageEndpointFactory, KafkaPoller> registeredFactories;
-    private Timer poller;
 
     public KafkaResourceAdapter() {
         this.registeredFactories = new ConcurrentHashMap<>();
@@ -79,19 +71,12 @@ public class KafkaResourceAdapter implements ResourceAdapter, Serializable{
     public void start(BootstrapContext ctx) throws ResourceAdapterInternalException {
         LOGGER.info("Kafka Resource Adapter Started..");
         context = ctx;
-        try {
-            poller = context.createTimer();
-        } catch (UnavailableException ex) {
-            LOGGER.log(Level.SEVERE, "Unable to create Poller", ex);
-            throw new ResourceAdapterInternalException(ex);
-        }
     }
 
     @Override
     public void stop() {
         LOGGER.info("Kafka Resource Adapter Stopped");
         // go through all the registered factories and stop 
-        poller.cancel();
         for (KafkaPoller value : registeredFactories.values()) {
             value.stop();
         }
@@ -103,7 +88,6 @@ public class KafkaResourceAdapter implements ResourceAdapter, Serializable{
             KafkaActivationSpec kSpec = (KafkaActivationSpec) spec;
             KafkaPoller kTask = new KafkaPoller(kSpec,context,endpointFactory);
             registeredFactories.put(endpointFactory, kTask);
-            poller.schedule(kTask, kSpec.getInitialPollDelay(), kSpec.getPollInterval());
         } else {
             LOGGER.warning("Got endpoint activation for an ActivationSpec of unknown class " + spec.getClass().getName());
         } 
@@ -113,7 +97,6 @@ public class KafkaResourceAdapter implements ResourceAdapter, Serializable{
     public void endpointDeactivation(MessageEndpointFactory endpointFactory, ActivationSpec spec) {
         KafkaPoller kTask = registeredFactories.get(endpointFactory);
         kTask.stop();
-        kTask.cancel();
     }
 
     @Override
