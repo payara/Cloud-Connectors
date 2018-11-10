@@ -42,7 +42,11 @@ package fish.payara.cloud.connectors.kafka.inbound;
 import fish.payara.cloud.connectors.kafka.api.OnRecord;
 import fish.payara.cloud.connectors.kafka.api.OnRecords;
 import java.lang.reflect.Method;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -59,10 +63,15 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
  */
 class KafkaPoller extends TimerTask {
 
+    private static final Logger LOGGER = Logger.getLogger(KafkaPoller.class.getName());
+
     private KafkaConsumer consumer;
     KafkaActivationSpec kSpec;
     BootstrapContext context;
     private MessageEndpointFactory endpointFactory;
+
+    private final List<Method> onRecordMethods = new ArrayList<>();
+    private final List<Method> onRecordsMethods = new ArrayList<>();
 
     KafkaPoller(KafkaActivationSpec kSpec, BootstrapContext context, MessageEndpointFactory endpointFactory) {
         this.kSpec = kSpec;
@@ -70,59 +79,72 @@ class KafkaPoller extends TimerTask {
         this.endpointFactory = endpointFactory;
         consumer = new KafkaConsumer(kSpec.getConsumerProperties());
         consumer.subscribe(Arrays.asList(kSpec.getTopics().split(",")));
+
+        Class<?> mdbClass = endpointFactory.getEndpointClass();
+        for (Method m : mdbClass.getMethods()) {
+            if (m.isAnnotationPresent(OnRecord.class)) {
+                if (m.getParameterCount() == 1 && ConsumerRecord.class.isAssignableFrom(m.getParameterTypes()[0])) {
+                    onRecordMethods.add(m);
+                } else {
+                    LOGGER.log(Level.WARNING, "@{0} annotated MDBs must have only one parameter of type {1}. {2}#{3} endpoint will be ignored.", new Object[]{
+                        OnRecord.class.getSimpleName(), ConsumerRecord.class.getSimpleName(), mdbClass.getName(), m.getName()});
+                }
+            }
+
+            if (m.isAnnotationPresent(OnRecords.class)) {
+                if (m.getParameterCount() == 1 && ConsumerRecords.class.isAssignableFrom(m.getParameterTypes()[0])) {
+                    onRecordsMethods.add(m);
+                } else {
+                    LOGGER.log(Level.WARNING, "@{0} annotated MDBs must have only one parameter of type {1}. {2}#{3} endpoint will be ignored.", new Object[]{
+                        OnRecords.class.getSimpleName(), ConsumerRecords.class.getSimpleName(), mdbClass.getName(), m.getName()});
+                }
+            }
+        }
     }
 
     @Override
     public void run() {
-        ConsumerRecords<Object, Object> records = consumer.poll(kSpec.getPollInterval());
-        
+        ConsumerRecords<Object, Object> records = consumer.poll(Duration.of(kSpec.getPollInterval(), ChronoUnit.MILLIS));
+
         // if we got noting just return
         if (records.isEmpty()) {
             return;
         }
-        
-        Class<?> mdbClass = endpointFactory.getEndpointClass();
-        
-        // search for methods with OnRecords annotation. This takes precedent.
-        for (Method m : mdbClass.getMethods()) {
-            if (m.isAnnotationPresent(OnRecords.class) && m.getParameterCount() == 1) {
-                try {
-                    // method receives a ConsumerRecord
-                    OnRecords recordsAttn;
-                    recordsAttn = m.getAnnotation(OnRecords.class);                 
-                    context.getWorkManager().scheduleWork(new KafkaWork(endpointFactory, m, records));
-                    if (!recordsAttn.matchOtherMethods()) {
-                        return;
-                    }
-                } catch (WorkException ex) {
-                    Logger.getLogger(KafkaResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
+
+        // search for methods with OnRecords annotation. This takes precedence.
+        for (Method m : onRecordsMethods) {
+            try {
+                // method receives a ConsumerRecord
+                OnRecords recordsAnnt = m.getAnnotation(OnRecords.class);
+                context.getWorkManager().scheduleWork(new KafkaWork(endpointFactory, m, records));
+                if (!recordsAnnt.matchOtherMethods()) {
+                    return;
                 }
+            } catch (WorkException ex) {
+                LOGGER.log(Level.SEVERE, null, ex);
             }
-        }   
-        
+        }
+
         // match methods with OnRecord annotation
         for (ConsumerRecord<Object, Object> record : records) {
-            for (Method m : mdbClass.getMethods()) {
-                if (m.isAnnotationPresent(OnRecord.class) && m.getParameterCount() == 1) {
-                    try {
-                        // method receives a ConsumerRecord
-                        OnRecord recordAttn;
-                        recordAttn = m.getAnnotation(OnRecord.class);
-                        String topics[] = recordAttn.topics();
-                        if ((topics.length == 0) || Arrays.binarySearch(recordAttn.topics(), record.topic()) >=0 ){
-                            context.getWorkManager().scheduleWork(new KafkaWork(endpointFactory, m, record));
-                            if (!recordAttn.matchOtherMethods()) {
-                                break;
-                            }
+            for (Method m : onRecordMethods) {
+                try {
+                    // method receives a ConsumerRecord
+                    OnRecord recordAnnt = m.getAnnotation(OnRecord.class);
+                    String topics[] = recordAnnt.topics();
+                    if ((topics.length == 0) || Arrays.binarySearch(recordAnnt.topics(), record.topic()) >= 0) {
+                        context.getWorkManager().scheduleWork(new KafkaWork(endpointFactory, m, record));
+                        if (!recordAnnt.matchOtherMethods()) {
+                            break;
                         }
-                    } catch (WorkException ex) {
-                        Logger.getLogger(KafkaResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
                     }
+                } catch (WorkException ex) {
+                    LOGGER.log(Level.SEVERE, null, ex);
                 }
             }
         }
     }
-    
+
     void stop() {
         if (consumer != null) {
             consumer.close();
