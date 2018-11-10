@@ -39,8 +39,9 @@
  */
 package fish.payara.cloud.connectors.kafka.outbound;
 
-import fish.payara.cloud.connectors.kafka.api.KafkaConnectionFactory;
 import fish.payara.cloud.connectors.kafka.api.KafkaConnection;
+import fish.payara.cloud.connectors.kafka.api.KafkaConnectionFactory;
+import fish.payara.cloud.connectors.kafka.tools.AdditionalPropertiesParser;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.Objects;
@@ -53,9 +54,8 @@ import javax.resource.spi.ConnectionManager;
 import javax.resource.spi.ConnectionRequestInfo;
 import javax.resource.spi.ManagedConnection;
 import javax.resource.spi.ManagedConnectionFactory;
+import javax.resource.spi.TransactionSupport;
 import javax.security.auth.Subject;
-
-import fish.payara.cloud.connectors.kafka.tools.AdditionalPropertiesParser;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 
@@ -68,7 +68,7 @@ import org.apache.kafka.clients.producer.ProducerConfig;
         connectionFactoryImpl = KafkaConnectionFactoryImpl.class,
         connectionImpl = KafkaConnectionImpl.class
 )
-public class KafkaManagedConnectionFactory implements ManagedConnectionFactory, Serializable {
+public class KafkaManagedConnectionFactory implements ManagedConnectionFactory, TransactionSupport, Serializable {
 
     private final Properties producerProperties;
     private AdditionalPropertiesParser additionalPropertiesParser;
@@ -382,6 +382,11 @@ public class KafkaManagedConnectionFactory implements ManagedConnectionFactory, 
         return writer;
     }
 
+    @Override
+    public TransactionSupportLevel getTransactionSupport() {
+        return TransactionSupportLevel.NoTransaction;
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
