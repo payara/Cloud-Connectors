@@ -42,7 +42,7 @@
         <dependency>
             <groupId>com.microsoft.azure</groupId>
             <artifactId>azure-servicebus</artifactId>
-            <version>1.2.5</version>
+            <version>1.2.13</version>
         </dependency>
         <dependency>
             <groupId>com.microsoft.azure</groupId>
@@ -52,17 +52,7 @@
         <dependency>
             <groupId>fish.payara.cloud.connectors.azuresb</groupId>
             <artifactId>azure-sb-jca-api</artifactId>
-            <version>0.4.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-api</artifactId>
-            <version>7.0</version>
-            <type>jar</type>
-            <scope>provided</scope>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 </project>
