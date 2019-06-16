@@ -25,7 +25,6 @@
             <artifactId>kafka-jca-api</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 

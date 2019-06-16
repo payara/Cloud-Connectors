@@ -41,6 +41,7 @@ package fish.payara.cloud.connectors.kafka.example;
 
 import fish.payara.cloud.connectors.kafka.api.KafkaConnection;
 import fish.payara.cloud.connectors.kafka.api.KafkaConnectionFactory;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
@@ -49,6 +50,7 @@ import javax.ejb.Stateless;
 import javax.resource.ConnectionFactoryDefinition;
 import javax.resource.spi.TransactionSupport.TransactionSupportLevel;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 
 /**
  *
@@ -61,7 +63,8 @@ import org.apache.kafka.clients.producer.ProducerRecord;
   minPoolSize = 2, 
   maxPoolSize = 2,
   transactionSupport = TransactionSupportLevel.NoTransaction,
-  properties = {})
+  properties = {"acks=all"
+  })
 @Stateless
 public class SendKafkaMessage {
     

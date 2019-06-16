@@ -42,6 +42,7 @@ package fish.payara.cloud.connectors.kafka.example;
 import fish.payara.cloud.connectors.kafka.api.KafkaListener;
 import fish.payara.cloud.connectors.kafka.api.OnRecord;
 import fish.payara.cloud.connectors.kafka.api.OnRecords;
+import java.util.logging.Logger;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -57,30 +58,33 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
     @ActivationConfigProperty(propertyName = "groupIdConfig", propertyValue = "testGroup"),
     @ActivationConfigProperty(propertyName = "topics", propertyValue = "test,test2"),
     @ActivationConfigProperty(propertyName = "bootstrapServersConfig", propertyValue = "localhost:9092"),    
-    @ActivationConfigProperty(propertyName = "autoCommitInterval", propertyValue = "100"),    
     @ActivationConfigProperty(propertyName = "retryBackoff", propertyValue = "1000"),    
     @ActivationConfigProperty(propertyName = "keyDeserializer", propertyValue = "org.apache.kafka.common.serialization.StringDeserializer"),    
     @ActivationConfigProperty(propertyName = "valueDeserializer", propertyValue = "org.apache.kafka.common.serialization.StringDeserializer"),    
-    @ActivationConfigProperty(propertyName = "pollInterval", propertyValue = "3000"),    
+    @ActivationConfigProperty(propertyName = "pollInterval", propertyValue = "3000"),
+    @ActivationConfigProperty(propertyName = "commitEachPoll", propertyValue = "true")
 })
 public class KafkaMDB implements KafkaListener {
     
+    private static final Logger LOGGER = Logger.getLogger(KafkaMDB.class.getName());
+    
     public KafkaMDB() {
+        LOGGER.info("Bean instance created");
     }
     
     @OnRecords( matchOtherMethods = true)
     public void getMessageTest2(ConsumerRecords records) {
-        System.out.println("Bulk processing called with " + records.count() + " records");
+        LOGGER.info("Bulk processing called with " + records.count() + " records");
     }
     
     @OnRecord( topics={"test"})
     public void getMessageTest(ConsumerRecord record) {
-        System.out.println("Got record on topic test " + record);
+        LOGGER.info("Got record on topic test " + record);
     }
     
     @OnRecord( topics={"test2"})
     public void getMessageTest2(ConsumerRecord record) {
-        System.out.println("Got record on topic test2 " + record);
+        LOGGER.info("Got record on topic test2 " + record);
     }
     
 }

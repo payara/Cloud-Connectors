@@ -64,7 +64,7 @@ public class KafkaActivationSpec implements ActivationSpec {
     private Long autoCommitInterval;
     private String bootstrapServersConfig;
     private String clientId;
-    private Boolean enableAutoCommit;
+    private Boolean enableAutoCommit = true;
     private String groupIdConfig;
     private String valueDeserializer;
     private String keyDeserializer;
@@ -86,6 +86,8 @@ public class KafkaActivationSpec implements ActivationSpec {
     private Long reconnectBackoff;
     private Long retryBackoff;
     private String additionalProperties;
+    private Boolean commitEachPoll = false;
+    private Boolean useSynchMode = false;
 
     public KafkaActivationSpec() {
         consumerProperties = new Properties();
@@ -116,6 +118,14 @@ public class KafkaActivationSpec implements ActivationSpec {
         this.ra = ra;
     }
 
+    public Boolean getCommitEachPoll() {
+        return commitEachPoll;
+    }
+
+    public void setCommitEachPoll(Boolean commitEachPoll) {
+        this.commitEachPoll = commitEachPoll;
+    }
+
     public Long getAutoCommitInterval() {
         return autoCommitInterval;
     }
@@ -124,6 +134,16 @@ public class KafkaActivationSpec implements ActivationSpec {
         this.autoCommitInterval = autoCommitInterval;
         consumerProperties.setProperty(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, Long.toString(autoCommitInterval));
     }
+
+    public Boolean getUseSynchMode() {
+        return useSynchMode;
+    }
+
+    public void setUseSynchMode(Boolean useSynchMode) {
+        this.useSynchMode = useSynchMode;
+    }
+    
+    
 
     public String getBootstrapServersConfig() {
         return bootstrapServersConfig;

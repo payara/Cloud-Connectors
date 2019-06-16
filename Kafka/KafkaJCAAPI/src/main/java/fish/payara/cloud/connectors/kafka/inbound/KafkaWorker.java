@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2017 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,32 +37,17 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.cloud.connectors.kafka.api;
+package fish.payara.cloud.connectors.kafka.inbound;
 
-import java.util.List;
-import java.util.concurrent.Future;
-import javax.resource.ResourceException;
-import org.apache.kafka.clients.producer.Callback;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.clients.producer.RecordMetadata;
-import org.apache.kafka.common.Metric;
-import org.apache.kafka.common.MetricName;
-import org.apache.kafka.common.PartitionInfo;
+import javax.resource.spi.work.Work;
 
 /**
  *
  * @author Steve Millidge (Payara Foundation)
  */
-public interface KafkaConnection extends AutoCloseable {
+public interface KafkaWorker extends Work {
     
-    public Future<RecordMetadata> send(ProducerRecord record) throws ResourceException;
-    
-    public Future<RecordMetadata> send(ProducerRecord record, Callback callback) throws ResourceException;
-    
-    public void flush() throws ResourceException;
-    
-    List<PartitionInfo> partitionsFor(String topic) throws ResourceException;
-    
-    public java.util.Map<MetricName,? extends Metric> metrics​() throws ResourceException;
+    public void stop();
+    public boolean isStopped();
     
 }
