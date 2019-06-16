@@ -100,6 +100,9 @@ public class MQTTManagedConnectionFactory implements ManagedConnectionFactory, S
     
     @ConfigProperty(type = String.class, description = "Client ID")
     String clientId;
+    
+    @ConfigProperty(type = Boolean.class, defaultValue="false", description = "Manually attempt reconnect on every publish call if disconnected")
+    Boolean manualReconnectOnPublish;
 
     public Boolean getFilePersistance() {
         return filePersistance;
@@ -223,6 +226,16 @@ public class MQTTManagedConnectionFactory implements ManagedConnectionFactory, S
         return logWriter;
     }
 
+    public Boolean getManualReconnectOnPublish() {
+        return manualReconnectOnPublish;
+    }
+
+    public void setManualReconnectOnPublish(Boolean manualReconnectOnPublish) {
+        this.manualReconnectOnPublish = manualReconnectOnPublish;
+    }
+    
+    
+
     @Override
     public int hashCode() {
         int hash = 3;
@@ -237,6 +250,7 @@ public class MQTTManagedConnectionFactory implements ManagedConnectionFactory, S
         hash = 41 * hash + Objects.hashCode(this.userName);
         hash = 41 * hash + Objects.hashCode(this.password);
         hash = 41 * hash + Objects.hashCode(this.clientId);
+        hash = 41 * hash + Objects.hashCode(this.manualReconnectOnPublish);
         return hash;
     }
 
@@ -285,8 +299,12 @@ public class MQTTManagedConnectionFactory implements ManagedConnectionFactory, S
         if (!Objects.equals(this.keepAliveInterval, other.keepAliveInterval)) {
             return false;
         }
+        if (!Objects.equals(this.manualReconnectOnPublish, other.manualReconnectOnPublish)) {
+            return false;
+        }
         return true;
     }
-    
+
+
     
 }

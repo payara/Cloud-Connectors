@@ -23,7 +23,7 @@ import javax.resource.spi.TransactionSupport;
   minPoolSize = 2, 
   maxPoolSize = 2,
   transactionSupport = TransactionSupport.TransactionSupportLevel.NoTransaction,
-  properties = {"cleanSession=true"})
+  properties = {"cleanSession=true","automaticReconnect=true"})
 @Stateless
 public class TimerSend {
 
@@ -36,7 +36,7 @@ public class TimerSend {
         try (MQTTConnection conn = factory.getConnection()) {
             conn.publish("test", "{\"test\": \"Hello World\"}".getBytes(), 0, false);
         } catch (Exception e) {
-            
+            e.printStackTrace();
         }
     }
 

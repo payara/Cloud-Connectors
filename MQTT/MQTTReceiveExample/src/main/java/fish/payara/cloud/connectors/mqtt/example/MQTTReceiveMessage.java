@@ -51,7 +51,8 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
  * @author Steve Millidge (Payara Foundation)
  */
 @MessageDriven(activationConfig = {
-    @ActivationConfigProperty(propertyName = "topicFilter", propertyValue = "test")    
+    @ActivationConfigProperty(propertyName = "topicFilter", propertyValue = "test") ,   
+    @ActivationConfigProperty(propertyName = "automaticReconnect", propertyValue = "true")    
 })
 public class MQTTReceiveMessage implements MQTTListener {
 

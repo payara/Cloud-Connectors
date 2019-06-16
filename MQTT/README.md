@@ -9,7 +9,7 @@ To use the JCA adapter the MQTTRAR-<version>.rar should be deployed to your appl
 
 To deploy the JCA adapter on Payara Micro use the following commands.
 
-You will first need to install an MQTT broker for example Mosquito in Linux.
+You will first need to install an MQTT broker for example Mosquitto in Linux.
 
 ```shell
 java -jar payara-micro.jar --deploy mqtt-rar-0.5.0-SNAPSHOT.rar mqtt-example-0.5.0-SNAPSHOT.jar
@@ -37,7 +37,8 @@ Valid properties for MDBs and Connection Factories are below. On Payara all prop
 |maxInflight | Integer | 10 | Sets the maximum messages that can be sent without acknowledgements
 |keepAliveInterval | Integer | 60 | Sets the keep alive interval in seconds
 |userName | String | None | The user name for the connection. 
-|password | String  | None | The password for the connection. 
+|password | String  | None | The password for the connection.
+|manualReconnectOnPublish | false | Every time publish is called if disconnected from the broker a reconnect call will be attempted. Note depending on your publish frequency this could lead to many reconnect calls in short succession. 
 |topicFilter| String | None | Topic Filter (For MDBs only)
 |qos| String | 0 | Quality of Service for the subscription (For MDBs only)
 
