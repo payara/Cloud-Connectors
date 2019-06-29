@@ -132,7 +132,7 @@ public class MQTTSubscriber implements IMqttMessageListener, MqttCallbackExtende
     public void connectComplete(boolean reconnect, String serverURI) {
         if (reconnect) {
             try {
-                LOGGER.info("Reconnection to " + serverURI + " complete resubscribing for topic " + topic );
+                LOGGER.log(Level.INFO, "Reconnection to {0} complete resubscribing for topic {1}", new Object[]{serverURI, topic});
                 subscribe();
             } catch (ResourceException ex) {
                 LOGGER.log(Level.SEVERE, "Problem resubscribing", ex);

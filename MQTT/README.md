@@ -38,7 +38,7 @@ Valid properties for MDBs and Connection Factories are below. On Payara all prop
 |keepAliveInterval | Integer | 60 | Sets the keep alive interval in seconds
 |userName | String | None | The user name for the connection. 
 |password | String  | None | The password for the connection.
-|manualReconnectOnPublish | false | Every time publish is called if disconnected from the broker a reconnect call will be attempted. Note depending on your publish frequency this could lead to many reconnect calls in short succession. 
+|manualReconnectOnPublish | Boolean | false | Every time publish is called if disconnected from the broker a reconnect call will be attempted. Note depending on your publish frequency this could lead to many reconnect calls in short succession. 
 |topicFilter| String | None | Topic Filter (For MDBs only)
 |qos| String | 0 | Quality of Service for the subscription (For MDBs only)
 
