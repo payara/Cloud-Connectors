@@ -76,9 +76,11 @@ public class MQTTManagedConnection implements ManagedConnection, MQTTConnection 
     private final Set<ConnectionEventListener> listeners;
     private final List<MQTTConnection> connectionHandles = new LinkedList<>();
     private final MqttClient theClient;
+    private final boolean manuallyReconnectOnPublish;
 
     MQTTManagedConnection(MQTTManagedConnectionFactory aThis, Subject subject, ConnectionRequestInfo cxRequestInfo) throws ResourceException {
         cf = aThis;
+        manuallyReconnectOnPublish = aThis.getManualReconnectOnPublish();
         listeners = new HashSet<>();
         MqttClientPersistence persistence = new MemoryPersistence();
         if (cf.getFilePersistance()) {
@@ -198,7 +200,17 @@ public class MQTTManagedConnection implements ManagedConnection, MQTTConnection 
     @Override
     public void publish(String topic, byte[] payload, int qos, boolean retained) throws ResourceException {
         try {
-            theClient.publish(topic, payload, qos, retained);
+            boolean connected = theClient.isConnected();            
+            if (!connected && manuallyReconnectOnPublish) {
+                theClient.reconnect();
+                connected = theClient.isConnected();
+            }
+            
+            if (connected) {
+                theClient.publish(topic, payload, qos, retained);
+            } else {
+                throw new ResourceException("Unable to send message to the MQTT Server we are disconnected");
+            }
         } catch (MqttException ex) {
             throw new ResourceException("Unable to send message to MQTT Server",ex);
         }
@@ -216,7 +228,17 @@ public class MQTTManagedConnection implements ManagedConnection, MQTTConnection 
     @Override
     public void publish(String topic, MqttMessage message) throws ResourceException {
         try {
-            theClient.publish(topic, message);
+            boolean connected = theClient.isConnected();            
+            if (!connected && manuallyReconnectOnPublish) {
+                theClient.reconnect();
+                connected = theClient.isConnected();
+            }
+            
+            if (connected) {
+                theClient.publish(topic, message);
+            } else {
+                throw new ResourceException("Unable to send message to the MQTT Server we are disconnected");                
+            }
         } catch (MqttException ex) {
             throw new ResourceException("Unable to send message to MQTT Server",ex);
         }

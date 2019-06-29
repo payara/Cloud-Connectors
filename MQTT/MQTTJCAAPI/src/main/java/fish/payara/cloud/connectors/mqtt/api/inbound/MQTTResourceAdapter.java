@@ -97,7 +97,7 @@ public class MQTTResourceAdapter implements ResourceAdapter {
 
     @Override
     public void endpointDeactivation(MessageEndpointFactory endpointFactory, ActivationSpec spec) {
-        MQTTSubscriber subs = registeredFactories.get(endpointFactory);
+        MQTTSubscriber subs = registeredFactories.remove(endpointFactory);
         if (subs != null) {
             try {
                 subs.close();
@@ -105,7 +105,6 @@ public class MQTTResourceAdapter implements ResourceAdapter {
                 Logger.getLogger(MQTTResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        registeredFactories.remove(endpointFactory);
     }
 
     @Override

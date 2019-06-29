@@ -56,7 +56,7 @@ import javax.resource.spi.TransactionSupport;
   minPoolSize = 2, 
   maxPoolSize = 2,
   transactionSupport = TransactionSupport.TransactionSupportLevel.NoTransaction,
-  properties = {"cleanSession=true"})
+  properties = {"cleanSession=true","automaticReconnect=true"})
 @Stateless
 public class MQTTSendMessage {
 
@@ -70,7 +70,7 @@ public class MQTTSendMessage {
             Logger.getAnonymousLogger().info("Sending Message at " + new Date());
             conn.publish("test", "{\"test\": \"Hello World\"}".getBytes(), 0, false);
         } catch (Exception e) {
-            
+            e.printStackTrace();
         }
     }
 

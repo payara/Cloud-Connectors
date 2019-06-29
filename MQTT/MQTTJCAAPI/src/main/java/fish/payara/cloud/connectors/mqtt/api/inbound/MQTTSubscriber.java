@@ -39,11 +39,15 @@
  */
 package fish.payara.cloud.connectors.mqtt.api.inbound;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.resource.ResourceException;
 import javax.resource.spi.ActivationSpec;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
 import javax.resource.spi.work.WorkManager;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -53,13 +57,14 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
  *
  * @author Steve Millidge (Payara Foundation)
  */
-public class MQTTSubscriber implements IMqttMessageListener {
+public class MQTTSubscriber implements IMqttMessageListener, MqttCallbackExtended {
     
     private MessageEndpointFactory factory;
     private MqttClient client;
     private WorkManager manager;
     private String topic;
     private int qos;
+    private static final Logger LOGGER = Logger.getLogger(MQTTSubscriber.class.getName());
 
     MQTTSubscriber(MessageEndpointFactory endpointFactory, ActivationSpec spec, WorkManager manager) throws ResourceException {
         this.manager = manager;
@@ -91,6 +96,7 @@ public class MQTTSubscriber implements IMqttMessageListener {
                     options.setUserName(aspec.getUserName());
                 }
                 client.connect(options);
+                client.setCallback(this);
 
             } catch (MqttException ex) {
                 throw new ResourceException("Unable to connection to the MQTT Server",ex);
@@ -109,6 +115,7 @@ public class MQTTSubscriber implements IMqttMessageListener {
 
     void close() throws ResourceException {
         try {
+            client.unsubscribe(topic);
             client.disconnect();
             client.close();
         } catch (MqttException ex) {
@@ -119,6 +126,28 @@ public class MQTTSubscriber implements IMqttMessageListener {
     @Override
     public void messageArrived(String topic, MqttMessage mm) throws Exception {
         manager.scheduleWork(new MQTTWork(topic, mm, factory));
+    }
+
+    @Override
+    public void connectComplete(boolean reconnect, String serverURI) {
+        if (reconnect) {
+            try {
+                LOGGER.log(Level.INFO, "Reconnection to {0} complete resubscribing for topic {1}", new Object[]{serverURI, topic});
+                subscribe();
+            } catch (ResourceException ex) {
+                LOGGER.log(Level.SEVERE, "Problem resubscribing", ex);
+            }
+        }
+    }
+
+    @Override
+    public void connectionLost(Throwable thrwbl) {
+        LOGGER.warning("MQTT RAR Inbound lost connection to MQTT Broker");
+    }
+
+    @Override
+    public void deliveryComplete(IMqttDeliveryToken imdt) {
+        // do nothing
     }
     
 }
