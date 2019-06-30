@@ -41,7 +41,7 @@ Valid properties are below. On Payara all properties in annotations can be repla
 |retryBackoff| Long | 100 | The amount of time to wait before attempting a retry (ms)
 |reconnectBackoff| Long | 100 | The amount of time to wait before attempting a reconnection (ms)
 |commitEachPoll| Boolean | false | If commitEachPoll is set to true a commitSynch will occur after MDBs have processed the records from a poll. Note multiple MDB calls may be made as a result of a single poll (For MDBs Only)
-|enableAutoCommit | Boolean | false | Enables autocommit on the Kafka Consumer (MDBs Only)
+|enableAutoCommit | Boolean | true | Enables autocommit on the Kafka Consumer (MDBs Only)
 |pollInterval | Long | 1000 | How often the MDB Consumer should poll Kafka for new records (MDBs only)
 |autoCommitInterval | Long | None | Interval before autoCommit is sent to the broker (ms) (MDBs only)
 |useSynchMode | Boolean | false | In synch mode a single MDB instance will consume all the records in sequence on a single thread (MDBs only)
