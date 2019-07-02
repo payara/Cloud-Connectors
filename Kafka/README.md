@@ -13,16 +13,11 @@ To deploy the JCA adapter on Payara Micro use the following commands.
 java -jar payara-micro.jar --deploy kafka-rar-0.1.0.rar --deploy kafka-example-0.1.0.jar
 ```
 
-## Inbound MDB
-The KafkaExample module shows an example MDB that receives messages from a Kafka topic.
-To receive messages you must implement the KafkaListener interface. 
-```java
-    public class KafkaMDB implements KafkaListener  
-```
+To deploy independently on Payara Server ensure the Connector Classloading Policy os set to GLOBAL in the Connector Service of your instance configuration.
 
-Also you must set the ActivationConfigProperty values suitable for your MDB. 
+## Resource Adapter Properties 
 
-Valid properties are below. On Payara all properties can be replaced via System properties using the syntax `${system.property.name}` or environment variables using the syntax `${ENV=evironment.property.name}` or password aliases using the syntax `${ALIAS=alias.name}`;
+Valid properties are below. On Payara all properties in annotations can be replaced via System properties using the syntax `${system.property.name}` or environment variables using the syntax `${ENV=evironment.property.name}` or password aliases using the syntax `${ALIAS=alias.name}`;
 
 |Config Property Name | Type | Default | Notes
 |---------------------|------|---------|------
@@ -45,6 +40,41 @@ Valid properties are below. On Payara all properties can be replaced via System 
 |metadataMaxAge| Long | 300000 | Period of time before a refresh of Metadata (ms)
 |retryBackoff| Long | 100 | The amount of time to wait before attempting a retry (ms)
 |reconnectBackoff| Long | 100 | The amount of time to wait before attempting a reconnection (ms)
+|commitEachPoll| Boolean | false | If commitEachPoll is set to true a commitSynch will occur after MDBs have processed the records from a poll. Note multiple MDB calls may be made as a result of a single poll (For MDBs Only)
+|enableAutoCommit | Boolean | true | Enables autocommit on the Kafka Consumer (MDBs Only)
+|pollInterval | Long | 1000 | How often the MDB Consumer should poll Kafka for new records (MDBs only)
+|autoCommitInterval | Long | None | Interval before autoCommit is sent to the broker (ms) (MDBs only)
+|useSynchMode | Boolean | false | In synch mode a single MDB instance will consume all the records in sequence on a single thread (MDBs only)
+
+## Inbound Processing (MDBs)
+
+For inbound processing the Resource Adapter has two modes.
+
+### Synch Mode
+Synch mode is an inbound processing mode whereby the resource adapter uses a single work manager thread
+to poll the KafkaConsumer and process all the inbound records. Synch mode uses a single thread and MDB instance
+to process all the records received from Kaka on the configured topic.
+
+Synch mode is enabled on an MDB by setting
+```java
+    @ActivationConfigProperty(propertyName = "useSynchMode", propertyValue = "true")
+```
+
+### Asynch Mode
+Asynch mode is the default. In this mode the resource adapter continually submits a Work Manager
+work instance to poll Kafka. When records are received a second Work instance is submitted to the 
+Work Manager to process all the records from the poll. Therefore record processing occurs on a different thread to 
+than polling for records. All records from the poll are processed by a single MDB instance.
+
+### Example MDB
+
+The KafkaExample module shows an example MDB that receives messages from a Kafka topic.
+To receive messages you must implement the KafkaListener interface. 
+```java
+    public class KafkaMDB implements KafkaListener  
+```
+
+Also you must set the ActivationConfigProperty values suitable for your MDB.
 
 Your MDB should contain one method annotated with `@OnRecord` and that method should take a single parameter of type `ConsumerRecord`. A specific set of topics to receive messages for can be specified `@OnRecord(topics={"test"})`
 
@@ -57,6 +87,7 @@ A full skeleton MDB is shown below
     @ActivationConfigProperty(propertyName = "groupIdConfig", propertyValue = "testGroup"),
     @ActivationConfigProperty(propertyName = "topics", propertyValue = "test,test2"),
     @ActivationConfigProperty(propertyName = "bootstrapServersConfig", propertyValue = "localhost:9092"),    
+    @ActivationConfigProperty(propertyName = "enableAutoCommit", propertyValue = "true"),    
     @ActivationConfigProperty(propertyName = "autoCommitInterval", propertyValue = "100"),    
     @ActivationConfigProperty(propertyName = "retryBackoff", propertyValue = "1000"),    
     @ActivationConfigProperty(propertyName = "keyDeserializer", propertyValue = "org.apache.kafka.common.serialization.StringDeserializer"),    
@@ -109,6 +140,8 @@ An example annotation defined connection factory is shown below;
   transactionSupport = TransactionSupportLevel.NoTransaction,
   properties = {})
 ```
+
+additional `KafkaProducer` properties can be set by using the `properties` section of the `ConnectionFactoryDefinition`
 
 This connection factory can then be injected into any JavaEE component;
 ```java

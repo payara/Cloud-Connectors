@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2017 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,77 +39,70 @@
  */
 package fish.payara.cloud.connectors.kafka.inbound;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.resource.ResourceException;
-import javax.resource.spi.endpoint.MessageEndpoint;
+import java.util.Objects;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
-import javax.resource.spi.work.Work;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
 
 /**
  *
  * @author Steve Millidge (Payara Foundation)
  */
-public class KafkaWork implements Work {
+public class EndpointKey {
+    
+    private MessageEndpointFactory mef;
+    private KafkaActivationSpec spec;
 
-    private MessageEndpoint endpoint;
-    private final ReentrantLock releaseEndpointLock = new ReentrantLock();
-    private final MessageEndpointFactory factory;
-    private final Method m;
-    private ConsumerRecord record;
-    private ConsumerRecords records;
-
-    public KafkaWork(MessageEndpointFactory factory, Method m, ConsumerRecord record) {
-        this.factory = factory;
-        this.m = m;
-        this.record = record;
+    public EndpointKey(MessageEndpointFactory mef, KafkaActivationSpec spec) {
+        this.mef = mef;
+        this.spec = spec;
     }
     
-    public KafkaWork(MessageEndpointFactory factory, Method m, ConsumerRecords records) {
-        this.factory = factory;
-        this.m = m;
-        this.records = records;
+    public MessageEndpointFactory getMef() {
+        return mef;
+    }
+
+    public void setMef(MessageEndpointFactory mef) {
+        this.mef = mef;
+    }
+
+    public KafkaActivationSpec getSpec() {
+        return spec;
+    }
+
+    public void setSpec(KafkaActivationSpec spec) {
+        this.spec = spec;
     }
     
+    
+
     @Override
-    public void release() {
-        releaseEndpoint();
-    }
-
-    private void releaseEndpoint() {
-        releaseEndpointLock.lock();
-        try {
-            if (endpoint != null) {
-                endpoint.release();
-                endpoint = null;
-            }
-        }
-        finally {
-            releaseEndpointLock.unlock();
-        }
+    public int hashCode() {
+        int hash = 7;
+        hash = 71 * hash + Objects.hashCode(this.mef);
+        hash = 71 * hash + Objects.hashCode(this.spec);
+        return hash;
     }
 
     @Override
-    public void run() {
-        try {
-            endpoint = factory.createEndpoint(null);
-            endpoint.beforeDelivery(m);
-            if (record != null) {
-                m.invoke(endpoint, record);
-            } else {
-                m.invoke(endpoint, records);                
-            }
-            endpoint.afterDelivery();
-        } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ResourceException ex) {
-            Logger.getLogger(KafkaResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            releaseEndpoint();
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
         }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final EndpointKey other = (EndpointKey) obj;
+        if (!Objects.equals(this.mef, other.mef)) {
+            return false;
+        }
+        if (!Objects.equals(this.spec, other.spec)) {
+            return false;
+        }
+        return true;
     }
-
+    
+    
+    
 }

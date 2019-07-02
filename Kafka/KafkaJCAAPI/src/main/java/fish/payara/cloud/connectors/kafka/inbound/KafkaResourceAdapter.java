@@ -41,7 +41,6 @@ package fish.payara.cloud.connectors.kafka.inbound;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,8 +50,11 @@ import javax.resource.spi.BootstrapContext;
 import javax.resource.spi.Connector;
 import javax.resource.spi.ResourceAdapter;
 import javax.resource.spi.ResourceAdapterInternalException;
-import javax.resource.spi.UnavailableException;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
+import javax.resource.spi.work.WorkEvent;
+import javax.resource.spi.work.WorkException;
+import javax.resource.spi.work.WorkListener;
+import javax.resource.spi.work.WorkManager;
 import javax.transaction.xa.XAResource;
 
 /**
@@ -64,46 +66,48 @@ import javax.transaction.xa.XAResource;
         vendorName = "Payara Services Limited",
         version = "1.0"
 )
-public class KafkaResourceAdapter implements ResourceAdapter, Serializable{
+public class KafkaResourceAdapter implements ResourceAdapter, Serializable, WorkListener {
     
     private static final Logger LOGGER = Logger.getLogger(KafkaResourceAdapter.class.getName());
+    private final Map<EndpointKey,KafkaWorker> registeredWorkers;
     private BootstrapContext context;
-    private final Map<MessageEndpointFactory, KafkaPoller> registeredFactories;
-    private Timer poller;
+    private WorkManager workManager;
+    private boolean running;
 
     public KafkaResourceAdapter() {
-        this.registeredFactories = new ConcurrentHashMap<>();
+        registeredWorkers = new ConcurrentHashMap<>();
     }
 
     @Override
     public void start(BootstrapContext ctx) throws ResourceAdapterInternalException {
         LOGGER.info("Kafka Resource Adapter Started..");
         context = ctx;
-        try {
-            poller = context.createTimer();
-        } catch (UnavailableException ex) {
-            LOGGER.log(Level.SEVERE, "Unable to create Poller", ex);
-            throw new ResourceAdapterInternalException(ex);
-        }
+        workManager = context.getWorkManager();
+        running = true;
     }
 
     @Override
     public void stop() {
         LOGGER.info("Kafka Resource Adapter Stopped");
-        // go through all the registered factories and stop 
-        poller.cancel();
-        for (KafkaPoller value : registeredFactories.values()) {
-            value.stop();
+        for (KafkaWorker work : registeredWorkers.values()) {
+            work.stop();
         }
+        running = false;
     }
 
     @Override
     public void endpointActivation(MessageEndpointFactory endpointFactory, ActivationSpec spec) throws ResourceException {
         if (spec instanceof KafkaActivationSpec) {
-            KafkaActivationSpec kSpec = (KafkaActivationSpec) spec;
-            KafkaPoller kTask = new KafkaPoller(kSpec,context,endpointFactory);
-            registeredFactories.put(endpointFactory, kTask);
-            poller.schedule(kTask, kSpec.getInitialPollDelay(), kSpec.getPollInterval());
+            EndpointKey endpointKey = new EndpointKey(endpointFactory, (KafkaActivationSpec) spec);
+            if (((KafkaActivationSpec) spec).getUseSynchMode()) {
+                KafkaSynchWorker kafkaWork = new KafkaSynchWorker(endpointKey);
+                registeredWorkers.put(endpointKey,kafkaWork);
+                workManager.scheduleWork(kafkaWork);
+            } else {
+                KafkaAsynchWorker kafkaWork = new KafkaAsynchWorker(endpointKey, workManager);
+                registeredWorkers.put(endpointKey, kafkaWork);
+                workManager.scheduleWork(kafkaWork, ((KafkaActivationSpec) spec).getPollInterval(), null, this);
+            }
         } else {
             LOGGER.warning("Got endpoint activation for an ActivationSpec of unknown class " + spec.getClass().getName());
         } 
@@ -111,9 +115,10 @@ public class KafkaResourceAdapter implements ResourceAdapter, Serializable{
 
     @Override
     public void endpointDeactivation(MessageEndpointFactory endpointFactory, ActivationSpec spec) {
-        KafkaPoller kTask = registeredFactories.get(endpointFactory);
-        kTask.stop();
-        kTask.cancel();
+        KafkaWorker work = registeredWorkers.remove(new EndpointKey(endpointFactory, (KafkaActivationSpec) spec));
+        if (work != null) {
+            work.stop();
+        }
     }
 
     @Override
@@ -129,5 +134,30 @@ public class KafkaResourceAdapter implements ResourceAdapter, Serializable{
     @Override
     public int hashCode() {
         return super.hashCode();
+    }
+
+    @Override
+    public void workAccepted(WorkEvent we) {
+   }
+
+    @Override
+    public void workRejected(WorkEvent we) {
+    }
+
+    @Override
+    public void workStarted(WorkEvent we) {
+    }
+
+    @Override
+    public void workCompleted(WorkEvent we) {
+        // when an asynch worker is completed it needs to be rescheduled if it is still active
+        try {
+            KafkaWorker worker = (KafkaWorker) we.getWork();
+            if (running && !worker.isStopped()) {
+                workManager.scheduleWork(worker, 1000, null, this);
+            }
+        } catch (WorkException ex) {
+            Logger.getLogger(KafkaResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

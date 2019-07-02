@@ -55,7 +55,10 @@ import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Future;
+import org.apache.kafka.common.Metric;
+import org.apache.kafka.common.MetricName;
 
 /**
  *
@@ -161,6 +164,11 @@ public class KafkaManagedConnection implements ManagedConnection, KafkaConnectio
     public void close() throws Exception {
         producer.close();
         producer = null;
+    }
+
+    @Override
+    public Map<MetricName, ? extends Metric> metrics() throws ResourceException {
+        return producer.metrics();
     }
     
     void remove(KafkaConnectionImpl conn) {
