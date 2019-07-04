@@ -1,6 +1,6 @@
 # Change Log for the MQTT JCA Connector
 
-## 0.5.0
+## 0.6.0-SNAPSHOT
 * new `ConnectionFactory` property `manualReconnectOnPublish`
 * Connector inbound subsystem now resubscribes for topics when it detects a reconnect
 * Connector inbound on undeploy connector unsubscribes MDBs from topics before closing MQTT client this prevent spurious exceptions for in-flight messages
