@@ -12,7 +12,7 @@ To deploy the JCA adapter on Payara Micro use the following commands.
 You will first need to install an MQTT broker for example Mosquitto in Linux.
 
 ```shell
-java -jar payara-micro.jar --deploy mqtt-rar-0.5.0-SNAPSHOT.rar mqtt-example-0.5.0-SNAPSHOT.jar
+java -jar payara-micro.jar --deploy mqtt-rar-0.5.0.rar mqtt-example-0.5.0.jar
 ```
 
 ## Inbound MDB
@@ -76,7 +76,7 @@ An example annotation defined connection factory is shown below;
 @ConnectionFactoryDefinition(name = "java:comp/env/MQTTConnectionFactory", 
   description = "MQTT Conn Factory", 
   interfaceName = "fish.payara.cloud.connectors.mqtt.api.MQTTConnectionFactory", 
-  resourceAdapter = "mqtt-rar-0.5.0-SNAPSHOT", 
+  resourceAdapter = "mqtt-rar-0.5.0", 
   minPoolSize = 2, 
   maxPoolSize = 2,
   transactionSupport = TransactionSupport.TransactionSupportLevel.NoTransaction,
