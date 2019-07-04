@@ -1,6 +1,6 @@
 # Change Log for Kafka Resource Adapter
 
-## 0.5.0
+## 0.6.0-SNAPSHOT
 
 Reimplemented the JCA adapter and now has two modes of operation
 Further testing and bug fixing for reconnects, redeploys of MDBs and the RAR.
