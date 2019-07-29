@@ -64,7 +64,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 @Path("/queues/{queue}")
 @ConnectionFactoryDefinition(name = "java:comp/env/KafkaConnectionFactory", 
   description = "Kafka Conn Factory", 
-  interfaceName = "fish.payara.cloud.connectors.kafka.KafkaConnectionFactory", 
+  interfaceName = "fish.payara.cloud.connectors.kafka.api.KafkaConnectionFactory", 
   resourceAdapter = "kafka-rar-0.6.0-SNAPSHOT", 
   minPoolSize = 2, 
   maxPoolSize = 20,
