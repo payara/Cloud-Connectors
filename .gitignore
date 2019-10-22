@@ -8,21 +8,8 @@
 *.war
 *.ear
 
+*nb-configuration.xml
+
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
-/Kafka/KafkaRAR/target/
-/Kafka/KafkaRARPackaging/target/
-/AmazonSQS/AmazonSQSJCAAPI/target/
-/AmazonSQS/AmazonSQSRAR/target/
-/MQTT/MQTTJCA/nbproject/private/
-/MQTT/MQTT-JCA-API/target/
-/MQTTRAR/target/
-/MQTT/MQTTRAR/target/
-/Kafka/KafkaExample/target/
-/AmazonSQS/AmazonSQSExample/target/
-/MQTT/MQTTExample/target/
-/AzureServiceBus/AzureSBJCAAPI/target/
-/AzureServiceBus/AzureSBExample/target/
-/AzureServiceBus/AzureSBRAR/target/
-/Kafka/kafka-rest-example/target/
 target/
