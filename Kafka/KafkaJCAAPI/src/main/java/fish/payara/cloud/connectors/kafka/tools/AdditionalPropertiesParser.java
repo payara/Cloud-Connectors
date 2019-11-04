@@ -39,6 +39,7 @@
  */
 package fish.payara.cloud.connectors.kafka.tools;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -48,12 +49,54 @@ public class AdditionalPropertiesParser {
     private static final Logger LOG = Logger.getLogger(AdditionalPropertiesParser.class.getName());
     private static final String LIST_SEPARATOR = ",";
     private static final String KEY_VALUE_SEPARATOR = "=";
+    private static final char ESCAPE_CHARACTER = '\'';
 
     private String propertiesString;
 
     public AdditionalPropertiesParser(String propertiesString) {
         this.propertiesString = propertiesString;
     }
+
+
+    private static String[] split(String propertiesString, String separator) {
+        ArrayList<String> properties = new ArrayList<>();
+        boolean insideComplexValue = false;
+        StringBuilder part = new StringBuilder();
+
+        for (int i = 0; i < propertiesString.length(); i++) {
+            part.append(propertiesString.charAt(i));
+
+            if (propertiesString.charAt(i) == ESCAPE_CHARACTER) {
+                insideComplexValue = !insideComplexValue;
+            }
+
+            // separator already in part, add to result list
+            if (part.substring(part.length() - separator.length()).equals(separator) && !insideComplexValue) {
+                properties.add(part.substring(0, part.length() - separator.length()));
+                part.setLength(0);
+            }
+        }
+
+        if (part.length() > 0) {
+            properties.add(part.toString());
+        }
+
+        return properties.toArray(new String[0]);
+    }
+
+    private static String correctSingleQuotes(String val) {
+        String cleaned = val.replace("" + ESCAPE_CHARACTER + ESCAPE_CHARACTER, "" + ESCAPE_CHARACTER);
+
+        if (cleaned.charAt(0) == ESCAPE_CHARACTER) {
+            cleaned = cleaned.substring(1);
+        }
+        if (cleaned.charAt(cleaned.length() - 1) == ESCAPE_CHARACTER) {
+            cleaned = cleaned.substring(0, cleaned.length() - 1);
+        }
+
+        return cleaned;
+    }
+
 
     public static Properties merge(Properties base, Properties addtional){
         Properties properties = new Properties();
@@ -70,14 +113,14 @@ public class AdditionalPropertiesParser {
         Properties properties = new Properties();
         if (propertiesString != null) {
             String lastKey = null;
-            final String[] splittedProperties = propertiesString.split(LIST_SEPARATOR);
+            final String[] splittedProperties = split(propertiesString, LIST_SEPARATOR);
             for (String singleKeyValue : splittedProperties) {
-                final String[] splittedKeyValue = singleKeyValue.split(KEY_VALUE_SEPARATOR);
+                final String[] splittedKeyValue = split(singleKeyValue, KEY_VALUE_SEPARATOR);
                 switch (splittedKeyValue.length) {
                     case 2: {
-                        final String key = splittedKeyValue[0].trim();
+                        final String key = correctSingleQuotes(splittedKeyValue[0].trim());
                         lastKey = key;
-                        final String value = splittedKeyValue[1].trim();
+                        final String value = correctSingleQuotes(splittedKeyValue[1].trim());
                         final String existingValue = properties.getProperty(key);
                         if (existingValue != null) {
                             properties.setProperty(key, existingValue + LIST_SEPARATOR + value);
@@ -88,7 +131,7 @@ public class AdditionalPropertiesParser {
                     }
                     case 1: {
                         if (lastKey != null) {
-                            final String value = splittedKeyValue[0].trim();
+                            final String value = correctSingleQuotes(splittedKeyValue[0].trim());
                             // assume property to be list and use the last key to add to
                             final String existingValue = properties.getProperty(lastKey);
                             if (existingValue != null) {

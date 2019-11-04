@@ -18,6 +18,11 @@ public class AdditionalPropertiesParserTest {
                 {"A=aValue , B=bValue", properties(new String[]{"A", "B"}, new String[]{"aValue","bValue"})},
                 {"A=aValue , B=b1Value , b2Value", properties(new String[]{"A", "B"}, new String[]{"aValue","b1Value,b2Value"})},
                 {"A=aValue , B=b1Value , B=b2Value", properties(new String[]{"A", "B"}, new String[]{"aValue","b1Value,b2Value"})},
+                {"A='aValue , b1Value' , B=b2Value", properties(new String[]{"A", "B"}, new String[]{"aValue , b1Value","b2Value"})},
+                {"A='aValue B=b1Value' , B=b2Value", properties(new String[]{"A", "B"}, new String[]{"aValue B=b1Value","b2Value"})},
+                {"A='aValue , B=b1Value' , B=b2Value", properties(new String[]{"A", "B"}, new String[]{"aValue , B=b1Value","b2Value"})},
+                {"A='aValue , '' B=b1Value' , B=b2Value", properties(new String[]{"A", "B"}, new String[]{"aValue , ' B=b1Value","b2Value"})},
+                {"A='''aValue , B=b1Value''' , B=b2Value", properties(new String[]{"A", "B"}, new String[]{"'aValue , B=b1Value'","b2Value"})},
         };
     }
 
