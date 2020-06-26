@@ -47,6 +47,7 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
@@ -102,7 +103,11 @@ public class KafkaSynchWorker implements KafkaWorker {
 
     @Override
     public void run() {
-        
+        try {
+            Thread.sleep(key.getSpec().getInitialPollDelay());
+        } catch (InterruptedException e) {
+            LOGGER.log(Level.WARNING, "Interrupt Exception in wait for start");
+        }
         try {
             // create the consumer
             consumer = new KafkaConsumer(key.getSpec().getConsumerProperties());
