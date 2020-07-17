@@ -4,13 +4,13 @@
     <parent>
         <groupId>fish.payara.cloud.connectors</groupId>
         <artifactId>cloud-connectors</artifactId>
-        <version>0.6.0-SNAPSHOT</version>
+        <version>0.6.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     
     <groupId>fish.payara.cloud.connectors.azuresb</groupId>
     <artifactId>azure-sb-example</artifactId>
-    <version>0.6.0-SNAPSHOT</version>
+    <version>0.6.0</version>
     <packaging>ejb</packaging>
 
     <name>AzureSBExample</name>

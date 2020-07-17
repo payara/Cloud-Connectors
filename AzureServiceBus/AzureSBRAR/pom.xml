@@ -4,12 +4,12 @@
     <parent>
         <groupId>fish.payara.cloud.connectors</groupId>
         <artifactId>cloud-connectors</artifactId>
-        <version>0.6.0-SNAPSHOT</version>
+        <version>0.6.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <groupId>fish.payara.cloud.connectors.azuresb</groupId>
     <artifactId>azure-sb-rar</artifactId>
-    <version>0.6.0-SNAPSHOT</version>
+    <version>0.6.0</version>
     <packaging>rar</packaging>
     <name>Azure Service Bus JCA Adapter RAR</name>
     <description>RAR for the Azure Service Bus JCA Adapter</description>

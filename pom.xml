@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fish.payara.cloud.connectors</groupId>
     <artifactId>cloud-connectors</artifactId>
-    <version>0.6.0-SNAPSHOT</version>
+    <version>0.6.0</version>
     <packaging>pom</packaging>
     <name>Payara Cloud Connectors</name>
     <description>Project for JCA modules that connect to various cloud services</description>
