@@ -4,7 +4,7 @@
 
     <groupId>fish.payara.cloud.connectors.kafka</groupId>
     <artifactId>kafka-rest-example</artifactId>
-    <version>0.6.0-SNAPSHOT</version>
+    <version>0.6.0</version>
     <packaging>war</packaging>
 
     <name>kafka-rest-example</name>
@@ -18,7 +18,7 @@
         <dependency>
             <groupId>fish.payara.cloud.connectors.kafka</groupId>
             <artifactId>kafka-jca-api</artifactId>
-            <version>0.6.0-SNAPSHOT</version>
+            <version>0.6.0</version>
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
