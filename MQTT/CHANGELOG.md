@@ -1,6 +1,9 @@
 # Change Log for the MQTT JCA Connector
 
-## 0.6.0-SNAPSHOT
+ ## 0.5.0
+ * Upgrade Eclipse Paho Client API to 1.2.5
+
+## 0.5.0
 * new `ConnectionFactory` property `manualReconnectOnPublish`
 * Connector inbound subsystem now resubscribes for topics when it detects a reconnect
 * Connector inbound on undeploy connector unsubscribes MDBs from topics before closing MQTT client this prevent spurious exceptions for in-flight messages

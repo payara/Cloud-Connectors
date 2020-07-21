@@ -1,6 +1,6 @@
 # Azure Service Bus
 
-NOTE The Azure Service Bus Connector from 0.6.0-SNAPSHOT onwards uses the new Azure Service Bus 
+NOTE The Azure Service Bus Connector from 0.6.1-SNAPSHOT onwards uses the new Azure Service Bus 
 apis and is not api compatible with the JCA adapter 0.2.0 and below.
 
 These modules form the basis of the Azure Service Bus Queues JCA connector. The code is in three modules
@@ -15,7 +15,7 @@ To deploy the JCA adapter on Payara Micro use the following commands.
 ```shell
 export sasKey=<yoursaskey>
 export nameSpace=<your-name-space>
-java -jar payara-micro.jar --deploy azure-sb-rar-0.6.0-SNAPSHOT.rar azure-sb-example-0.6.0-SNAPSHOT.jar
+java -jar payara-micro.jar --deploy azure-sb-rar-0.6.1-SNAPSHOT.rar azure-sb-example-0.6.1-SNAPSHOT.jar
 ```
 
 ## Inbound MDB
@@ -80,7 +80,7 @@ An example annotation defined connection factory is shown below;
 @ConnectionFactoryDefinition(name = "java:comp/env/AzureSBConnectionFactory",
         description = "Azure SB Conn Factory",
         interfaceName = "fish.payara.cloud.connectors.azuresb.api.AzureSBConnectionFactory",
-        resourceAdapter = "azure-sb-rar-0.6.0-SNAPSHOT",
+        resourceAdapter = "azure-sb-rar-0.6.1-SNAPSHOT",
         minPoolSize = 2, maxPoolSize = 2,
         transactionSupport = TransactionSupportLevel.NoTransaction,
         properties = {"nameSpace=${ENV=nameSpace}",

@@ -1,6 +1,12 @@
 # Change Log for Kafka Resource Adapter
 
-## 0.6.0-SNAPSHOT
+ ## 0.6.0
+
+ Upgrade Kafka Client API to 2.5.0
+ Add support for complex additional properties in Kafka connector
+
+
+## 0.5.0
 
 Reimplemented the JCA adapter and now has two modes of operation
 Further testing and bug fixing for reconnects, redeploys of MDBs and the RAR.
