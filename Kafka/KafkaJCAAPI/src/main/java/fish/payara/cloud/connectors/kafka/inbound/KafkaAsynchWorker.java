@@ -124,10 +124,16 @@ public class KafkaAsynchWorker implements KafkaWorker {
     }
 
     private void checkStart(){
-        if (new Date().getTime()>key.getSpec().getInitialPollDelay()+startTime) {
+        long now = System.currentTimeMillis();
+        if (now >key.getSpec().getInitialPollDelay()+startTime) {
             started.set(true);
         }else {
-//            LOGGER.log(Level.WARNING, "waiting for a bit before processing start" + new Date(startTime) +  " now: " + new Date());
+            try {
+                Thread.sleep(key.getSpec().getInitialPollDelay() - (now - startTime));
+                started.set(true);
+            } catch (InterruptedException e) {
+                LOGGER.log(Level.WARNING, "Interrupt during sleep while waiting for initial poll delay");
+            }
         }
     }
     
