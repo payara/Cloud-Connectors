@@ -47,6 +47,7 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
@@ -75,6 +76,10 @@ public class KafkaAsynchWorker implements KafkaWorker {
 
     private final List<Method> onRecordMethods = new ArrayList<>();
     private final List<Method> onRecordsMethods = new ArrayList<>();
+
+    private final long startTime = new Date().getTime();
+    private AtomicBoolean started = new AtomicBoolean();
+
 
     public KafkaAsynchWorker(EndpointKey key, WorkManager wm) {
         // new work for the specified key
@@ -118,7 +123,19 @@ public class KafkaAsynchWorker implements KafkaWorker {
         return stopped.get();
     }
 
-    
+    private void checkStart(){
+        long now = System.currentTimeMillis();
+        if (now >key.getSpec().getInitialPollDelay()+startTime) {
+            started.set(true);
+        }else {
+            try {
+                Thread.sleep(key.getSpec().getInitialPollDelay() - (now - startTime));
+                started.set(true);
+            } catch (InterruptedException e) {
+                LOGGER.log(Level.WARNING, "Interrupt during sleep while waiting for initial poll delay");
+            }
+        }
+    }
     
     @Override
     public void release() {
@@ -127,24 +144,28 @@ public class KafkaAsynchWorker implements KafkaWorker {
 
     @Override
     public void run() {
-        ConsumerRecords<Object, Object> records = consumer.poll(Duration.of(key.getSpec().getPollInterval(), ChronoUnit.MILLIS));
-        if (!records.isEmpty()) {
-            try {
-                // ok we got something
-                // schedule on the Work Manager Again
-                wm.scheduleWork(new RecordsProcessor(records));
-            } catch (WorkException ex) {
-                Logger.getLogger(KafkaAsynchWorker.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-            if (key.getSpec().getCommitEachPoll()) {
-                consumer.commitSync();
-            }
-        }
+        if (!started.get()) {
+            checkStart();
+        }else{
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.of(key.getSpec().getPollInterval(), ChronoUnit.MILLIS));
+            if (!records.isEmpty()) {
+                try {
+                    // ok we got something
+                    // schedule on the Work Manager Again
+                    wm.scheduleWork(new RecordsProcessor(records));
+                } catch (WorkException ex) {
+                    Logger.getLogger(KafkaAsynchWorker.class.getName()).log(Level.SEVERE, null, ex);
+                }
 
-        // consume records
-        if (stopped.get()) {
-            consumer.close();
+                if (key.getSpec().getCommitEachPoll()) {
+                    consumer.commitSync();
+                }
+            }
+
+            // consume records
+            if (stopped.get()) {
+                consumer.close();
+            }
         }
     }
 
