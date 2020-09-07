@@ -30,7 +30,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-sqs</artifactId>
-            <version>1.11.822</version>
+            <version>1.11.856</version>
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
