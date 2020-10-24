@@ -36,8 +36,9 @@ Valid properties are below. On Payara all properties can be replaced via System 
 
 |Config Property Name | Type | Default | Notes
 |---------------------|------|---------|------
-|awsAccessKeyId | String | None | Must be set to the access key of your AWS account
-|awsSecretKey | String | None | Must be set to the secret key of your AWS account
+|awsAccessKeyId | String | None | Must be set to the access key of your AWS account. Ignored if profileName is present
+|awsSecretKey | String | None | Must be set to the secret key of your AWS account. Ignored if profileName is present
+|profileName | String | None | AWS Profile Name as configured in ~/.aws directory. 
 |queueURL | String | None | Must be set to the URL for an SQS queue
 |region | String | None | Must be set to the AWS region name of your queue
 |maxMessages | Integer | 10 | The maximum number of messages to download on a poll
@@ -48,7 +49,7 @@ Valid properties are below. On Payara all properties can be replaced via System 
 
 Your MDB should contain one method annotated with `@OnSQSMessage` and that method should take a single parameter of type `com.amazonaws.services.sqs.model.Message`
 
-A full skeleton MDB is shown below
+A full skeleton MDB using Access and Secret keys shown below
 ```java
 @MessageDriven(activationConfig = {
     @ActivationConfigProperty(propertyName = "awsAccessKeyId", propertyValue = "${ENV=accessKey}"),
@@ -65,7 +66,22 @@ public class ReceiveSQSMessage implements AmazonSQSListener {
     }
 }
 ```
+Using Profile Name
+```java
+@MessageDriven(activationConfig = {
+    @ActivationConfigProperty(propertyName = "profileName", propertyValue = "${ENV=profileName}"),
+    @ActivationConfigProperty(propertyName = "queueURL", propertyValue = "${ENV=queueURL}"),   
+    @ActivationConfigProperty(propertyName = "pollInterval", propertyValue = "1"),    
+    @ActivationConfigProperty(propertyName = "region", propertyValue = "eu-west-2")    
+})
+public class ReceiveSQSMessage implements AmazonSQSListener {
 
+    @OnSQSMessage
+    public void receiveMessage(Message message) {
+        System.out.println("Got message " + message.getBody());
+    }
+}
+```
 ## Outbound messages sending
 It is also possible to send messages to the queue using a defined connection factory. 
 A full example of this is shown below;
@@ -90,7 +106,11 @@ An example annotation defined connection factory is shown below;
                 "awsSecretKey=${ENV=secretKey}",
                 "region=eu-west-2"})
 ```
-
+Profile Name properties configuration
+```java
+  properties = {"profileName=${ENV=profileName}"
+                "region=eu-west-2"})
+```
 This connection factory can then be injected into any JavaEE component;
 ```java
     @Resource(lookup="java:comp/env/SQSConnectionFactory")

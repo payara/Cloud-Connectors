@@ -41,7 +41,10 @@ package fish.payara.cloud.connectors.amazonsqs.api.inbound;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.util.StringUtils;
 import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSListener;
+
 import javax.resource.ResourceException;
 import javax.resource.spi.Activation;
 import javax.resource.spi.ActivationSpec;
@@ -50,13 +53,14 @@ import javax.resource.spi.ResourceAdapter;
 
 /**
  * Activation Specification for Amazon SQS
+ *
  * @author Steve Millidge (Payara Foundation)
  */
 @Activation(messageListeners = AmazonSQSListener.class)
 public class AmazonSQSActivationSpec implements ActivationSpec, AWSCredentialsProvider {
-    
+
     ResourceAdapter adapter;
-    
+
     private String awsAccessKeyId;
     private String awsSecretKey;
     private String queueURL;
@@ -67,25 +71,30 @@ public class AmazonSQSActivationSpec implements ActivationSpec, AWSCredentialsPr
     private Integer pollInterval = 1000;
     private String messageAttributeNames = "All";
     private String attributeNames = "All";
-    
+    private String profileName;
 
     @Override
     public void validate() throws InvalidPropertyException {
-        if (region == null) {
+        if (StringUtils.isNullOrEmpty(region)) {
             throw new InvalidPropertyException("region must be specified");
         }
-        
-        if (awsAccessKeyId == null) {
-            throw new InvalidPropertyException("awsAccessKeyId must be specified");
-        } 
-        
-        if (awsSecretKey == null) {
-            throw new InvalidPropertyException("awsSecretKey must be specified");
-        }      
-        
-        if (queueURL == null) {
+
+        // Validate profileName if present, skip validation off other keys
+        if (StringUtils.isNullOrEmpty(profileName)) {
+
+            // validate keys if profileName isn't available
+            if (StringUtils.isNullOrEmpty(awsAccessKeyId)) {
+                throw new InvalidPropertyException("awsAccessKeyId must be specified");
+            }
+
+            if (StringUtils.isNullOrEmpty(awsSecretKey)) {
+                throw new InvalidPropertyException("awsSecretKey must be specified");
+            }
+        }
+
+        if (StringUtils.isNullOrEmpty(queueURL)) {
             throw new InvalidPropertyException("queueURL must be specified");
-        }  
+        }
     }
 
     @Override
@@ -177,30 +186,39 @@ public class AmazonSQSActivationSpec implements ActivationSpec, AWSCredentialsPr
     public void setAttributeNames(String attributeNames) {
         this.attributeNames = attributeNames;
     }
-    
-    
-    
+
+    public String getProfileName() {
+        return profileName;
+    }
+
+    public void setProfileName(String profileName) {
+        this.profileName = profileName;
+    }
 
     @Override
     public AWSCredentials getCredentials() {
-        return new AWSCredentials() {
-            @Override
-            public String getAWSAccessKeyId() {
-               return awsAccessKeyId;
-            }
+        // Return Credentials based on what is present, profileName taking priority.
+        if (StringUtils.isNullOrEmpty(getProfileName())) {
+            return new AWSCredentials() {
+                @Override
+                public String getAWSAccessKeyId() {
+                    return awsAccessKeyId;
+                }
 
-            @Override
-            public String getAWSSecretKey() {
-                return awsSecretKey;
-            }
-        };
+                @Override
+                public String getAWSSecretKey() {
+                    return awsSecretKey;
+                }
+            };
+        } else {
+            return new ProfileCredentialsProvider(getProfileName()).getCredentials();
+        }
     }
 
     @Override
     public void refresh() {
-        
+
     }
 
-    
-    
+
 }

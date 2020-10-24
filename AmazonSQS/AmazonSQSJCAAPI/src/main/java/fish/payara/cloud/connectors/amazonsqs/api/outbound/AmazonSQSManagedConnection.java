@@ -41,6 +41,8 @@ package fish.payara.cloud.connectors.amazonsqs.api.outbound;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import com.amazonaws.services.sqs.model.SendMessageBatchRequest;
@@ -48,11 +50,9 @@ import com.amazonaws.services.sqs.model.SendMessageBatchRequestEntry;
 import com.amazonaws.services.sqs.model.SendMessageBatchResult;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.amazonaws.services.sqs.model.SendMessageResult;
+import com.amazonaws.util.StringUtils;
 import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnection;
-import java.io.PrintWriter;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+
 import javax.resource.NotSupportedException;
 import javax.resource.ResourceException;
 import javax.resource.spi.ConnectionEvent;
@@ -64,38 +64,40 @@ import javax.resource.spi.ManagedConnectionMetaData;
 import javax.security.auth.Subject;
 import javax.transaction.xa.XAResource;
 
+import java.io.PrintWriter;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+
 /**
- *
  * @author Steve Millidge (Payara Foundation)
  */
 public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSConnection {
-    
+
     private final List<AmazonSQSConnection> connectionHandles = new LinkedList<>();
     private final HashSet<ConnectionEventListener> listeners = new HashSet<>();
     private PrintWriter logWriter;
     private final AmazonSQS sqsClient;
 
     AmazonSQSManagedConnection(Subject subject, ConnectionRequestInfo cxRequestInfo, AmazonSQSManagedConnectionFactory aThis) {
-        sqsClient = AmazonSQSClientBuilder.standard().withRegion(aThis.getRegion()).withCredentials(new AWSCredentialsProvider() {
-            @Override
-            public AWSCredentials getCredentials() {
-                return new AWSCredentials() {
-                    @Override
-                    public String getAWSAccessKeyId() {
-                        return aThis.getAwsAccessKeyId();
-                    }
+        AWSCredentialsProvider credentialsProvider;
+        if (StringUtils.isNullOrEmpty(aThis.getProfileName())) {
+            credentialsProvider = new AWSStaticCredentialsProvider(new AWSCredentials() {
+                @Override
+                public String getAWSAccessKeyId() {
+                    return aThis.getAwsAccessKeyId();
+                }
 
-                    @Override
-                    public String getAWSSecretKey() {
-                        return aThis.getAwsSecretKey();
-                    }
-                };
-            }
+                @Override
+                public String getAWSSecretKey() {
+                    return aThis.getAwsSecretKey();
+                }
+            });
+        } else {
+            credentialsProvider = new ProfileCredentialsProvider(aThis.getProfileName());
+        }
 
-            @Override
-            public void refresh() {
-            }
-        }).build();
+        sqsClient = AmazonSQSClientBuilder.standard().withRegion(aThis.getRegion()).withCredentials(credentialsProvider).build();
     }
 
     @Override
@@ -134,12 +136,12 @@ public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSC
 
     @Override
     public XAResource getXAResource() throws ResourceException {
-        throw new NotSupportedException("Not supported yet."); 
+        throw new NotSupportedException("Not supported yet.");
     }
 
     @Override
     public LocalTransaction getLocalTransaction() throws ResourceException {
-        throw new NotSupportedException("Not supported yet."); 
+        throw new NotSupportedException("Not supported yet.");
     }
 
     @Override
@@ -176,7 +178,7 @@ public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSC
     public PrintWriter getLogWriter() throws ResourceException {
         return logWriter;
     }
-    
+
     void removeHandle(AmazonSQSConnection connection) {
         connectionHandles.remove(connection);
         ConnectionEvent event = new ConnectionEvent(this, ConnectionEvent.CONNECTION_CLOSED);
@@ -210,5 +212,5 @@ public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSC
     public void close() throws Exception {
         destroy();
     }
-    
+
 }
