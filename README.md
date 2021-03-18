@@ -12,6 +12,8 @@ Currently we have JCA adapters for;
 * MQTT - sending messages using a Connection Factory and receiving messages via an MDB to an MQTT broker or to IOT hubs that support MQTT.
 * Azure Service Bus - Sending and receiving messages to/from Azure Service Bus Queues using ConnectionFactory via MDB
 
+**ATTENTION**: Support for this repository is handled in the [Ecosystem Support repository](https://github.com/payara/ecosystem-support)
+
 ## Why Use JCA
 
 One of the benefits of using these JCA adapters rather than crafting your own clients, using the standard apis for the messaging technologies, is that the JCA adapters are fully integrated into your Java EE environment.
