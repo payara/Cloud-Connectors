@@ -41,6 +41,16 @@ package fish.payara.cloud.connectors.kafka.inbound;
 
 import fish.payara.cloud.connectors.kafka.api.OnRecord;
 import fish.payara.cloud.connectors.kafka.api.OnRecords;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+
+import javax.resource.ResourceException;
+import javax.resource.spi.UnavailableException;
+import javax.resource.spi.endpoint.MessageEndpoint;
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
+import javax.resource.spi.work.WorkManager;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.Duration;
@@ -52,15 +62,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.resource.ResourceException;
-import javax.resource.spi.UnavailableException;
-import javax.resource.spi.endpoint.MessageEndpoint;
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkException;
-import javax.resource.spi.work.WorkManager;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -110,7 +112,12 @@ public class KafkaAsynchWorker implements KafkaWorker {
         }
 
         consumer = new KafkaConsumer(key.getSpec().getConsumerProperties());
-        consumer.subscribe(Arrays.asList(key.getSpec().getTopics().split(",")));
+        final Pattern topicsPattern = createTopicsPattern(key);
+        if (topicsPattern != null) {
+            consumer.subscribe(topicsPattern);
+        } else {
+            consumer.subscribe(Arrays.asList(key.getSpec().getTopics().split(",")));
+        }
     }
 
     @Override

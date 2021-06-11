@@ -86,6 +86,7 @@ A full skeleton MDB is shown below
     @ActivationConfigProperty(propertyName = "clientId", propertyValue = "testClient"),
     @ActivationConfigProperty(propertyName = "groupIdConfig", propertyValue = "testGroup"),
     @ActivationConfigProperty(propertyName = "topics", propertyValue = "test,test2"),
+    //@ActivationConfigProperty(propertyName = "regexTopics", propertyValue = "test.*"),
     @ActivationConfigProperty(propertyName = "bootstrapServersConfig", propertyValue = "localhost:9092"),    
     @ActivationConfigProperty(propertyName = "enableAutoCommit", propertyValue = "true"),    
     @ActivationConfigProperty(propertyName = "autoCommitInterval", propertyValue = "100"),    

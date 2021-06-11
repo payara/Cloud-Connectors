@@ -40,6 +40,7 @@
 package fish.payara.cloud.connectors.kafka.inbound;
 
 import javax.resource.spi.work.Work;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -49,5 +50,13 @@ public interface KafkaWorker extends Work {
     
     public void stop();
     public boolean isStopped();
+
+    default Pattern createTopicsPattern(EndpointKey key) {
+        final String regexTopics = key.getSpec().getRegexTopics();
+        if (regexTopics != null) {
+            return Pattern.compile(regexTopics);
+        }
+        return null;
+    }
     
 }
