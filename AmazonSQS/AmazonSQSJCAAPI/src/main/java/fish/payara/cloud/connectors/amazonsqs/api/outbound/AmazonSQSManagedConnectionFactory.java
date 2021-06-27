@@ -55,25 +55,27 @@ import javax.resource.spi.ManagedConnectionFactory;
 import javax.security.auth.Subject;
 
 /**
- *
  * @author Steve Millidge (Payara Foundation)
  */
-@ConnectionDefinition( connection = AmazonSQSConnection.class,
+@ConnectionDefinition(connection = AmazonSQSConnection.class,
         connectionFactory = AmazonSQSConnectionFactory.class,
         connectionFactoryImpl = AmazonSQSConnectionFactoryImpl.class,
         connectionImpl = AmazonSQSConnectionImpl.class
 )
 public class AmazonSQSManagedConnectionFactory implements ManagedConnectionFactory, Serializable {
-    
+
     @ConfigProperty(description = "AWS Secret Key", type = String.class)
     private String awsSecretKey;
-    
-    @ConfigProperty(description = "AWS Access Key", type=String.class)
+
+    @ConfigProperty(description = "AWS Access Key", type = String.class)
     private String awsAccessKeyId;
-    
-    @ConfigProperty(description = "Region hosting the queue", type=String.class)
+
+    @ConfigProperty(description = "Region hosting the queue", type = String.class)
     private String region;
-    
+
+    @ConfigProperty(description = "AWS Profile Name", type = String.class)
+    private String profileName;
+
     private PrintWriter logger;
 
     public String getAwsSecretKey() {
@@ -100,11 +102,19 @@ public class AmazonSQSManagedConnectionFactory implements ManagedConnectionFacto
         this.region = region;
     }
 
+    public String getProfileName() {
+        return profileName;
+    }
+
+    public void setProfileName(String profileName) {
+        this.profileName = profileName;
+    }
+
     public AmazonSQSManagedConnectionFactory() {
     }
-    
-    
-    
+
+
+
     @Override
     public Object createConnectionFactory(ConnectionManager cxManager) throws ResourceException {
         return new AmazonSQSConnectionFactoryImpl(cxManager, this);
@@ -142,6 +152,7 @@ public class AmazonSQSManagedConnectionFactory implements ManagedConnectionFacto
         hash = 97 * hash + Objects.hashCode(this.awsSecretKey);
         hash = 97 * hash + Objects.hashCode(this.awsAccessKeyId);
         hash = 97 * hash + Objects.hashCode(this.region);
+        hash = 97 * hash + Objects.hashCode(this.profileName);
         return hash;
     }
 
@@ -166,9 +177,12 @@ public class AmazonSQSManagedConnectionFactory implements ManagedConnectionFacto
         if (!Objects.equals(this.region, other.region)) {
             return false;
         }
+        if (!Objects.equals(this.profileName, other.profileName)) {
+            return false;
+        }
         return true;
     }
-    
-    
-    
+
+
+
 }
