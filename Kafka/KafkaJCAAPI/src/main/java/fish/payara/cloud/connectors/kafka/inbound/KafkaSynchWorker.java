@@ -41,23 +41,24 @@ package fish.payara.cloud.connectors.kafka.inbound;
 
 import fish.payara.cloud.connectors.kafka.api.OnRecord;
 import fish.payara.cloud.connectors.kafka.api.OnRecords;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+
+import javax.resource.ResourceException;
+import javax.resource.spi.UnavailableException;
+import javax.resource.spi.endpoint.MessageEndpoint;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.resource.ResourceException;
-import javax.resource.spi.UnavailableException;
-import javax.resource.spi.endpoint.MessageEndpoint;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -111,7 +112,12 @@ public class KafkaSynchWorker implements KafkaWorker {
         try {
             // create the consumer
             consumer = new KafkaConsumer(key.getSpec().getConsumerProperties());
-            consumer.subscribe(Arrays.asList(key.getSpec().getTopics().split(",")));
+            final Pattern topicsPattern = createTopicsPattern(key);
+            if (topicsPattern != null) {
+                consumer.subscribe(topicsPattern);
+            } else {
+                consumer.subscribe(Arrays.asList(key.getSpec().getTopics().split(",")));
+            }
             MessageEndpoint endpoint  = key.getMef().createEndpoint(null);
             while (ok.get()) {
                 ConsumerRecords<Object, Object> records = consumer.poll(Duration.of(key.getSpec().getPollInterval(), ChronoUnit.MILLIS));
