@@ -62,14 +62,15 @@ import org.apache.kafka.clients.producer.ProducerRecord;
  * @author Steve Millidge (Payara Foundation)
  */
 @Path("/queues/{queue}")
-@ConnectionFactoryDefinition(name = "java:comp/env/KafkaConnectionFactory", 
+@ConnectionFactoryDefinition(name = "java:global/KafkaConnectionFactory", 
   description = "Kafka Conn Factory", 
   interfaceName = "fish.payara.cloud.connectors.kafka.api.KafkaConnectionFactory", 
   resourceAdapter = "kafka-rar-0.6.1-SNAPSHOT", 
   minPoolSize = 2, 
   maxPoolSize = 20,
   transactionSupport = TransactionSupport.TransactionSupportLevel.NoTransaction,
-  properties = {})
+  properties = {"acks=all"
+  })
 @ApplicationScoped
 public class KafkaQueueResource {
 
@@ -77,15 +78,15 @@ public class KafkaQueueResource {
     private UriInfo context;
     
         
-    @Resource(lookup="java:comp/env/KafkaConnectionFactory")
+    @Resource(lookup="java:global/KafkaConnectionFactory")
     KafkaConnectionFactory factory;
-
+    
     /**
      * Creates a new instance of KafkaQueueResource
      */
     public KafkaQueueResource() {
     }
-
+    
     /**
      * PUT method for updating or creating an instance of KafkaQueueResource
      * @param queue
