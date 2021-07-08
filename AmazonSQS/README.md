@@ -9,11 +9,47 @@ To use the JCA adapter the AmazonSQSRAR-<version>.rar should be deployed to your
 
 To deploy the JCA adapter on Payara Micro use the following commands.
 
-The example uses a number of environment variables for connecting to your Amazon account.
+To run the example, first set your queue ARN and AWS region:
+
+```shell
+    export queueURL=<your SQS queue ARN>
+    export region=us-east-1
+```
+
+A number of different ways are supported to connect to your AWS account.
+
+## IAM Role
+
+When running inside of Amazon ECS, a [task-based role](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html) can be used to grant access to AWS resources.
+
+```shell
+    export useIAMRole=true
+```
+
+## Profile
+
+Alternatively a profile from your ~/.aws/credentials file can be used:
+
+```shell
+   export profileName="<your profile>"
+```
+
+## Session based credentials
+
+Alternatively, temporary session keys can be used, if your AWS account uses federated login:
 
 ```shell
    export accessKey="<your amazon access key>"
-   export queueURL="<URL of the SQS queue in your amazon account>"
+   export secretKey="<your amazon secret key>"
+   export sessionToken="<your session token>"
+```
+
+## Basic Credentials
+
+If no other method is provided, standard access key ID and secret key credentials can be provided:
+
+```shell
+   export accessKey="<your amazon access key>"
    export secretKey="<your amazon secret key>"
 ```
 
@@ -87,7 +123,7 @@ It is also possible to send messages to the queue using a defined connection fac
 A full example of this is shown below;
 ```java
         try (AmazonSQSConnection connection = factory.getConnection()) {
-        connection.sendMessage(new SendMessageRequest("queueURL", "Hello World"));
+            connection.sendMessage(new SendMessageRequest("queueURL", "Hello World"));
         } catch (Exception e) {}
 
 ```

@@ -54,23 +54,26 @@ import java.util.Map;
 @MessageDriven(activationConfig = {
     @ActivationConfigProperty(propertyName = "awsAccessKeyId", propertyValue = "${ENV=accessKey}"),
     @ActivationConfigProperty(propertyName = "awsSecretKey", propertyValue = "${ENV=secretKey}"),
-    @ActivationConfigProperty(propertyName = "queueURL", propertyValue = "${ENV=queueURL}"),   
+    @ActivationConfigProperty(propertyName = "awsSessionToken", propertyValue = "${ENV=sessionToken}"),
+    @ActivationConfigProperty(propertyName = "profileName", propertyValue = "${ENV=profileName}"),
+    @ActivationConfigProperty(propertyName = "useIAMRole", propertyValue = "${ENV=useIAMRole}"),
+    @ActivationConfigProperty(propertyName = "queueURL", propertyValue = "${ENV=queueURL}"),
     @ActivationConfigProperty(propertyName = "pollInterval", propertyValue = "1000"),    
-    @ActivationConfigProperty(propertyName = "region", propertyValue = "eu-west-2")    
+    @ActivationConfigProperty(propertyName = "region", propertyValue = "${ENV=region}")
 })
 public class ReceiveSQSMessage implements AmazonSQSListener {
 
     @OnSQSMessage
     public void receiveMessage(Message message) {
-        System.out.println("Got message " + message.getBody());
+        System.out.println(">> Got message " + message.getBody());
         Map<String,MessageAttributeValue> mattrs = message.getMessageAttributes();
         for (String key : mattrs.keySet()) {
-            System.out.println("Got Message attribute " + key + "," + mattrs.get(key).getStringValue());
+            System.out.println(">> Got Message attribute " + key + "," + mattrs.get(key).getStringValue());
         }
         
         Map<String,String> attrs = message.getAttributes();
         for (String key : attrs.keySet()) {
-            System.out.println("Got attribute " + key + "," + attrs.get(key));
+            System.out.println(">> Got attribute " + key + "," + attrs.get(key));
         }
     }
 }

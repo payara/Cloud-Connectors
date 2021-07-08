@@ -70,11 +70,17 @@ public class AmazonSQSManagedConnectionFactory implements ManagedConnectionFacto
     @ConfigProperty(description = "AWS Access Key", type = String.class)
     private String awsAccessKeyId;
 
+    @ConfigProperty(description = "AWS Session Token", type = String.class)
+    private String awsSessionToken;
+
     @ConfigProperty(description = "Region hosting the queue", type = String.class)
     private String region;
 
     @ConfigProperty(description = "AWS Profile Name", type = String.class)
     private String profileName;
+
+    @ConfigProperty(description = "Use IAM Task Role credentials", type = String.class)
+    private boolean useIAMRole;
 
     private PrintWriter logger;
 
@@ -94,12 +100,28 @@ public class AmazonSQSManagedConnectionFactory implements ManagedConnectionFacto
         this.awsAccessKeyId = awsAccessKey;
     }
 
+    public String getAwsSessionToken() {
+        return awsSessionToken;
+    }
+
+    public void setAwsSessionToken(String awsSessionToken) {
+        this.awsSessionToken = awsSessionToken;
+    }
+
     public String getRegion() {
         return region;
     }
 
     public void setRegion(String region) {
         this.region = region;
+    }
+
+    public boolean isUseIAMRole() {
+        return useIAMRole;
+    }
+
+    public void setUseIAMRole(boolean useIAMRole) {
+        this.useIAMRole = useIAMRole;
     }
 
     public String getProfileName() {
@@ -178,6 +200,9 @@ public class AmazonSQSManagedConnectionFactory implements ManagedConnectionFacto
             return false;
         }
         if (!Objects.equals(this.profileName, other.profileName)) {
+            return false;
+        }
+        if (!Objects.equals(this.useIAMRole, other.useIAMRole)) {
             return false;
         }
         return true;
