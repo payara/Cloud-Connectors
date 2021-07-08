@@ -44,12 +44,13 @@ package fish.payara.cloud.connectors.amazonsqs.example;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnection;
 import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory;
-import java.util.Date;
+
 import javax.annotation.Resource;
 import javax.ejb.Schedule;
 import javax.ejb.Stateless;
 import javax.resource.ConnectionFactoryDefinition;
 import javax.resource.spi.TransactionSupport.TransactionSupportLevel;
+import java.time.LocalTime;
 
 /**
  *
@@ -63,17 +64,23 @@ import javax.resource.spi.TransactionSupport.TransactionSupportLevel;
   transactionSupport = TransactionSupportLevel.NoTransaction,
   properties = {"awsAccessKeyId=${ENV=accessKey}",
                 "awsSecretKey=${ENV=secretKey}",
-                "region=eu-west-2"})
+                "awsSessionToken=${ENV=sessionToken}",
+                "profileName=${ENV=profileName}",
+                "region=${ENV=region}"})
 @Stateless
 public class NewTimerSessionBean {
 
     @Resource(lookup="java:comp/env/SQSConnectionFactory")
     AmazonSQSConnectionFactory factory;
     
-    @Schedule(second = "*/1", hour="*", minute="*")   
+    @Schedule(second = "*/3", hour="*", minute="*")
     public void myTimer() {
         try (AmazonSQSConnection connection = factory.getConnection()) {
-        connection.sendMessage(new SendMessageRequest(System.getenv("queueURL"), "Hello World"));
-        } catch (Exception e) {}
+            String msg = "Hello World @ " + LocalTime.now();
+            System.out.println("<< Sending message: " + msg);
+            connection.sendMessage(new SendMessageRequest(System.getenv("queueURL"), msg));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

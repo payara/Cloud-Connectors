@@ -70,6 +70,9 @@ public class AmazonSQSManagedConnectionFactory implements ManagedConnectionFacto
     @ConfigProperty(description = "AWS Access Key", type = String.class)
     private String awsAccessKeyId;
 
+    @ConfigProperty(description = "AWS Session Token", type = String.class)
+    private String awsSessionToken;
+
     @ConfigProperty(description = "Region hosting the queue", type = String.class)
     private String region;
 
@@ -92,6 +95,14 @@ public class AmazonSQSManagedConnectionFactory implements ManagedConnectionFacto
 
     public void setAwsAccessKeyId(String awsAccessKey) {
         this.awsAccessKeyId = awsAccessKey;
+    }
+
+    public String getAwsSessionToken() {
+        return awsSessionToken;
+    }
+
+    public void setAwsSessionToken(String awsSessionToken) {
+        this.awsSessionToken = awsSessionToken;
     }
 
     public String getRegion() {
