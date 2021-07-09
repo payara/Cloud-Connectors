@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# convenience script for running the example
+
+VER=0.6.1-SNAPSHOT
+RAR=../AmazonSQSRAR/target/amazon-sqs-rar-${VER}.rar
+JAR=./target/amazon-sqs-example-${VER}.jar
+MICRO=payara-micro-5.2021.1.jar
+
+# for POC account
+#export accessKey=AKIA6HJ4YCU5BLMQETN2
+#export secretKey=8LN8dBFQIKylQuJ+iQ2AsJVNXMI2cOZnLxuQBpws
+#export queueURL=https://sqs.us-east-1.amazonaws.com/977769338170/martins-queue
+#export profileName=9777poc
+export useIAMRole=false
+
+# dbs-app-dev account
+export accessKey="ASIASBEOUJLQVZAGGZF3"
+export secretKey="PFys7EpJCtf1BFyV72QRCr4t6BTpQl0VfCA3G3qC"
+export sessionToken="IQoJb3JpZ2luX2VjEKL//////////wEaCXVzLWVhc3QtMSJIMEYCIQCcG3XgMFUZhu26YZpokwY7Ip97um/VI2SUq/gA6fDbxAIhAOU9SkTbGVZF8fFjwomxs9GIFp0azcGNzoRmjM/Add+4KqcDCIv//////////wEQAhoMMTM5ODg1NTYyNTkzIgwOwDwJ8lHOQ+oG7kcq+wKZRdUlGbztP8GzFg3Z0OFPSyd44GLSlDxsrAMwL9u+6dk7VdoY0F9UvNM+wi++OVhEWGpfUGm4GlGiGf6N58Iow11QZ0F4+gubDZrPt37to1hkWroVRhmbrGkDkcfuG8NyGZ+K/v347pesZNlUCh6M4gLh1lfqNaAivw7875Wu8vktWvY2akIFzAczna0GRhIEBiX8Vn9k0b/Ncvq+EjQXm0zfVkANeDSHGg4S8C6SU9OWQQ7PxwaMVXDb3aOHzbrdCzCYEElgVhPvx0Qh2CoHmv5g4aAwcyRpJX39P6V1NMtZ3GWgftXvqi7UtuVVVCpild9/bCfl+6Lea34TqW2uD1oQGqAqZQbRY4CnfqHtHrodURsXWHNP96lXjxRhk2L6nebC4QSXwBlSxKL1LIFhJkLA5Rn0Cr0DUA8ypCnLHKfkYAj5MF5+/RwDEFgYSVISg1uqAXm8isY+LDDpUF2grmVMW6vI9bhoLyTlqHFxiwqEq9OeiaqQY6OnMP68oIcGOqUBKavikEA6LN/nU73/dGQA+l40lnT58p+JtAoAjnMUIKoDDl51g9DFqfaAx9Bp9K34TWWvOEgmJRfq+EFbLJsLJZs1jYR02smFvjhG1kq0MGV8misJ16MgpY4jxHcMu+wW/vuBgoR6u6iUGnZ+80KZaaze4DEryrGhiTjOVwLVBcL5TuTgjsWYKy5ReY8LKCPeiRJ2bd5Ts/tGddE+XIbUkBQ1A/Tn"
+export queueURL=https://sqs.us-east-1.amazonaws.com/139885562593/de-martin-test-q
+
+region=us-east-1 \
+  /opt/java11/bin/java -jar ${MICRO} --deploy ${RAR} ${JAR}
+
+#SESSION_TOKEN="IQoJb3JpZ2luX2VjEIn//////////wEaCXVzLWVhc3QtMSJIMEYCIQDd0apwsx2JiG9xfrVe3KzBhuadpOK//b7LMDP6lgIYDgIhAJYyU2+V0c/9DiX9pygnzx3dpNomYI8mjE72dpjqyIkRKp4DCHIQAhoMMTM5ODg1NTYyNTkzIgyykqxkWyYOqhdw2Hgq+wIcDZf/5X6dmct9u8nmpgEVPZEQrDmqPXdl/737rW/58jnQ1PELP/B5RjDJGKeqvJ6J+5R1E7TOLH1IebWXLbbgYNzcKPoUqKdzUzBmgBUtEMRxfEeHk4gcTOnrpONrWUOO0IZvzVOCPNvBCXFRkcFwRd4ShgPxR5LKERBe71ppdzSKa7REg2CDijqe/y/ioM8h9LCJB4RbdEmqWgYCdOeqx/erafmZPfugALr22Q46a3AZEqYzNlYSkDHbHJdWUx3YwRqNZaFk5w0An8SCEd0UqAjZrU19WJgkBEB6qsU2VbewU2vnY0Ma64z5SsCUtg0Dnq+CMAyiuaKfjNLknZN9HxoML1hEACX+AsbBQ6BKE6XiEHAaux+4D0YLgwmvbVOFpvmv5DRfA1lJQs2qcCtq891bFUltaXe/IpI113Avj1HmN5jdtnp+rKTSaAri1VkzyRFi+8ZhYHLntxAuLKIDnVmtzboi7OnxFObh8Tk+JqqSlHDspIbznXc4MM36mocGOqUB35ytcugcD7VpmcXeWB/vUN7RBvxfchlplUB58gWAlnHqMPHKDQ98bDj0jMsFDXw1sKcI+NaDjSzPkvBH2qO3yskQ508bqXxAynBqM4dAXwnnCtVfzWpYZgvzD6bt2VkBtmc2m3FA8n6cOdW+OzMBs4fAT8g+1X60RwzeRbrE1RzT2WpbGzCDmCPuMi998876T92A/zNxRNUseIQWDGgPALu1kXSd" \
+#  profileName=iam_role \
