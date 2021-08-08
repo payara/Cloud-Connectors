@@ -41,7 +41,6 @@ package fish.payara.cloud.connectors.amazonsqs.api.inbound;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -69,33 +68,23 @@ public class AmazonSQSResourceAdapter implements ResourceAdapter, Serializable {
     
     private static final Logger LOGGER = Logger.getLogger(AmazonSQSResourceAdapter.class.getName());
     private final Map<MessageEndpointFactory, SQSPoller> registeredFactories;
+    private final Map<MessageEndpointFactory, Timer> registeredTimers;
     private BootstrapContext context;
-    private Timer poller;
-    
+
     public AmazonSQSResourceAdapter() {
         registeredFactories = new ConcurrentHashMap<>();
+        registeredTimers = new ConcurrentHashMap<>();
     }
     
     @Override
     public void start(BootstrapContext ctx) throws ResourceAdapterInternalException {        
         LOGGER.info("Amazon SQS Resource Adapter Started..");
         context = ctx;
-        try {
-            poller = context.createTimer();
-        } catch (UnavailableException ex) {
-            LOGGER.log(Level.SEVERE, "Unable to create Poller", ex);
-            throw new ResourceAdapterInternalException(ex);
-        }
     }
 
     @Override
     public void stop() {
         LOGGER.info("Amazon SQS Resource Adapter Stopped");
-        // go through all the registered factories and stop 
-        poller.cancel();
-        for (SQSPoller value : registeredFactories.values()) {
-            value.stop();
-        }
     }
 
     @Override
@@ -104,7 +93,11 @@ public class AmazonSQSResourceAdapter implements ResourceAdapter, Serializable {
             AmazonSQSActivationSpec sqsSpec = (AmazonSQSActivationSpec) spec;
             SQSPoller sqsTask = new SQSPoller(sqsSpec,context,endpointFactory);
             registeredFactories.put(endpointFactory, sqsTask);
-            poller.schedule(sqsTask, sqsSpec.getInitialPollDelay(), sqsSpec.getPollInterval());
+
+            Timer timer = createTimer();
+            registeredTimers.put(endpointFactory, timer);
+            timer.schedule(sqsTask, sqsSpec.getInitialPollDelay(), sqsSpec.getPollInterval());
+
         } else {
             LOGGER.log(Level.WARNING, "Got endpoint activation for an ActivationSpec of unknown class {0}", spec.getClass().getName());
         }     
@@ -115,11 +108,24 @@ public class AmazonSQSResourceAdapter implements ResourceAdapter, Serializable {
         SQSPoller sqsTask = registeredFactories.get(endpointFactory);
         sqsTask.stop();
         sqsTask.cancel();
+
+        Timer timer = registeredTimers.get(endpointFactory);
+        timer.cancel();
     }
 
     @Override
     public XAResource[] getXAResources(ActivationSpec[] specs) throws ResourceException {
         return null;
+    }
+
+    private Timer createTimer() throws ResourceAdapterInternalException {
+        try {
+            return context.createTimer();
+
+        } catch (UnavailableException ex) {
+            LOGGER.log(Level.SEVERE, "Unable to create Poller", ex);
+            throw new ResourceAdapterInternalException(ex);
+        }
     }
 
     @Override
