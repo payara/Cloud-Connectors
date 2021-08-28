@@ -79,9 +79,6 @@ public class AmazonSQSManagedConnectionFactory implements ManagedConnectionFacto
     @ConfigProperty(description = "AWS Profile Name", type = String.class)
     private String profileName;
 
-    @ConfigProperty(description = "Use IAM Task Role credentials", type = String.class)
-    private boolean useIAMRole;
-
     private PrintWriter logger;
 
     public String getAwsSecretKey() {
@@ -114,14 +111,6 @@ public class AmazonSQSManagedConnectionFactory implements ManagedConnectionFacto
 
     public void setRegion(String region) {
         this.region = region;
-    }
-
-    public boolean isUseIAMRole() {
-        return useIAMRole;
-    }
-
-    public void setUseIAMRole(boolean useIAMRole) {
-        this.useIAMRole = useIAMRole;
     }
 
     public String getProfileName() {
@@ -200,9 +189,6 @@ public class AmazonSQSManagedConnectionFactory implements ManagedConnectionFacto
             return false;
         }
         if (!Objects.equals(this.profileName, other.profileName)) {
-            return false;
-        }
-        if (!Objects.equals(this.useIAMRole, other.useIAMRole)) {
             return false;
         }
         return true;

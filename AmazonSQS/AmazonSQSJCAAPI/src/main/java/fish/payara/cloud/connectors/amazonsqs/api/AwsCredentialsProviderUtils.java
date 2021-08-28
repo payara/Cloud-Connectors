@@ -15,14 +15,9 @@ public class AwsCredentialsProviderUtils {
 	public static AWSCredentialsProvider getProvider(String accessKey,
 													 String secretKey,
 													 String sessionToken,
-													 String profileName,
-													 boolean useIAMRole) {
+													 String profileName) {
 		AWSCredentialsProvider awsCredentialsProvider = null;
-		if (useIAMRole) {
-			// this provider is used when running inside AWS using an IAM task-based role.
-			// specify profileName=iam_role (case insensitive)
-			awsCredentialsProvider = new EC2ContainerCredentialsProviderWrapper();
-		} else if (isValidParam(profileName)) {
+		if (isValidParam(profileName)) {
 			// uses specified credentials profile
 			awsCredentialsProvider = new ProfileCredentialsProvider(profileName);
 
@@ -38,8 +33,9 @@ public class AwsCredentialsProviderUtils {
 			}
 		}
 		if (awsCredentialsProvider == null) {
-			// this should never happen if we have implemented AmazonSQSActivationSpec.validate() correctly
-			throw new RuntimeException("Invalid AWS credential information");
+			// if neither credentials nor profile are provided, fall back on the default provider chain, which will
+			// eventually give us a EC2ContainerCredentialsProviderWrapper, if running in ECS.
+			awsCredentialsProvider = DefaultAWSCredentialsProviderChain.getInstance();
 		}
 
 		return awsCredentialsProvider;

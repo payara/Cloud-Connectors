@@ -66,7 +66,6 @@ import java.time.LocalTime;
                 "awsSecretKey=${ENV=secretKey}",
                 "awsSessionToken=${ENV=sessionToken}",
                 "profileName=${ENV=profileName}",
-                "useIAMRole=${ENV=useIAMRole}",
                 "region=${ENV=region}"})
 @Stateless
 public class NewTimerSessionBean {

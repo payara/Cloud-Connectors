@@ -56,7 +56,6 @@ import java.util.Map;
     @ActivationConfigProperty(propertyName = "awsSecretKey", propertyValue = "${ENV=secretKey}"),
     @ActivationConfigProperty(propertyName = "awsSessionToken", propertyValue = "${ENV=sessionToken}"),
     @ActivationConfigProperty(propertyName = "profileName", propertyValue = "${ENV=profileName}"),
-    @ActivationConfigProperty(propertyName = "useIAMRole", propertyValue = "${ENV=useIAMRole}"),
     @ActivationConfigProperty(propertyName = "queueURL", propertyValue = "${ENV=queueURL}"),
     @ActivationConfigProperty(propertyName = "pollInterval", propertyValue = "1000"),    
     @ActivationConfigProperty(propertyName = "region", propertyValue = "${ENV=region}")

@@ -73,7 +73,6 @@ public class AmazonSQSActivationSpec implements ActivationSpec, AWSCredentialsPr
     private String messageAttributeNames = "All";
     private String attributeNames = "All";
     private String profileName;
-    private boolean useIAMRole;
 
     @Override
     public void validate() throws InvalidPropertyException {
@@ -81,17 +80,8 @@ public class AmazonSQSActivationSpec implements ActivationSpec, AWSCredentialsPr
             throw new InvalidPropertyException("region must be specified");
         }
 
-        // Validate profileName if present, skip validation of other keys
-        if (!useIAMRole && !isValidProfile()) {
-
-            // validate keys if profileName isn't available
-            if (StringUtils.isNullOrEmpty(awsAccessKeyId)) {
-                throw new InvalidPropertyException("awsAccessKeyId must be specified");
-            }
-
-            if (StringUtils.isNullOrEmpty(awsSecretKey)) {
-                throw new InvalidPropertyException("awsSecretKey must be specified");
-            }
+        if (profileName != null && profileName.startsWith("${ENV")) {
+            throw new InvalidPropertyException("invalid profileName");
         }
 
         if (StringUtils.isNullOrEmpty(queueURL)) {
@@ -181,14 +171,6 @@ public class AmazonSQSActivationSpec implements ActivationSpec, AWSCredentialsPr
         this.region = region;
     }
 
-    public boolean isUseIAMRole() {
-        return useIAMRole;
-    }
-
-    public void setUseIAMRole(boolean useIAMRole) {
-        this.useIAMRole = useIAMRole;
-    }
-
     public String getMessageAttributeNames() {
         return messageAttributeNames;
     }
@@ -220,7 +202,7 @@ public class AmazonSQSActivationSpec implements ActivationSpec, AWSCredentialsPr
     @Override
     public AWSCredentials getCredentials() {
         // Return Credentials based on what is present: IAM role taking priority, then profileName, then keys.
-        return AwsCredentialsProviderUtils.getProvider(awsAccessKeyId, awsSecretKey, awsSessionToken, profileName, useIAMRole)
+        return AwsCredentialsProviderUtils.getProvider(awsAccessKeyId, awsSecretKey, awsSessionToken, profileName)
                 .getCredentials();
     }
 

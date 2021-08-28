@@ -82,8 +82,7 @@ public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSC
                 aThis.getAwsAccessKeyId(),
                 aThis.getAwsSecretKey(),
                 aThis.getAwsSessionToken(),
-                aThis.getProfileName(),
-                aThis.isUseIAMRole());
+                aThis.getProfileName());
 
         sqsClient = AmazonSQSClientBuilder.standard().withRegion(aThis.getRegion()).withCredentials(credentialsProvider).build();
     }
