@@ -20,7 +20,7 @@ The example uses a number of environment variables for connecting to your Amazon
 These environment variables must be set before running the example
 
 ```shell
-java -jar payara-micro.jar --deploy amazon-sqs-rar-0.6.1-SNAPSHOT.rar amazon-sqs-example-0.6.1-SNAPSHOT.jar
+java -jar payara-micro.jar --deploy amazon-sqs-rar-0.7.0.rar amazon-sqs-example-0.7.0.jar
 ```
 
 ## Inbound MDB
@@ -98,7 +98,7 @@ An example annotation defined connection factory is shown below;
 @ConnectionFactoryDefinition(name = "java:comp/env/SQSConnectionFactory", 
   description = "SQS Conn Factory", 
   interfaceName = "fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory", 
-  resourceAdapter = "amazon-sqs-rar-0.6.1-SNAPSHOT", 
+  resourceAdapter = "amazon-sqs-rar-0.7.0", 
   minPoolSize = 2, 
   maxPoolSize = 2,
   transactionSupport = TransactionSupportLevel.NoTransaction,
