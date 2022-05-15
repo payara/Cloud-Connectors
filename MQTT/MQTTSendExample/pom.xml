@@ -15,11 +15,6 @@
 
     <name>MQTT Send Example</name>
 
-    <properties>
-        <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>fish.payara.cloud.connectors.mqtt</groupId>
