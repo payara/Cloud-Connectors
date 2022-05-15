@@ -7,7 +7,7 @@
     <packaging>pom</packaging>
     <name>Payara Cloud Connectors</name>
     <description>Project for JCA modules that connect to various cloud services</description>
-    <url>http://www.payara.org</url>
+    <url>http://www.payara.fish</url>
     <licenses>
         <license>
             <name>GPL Version 2 with Classpath Exception</name>
@@ -67,7 +67,7 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>7.4.0</version>
+            <version>7.5</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -97,12 +97,12 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.3.1</version>
+                        <version>3.4.0</version>
                         <configuration>
                             <javadocVersion>${javadoc.version}</javadocVersion>
                             <notimestamp>true</notimestamp>
                             <splitindex>true</splitindex>
-                            <doctitle>Arquillian connector</doctitle>
+                            <doctitle>Cloud Connectors</doctitle>
                             <links>
                                 <link>https://docs.oracle.com/javaee/${javaee.version}/api/</link>
                             </links>
@@ -178,7 +178,7 @@
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.8</version>
+                        <version>1.6.13</version>
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>ossrh</serverId>
