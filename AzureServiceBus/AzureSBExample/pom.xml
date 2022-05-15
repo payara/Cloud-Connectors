@@ -15,10 +15,6 @@
 
     <name>AzureSBExample</name>
 
-    <properties>
-        <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>fish.payara.cloud.connectors.azuresb</groupId>

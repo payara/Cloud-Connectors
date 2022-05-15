@@ -15,10 +15,6 @@
 
     <name>MQTTExample</name>
 
-    <properties>
-        <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>fish.payara.cloud.connectors.mqtt</groupId>

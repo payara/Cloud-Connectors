@@ -30,7 +30,7 @@
     </scm>
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/payara/Cloud-Connectors/issues</url>
+        <url>https://github.com/payara/ecosystem-support/issues</url>
     </issueManagement>
     <modules>
         <module>Kafka/KafkaJCAAPI</module>
@@ -54,6 +54,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
     </properties>
     <dependencies>
         <dependency>

@@ -11,13 +11,7 @@
     <artifactId>kafka-example</artifactId>
     <version>0.6.1-SNAPSHOT</version>
     <packaging>ejb</packaging>
-
     <name>KafkaExample</name>
-
-    <properties>
-        <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
     <dependencies>
         <dependency>
