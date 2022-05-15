@@ -1,4 +1,5 @@
 # Payara Cloud Connectors
+[![Java CI](https://github.com/payara/Cloud-Connectors/actions/workflows/maven.yml/badge.svg)](https://github.com/payara/Cloud-Connectors/actions/workflows/maven.yml)
 
 Payara Cloud Connectors is a project to provide JavaEE standards based connectivity 
 to common Cloud infrastructure. Utilising JCA we provide connectivity to many different 
