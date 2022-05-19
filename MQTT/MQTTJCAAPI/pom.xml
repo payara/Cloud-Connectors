@@ -4,7 +4,7 @@
     <parent>
         <groupId>fish.payara.cloud.connectors</groupId>
         <artifactId>cloud-connectors</artifactId>
-        <version>0.6.1-SNAPSHOT</version>
+        <version>0.8.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <groupId>fish.payara.cloud.connectors.mqtt</groupId>
@@ -12,31 +12,7 @@
     <packaging>jar</packaging>
     <name>MQTT JCA Adapter API</name>
     <description>API classes for the MQTT JCA Adapter</description>
-    <url>http://www.payara.fish</url>
-    <licenses>
-        <license>
-            <name>CDDL Version 1.1</name>
-            <url>https://github.com/payara/Payara/blob/master/LICENSE.txt</url>
-        </license>
-    </licenses>
-    <developers>
-    <developer>
-        <id>smillidge</id>
-        <name>Steve Millidge</name>
-        <organization>Payara Foundation</organization>
-        <organizationUrl>http://www.payara.org</organizationUrl>
-    </developer>
-    </developers>
-    <scm>
-        <connection>scm:git:git:github.com/payara/Cloud-Connectors.git</connection>
-        <developerConnection>git@github.com:payara/Cloud-Connectors.git</developerConnection>
-        <url>https://github.com/payara/Cloud-Connectors</url>
-        <tag>master</tag>
-    </scm>
-    <issueManagement>
-        <system>GitHub</system>
-        <url>https://github.com/payara/Cloud-Connectors/issues</url>
-    </issueManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.eclipse.paho</groupId>

@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fish.payara.cloud.connectors</groupId>
     <artifactId>cloud-connectors</artifactId>
-    <version>0.6.1-SNAPSHOT</version>
+    <version>0.8.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Payara Cloud Connectors</name>
     <description>Project for JCA modules that connect to various cloud services</description>
-    <url>http://www.payara.org</url>
+    <url>http://www.payara.fish</url>
     <licenses>
         <license>
             <name>GPL Version 2 with Classpath Exception</name>
@@ -30,7 +30,7 @@
     </scm>
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/payara/Cloud-Connectors/issues</url>
+        <url>https://github.com/payara/ecosystem-support/issues</url>
     </issueManagement>
     <modules>
         <module>Kafka/KafkaJCAAPI</module>
@@ -54,6 +54,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
     </properties>
     <dependencies>
         <dependency>
@@ -66,7 +67,7 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>7.4.0</version>
+            <version>7.5</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -96,12 +97,12 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.3.1</version>
+                        <version>3.4.0</version>
                         <configuration>
                             <javadocVersion>${javadoc.version}</javadocVersion>
                             <notimestamp>true</notimestamp>
                             <splitindex>true</splitindex>
-                            <doctitle>Arquillian connector</doctitle>
+                            <doctitle>Cloud Connectors</doctitle>
                             <links>
                                 <link>https://docs.oracle.com/javaee/${javaee.version}/api/</link>
                             </links>
@@ -177,7 +178,7 @@
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.8</version>
+                        <version>1.6.13</version>
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>ossrh</serverId>

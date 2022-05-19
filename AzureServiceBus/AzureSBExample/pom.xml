@@ -4,20 +4,16 @@
     <parent>
         <groupId>fish.payara.cloud.connectors</groupId>
         <artifactId>cloud-connectors</artifactId>
-        <version>0.6.1-SNAPSHOT</version>
+        <version>0.8.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     
     <groupId>fish.payara.cloud.connectors.azuresb</groupId>
     <artifactId>azure-sb-example</artifactId>
-    <version>0.6.1-SNAPSHOT</version>
+    <version>0.8.0-SNAPSHOT</version>
     <packaging>ejb</packaging>
 
     <name>AzureSBExample</name>
-
-    <properties>
-        <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -40,7 +36,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-ejb-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.2.1</version>
                 <configuration>
                     <ejbVersion>3.1</ejbVersion>
                 </configuration>

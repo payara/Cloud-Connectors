@@ -1,10 +1,11 @@
 # Payara Cloud Connectors
+[![Java CI](https://github.com/payara/Cloud-Connectors/actions/workflows/maven.yml/badge.svg)](https://github.com/payara/Cloud-Connectors/actions/workflows/maven.yml)
 
 Payara Cloud Connectors is a project to provide JavaEE standards based connectivity 
 to common Cloud infrastructure. Utilising JCA we provide connectivity to many different 
 services provided by the leading cloud providers and open source technologies. Payara Cloud Connectors enable the creation of Cloud Native applications using JavaEE apis with the ability to build Event Sourcing and Message Driven architectures simply on public clouds. 
 
-Payara Cloud Connectors are proven to work with Payara Server and Payara Micro 172+. The JCA connectors should work on other Java EE 7 application servers as they do not use any Payara specific code.
+Payara Cloud Connectors are proven to work with Payara Server and Payara Micro 172+. The JCA connectors should work on other Java EE 8 application servers as they do not use any Payara specific code.
 
 Currently we have JCA adapters for;
 * Apache Kafka - sending messages using a Connection Factory and receiving messages via an MDB

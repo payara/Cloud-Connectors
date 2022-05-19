@@ -4,20 +4,16 @@
     <parent>
         <groupId>fish.payara.cloud.connectors</groupId>
         <artifactId>cloud-connectors</artifactId>
-        <version>0.6.1-SNAPSHOT</version>
+        <version>0.8.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <groupId>fish.payara.cloud.connectors.amazonsqs</groupId>
     <artifactId>amazon-sqs-example</artifactId>
-    <version>0.6.1-SNAPSHOT</version>
+    <version>0.8.0-SNAPSHOT</version>
     <packaging>ejb</packaging>
 
     <name>AmazonSQSExample</name>
 
-    <properties>
-        <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -30,7 +26,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-sqs</artifactId>
-            <version>1.12.129</version>
+            <version>1.12.220</version>
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
@@ -41,7 +37,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-ejb-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.2.1</version>
                 <configuration>
                     <ejbVersion>3.1</ejbVersion>
                 </configuration>
