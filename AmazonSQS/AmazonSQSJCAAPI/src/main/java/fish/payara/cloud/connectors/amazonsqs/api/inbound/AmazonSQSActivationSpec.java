@@ -41,6 +41,7 @@ package fish.payara.cloud.connectors.amazonsqs.api.inbound;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.util.StringUtils;
 import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSListener;
@@ -58,9 +59,9 @@ import javax.resource.spi.ResourceAdapter;
  */
 @Activation(messageListeners = AmazonSQSListener.class)
 public class AmazonSQSActivationSpec implements ActivationSpec, AWSCredentialsProvider {
-
+    
     ResourceAdapter adapter;
-
+    
     private String awsAccessKeyId;
     private String awsSecretKey;
     private String queueURL;
@@ -72,153 +73,146 @@ public class AmazonSQSActivationSpec implements ActivationSpec, AWSCredentialsPr
     private String messageAttributeNames = "All";
     private String attributeNames = "All";
     private String profileName;
-
+    
     @Override
     public void validate() throws InvalidPropertyException {
         if (StringUtils.isNullOrEmpty(region)) {
             throw new InvalidPropertyException("region must be specified");
         }
-
-        // Validate profileName if present, skip validation off other keys
-        if (StringUtils.isNullOrEmpty(profileName)) {
-
-            // validate keys if profileName isn't available
-            if (StringUtils.isNullOrEmpty(awsAccessKeyId)) {
-                throw new InvalidPropertyException("awsAccessKeyId must be specified");
-            }
-
-            if (StringUtils.isNullOrEmpty(awsSecretKey)) {
-                throw new InvalidPropertyException("awsSecretKey must be specified");
-            }
-        }
-
+        
         if (StringUtils.isNullOrEmpty(queueURL)) {
             throw new InvalidPropertyException("queueURL must be specified");
         }
     }
-
+    
     @Override
     public ResourceAdapter getResourceAdapter() {
         return adapter;
     }
-
+    
     @Override
     public void setResourceAdapter(ResourceAdapter ra) throws ResourceException {
         adapter = ra;
     }
-
+    
     public String getAwsAccessKeyId() {
         return awsAccessKeyId;
     }
-
+    
     public void setAwsAccessKeyId(String awsAccessKeyId) {
         this.awsAccessKeyId = awsAccessKeyId;
     }
-
+    
     public String getAwsSecretKey() {
         return awsSecretKey;
     }
-
+    
     public void setAwsSecretKey(String awsSecretKey) {
         this.awsSecretKey = awsSecretKey;
     }
-
+    
     public String getQueueURL() {
         return queueURL;
     }
-
+    
     public void setQueueURL(String queueURL) {
         this.queueURL = queueURL;
     }
-
+    
     public Integer getMaxMessages() {
         return maxMessages;
     }
-
+    
     public void setMaxMessages(Integer maxMessages) {
         this.maxMessages = maxMessages;
     }
-
+    
     public Integer getVisibilityTimeout() {
         return visibilityTimeout;
     }
-
+    
     public void setVisibilityTimeout(Integer visibilityTimeout) {
         this.visibilityTimeout = visibilityTimeout;
     }
-
+    
     public Integer getInitialPollDelay() {
         return initialPollDelay;
     }
-
+    
     public void setInitialPollDelay(Integer initialPollDelay) {
         this.initialPollDelay = initialPollDelay;
     }
-
+    
     public Integer getPollInterval() {
         return pollInterval;
     }
-
+    
     public void setPollInterval(Integer pollInterval) {
         this.pollInterval = pollInterval;
     }
-
+    
     public String getRegion() {
         return region;
     }
-
+    
     public void setRegion(String region) {
         this.region = region;
     }
-
+    
     public String getMessageAttributeNames() {
         return messageAttributeNames;
     }
-
+    
     public void setMessageAttributeNames(String messageAttributeNames) {
         this.messageAttributeNames = messageAttributeNames;
     }
-
+    
     public String getAttributeNames() {
         return attributeNames;
     }
-
+    
     public void setAttributeNames(String attributeNames) {
         this.attributeNames = attributeNames;
     }
-
+    
     public String getProfileName() {
         return profileName;
     }
-
+    
     public void setProfileName(String profileName) {
         this.profileName = profileName;
     }
-
+    
     @Override
     public AWSCredentials getCredentials() {
+
         // Return Credentials based on what is present, profileName taking priority.
         if (StringUtils.isNullOrEmpty(getProfileName())) {
-            return new AWSCredentials() {
-                @Override
-                public String getAWSAccessKeyId() {
-                    return awsAccessKeyId;
-                }
-
-                @Override
-                public String getAWSSecretKey() {
-                    return awsSecretKey;
-                }
-            };
+            
+            if (!StringUtils.isNullOrEmpty(awsAccessKeyId) && !StringUtils.isNullOrEmpty(awsSecretKey)) {
+                return new AWSCredentials() {
+                    @Override
+                    public String getAWSAccessKeyId() {
+                        return awsAccessKeyId;
+                    }
+                    
+                    @Override
+                    public String getAWSSecretKey() {
+                        return awsSecretKey;
+                    }
+                };
+            } else {
+                return DefaultAWSCredentialsProviderChain.getInstance().getCredentials();
+            }
+            
         } else {
             return new ProfileCredentialsProvider(getProfileName()).getCredentials();
         }
     }
-
+    
     @Override
     public void refresh() {
-
+        
     }
-
-
+    
 }

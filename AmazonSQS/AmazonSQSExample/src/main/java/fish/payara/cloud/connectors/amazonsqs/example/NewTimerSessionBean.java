@@ -44,7 +44,6 @@ package fish.payara.cloud.connectors.amazonsqs.example;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnection;
 import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory;
-import java.util.Date;
 import javax.annotation.Resource;
 import javax.ejb.Schedule;
 import javax.ejb.Stateless;
@@ -61,9 +60,7 @@ import javax.resource.spi.TransactionSupport.TransactionSupportLevel;
   resourceAdapter = "amazon-sqs-rar-0.6.1-SNAPSHOT", 
   minPoolSize = 2, maxPoolSize = 2,
   transactionSupport = TransactionSupportLevel.NoTransaction,
-  properties = {"awsAccessKeyId=${ENV=accessKey}",
-                "awsSecretKey=${ENV=secretKey}",
-                "region=eu-west-2"})
+  properties = {"region=${ENV=region}"})
 @Stateless
 public class NewTimerSessionBean {
 
