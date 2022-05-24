@@ -9,19 +9,25 @@ To use the JCA adapter the AmazonSQSRAR-<version>.rar should be deployed to your
 
 To deploy the JCA adapter on Payara Micro use the following commands.
 
-The example uses a number of environment variables for connecting to your Amazon account.
+## Example 
+
+The example uses an environment variables for connecting to your Amazon SQS Queue.
+The example used DefaultAWSCredentialsProviderChain to obtain access credentials
 
 ```shell
-   export accessKey="<your amazon access key>"
    export queueURL="<URL of the SQS queue in your amazon account>"
-   export secretKey="<your amazon secret key>"
+   export region="<Amazon region hosting your queue.>"
 ```
 
-These environment variables must be set before running the example
+This environment variable must be set before running the example
 
 ```shell
 java -jar payara-micro.jar --deploy amazon-sqs-rar-0.6.1-SNAPSHOT.rar amazon-sqs-example-0.6.1-SNAPSHOT.jar
 ```
+
+## AWS Credentials
+The connector supports creation of AWS Credentials through profileName, awsAccessKey and awsSecretKey property pair and if neither of these 
+properties are set the connector will fall back to using the DefaultAWSCredentialsProviderChain(https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/auth/DefaultAWSCredentialsProviderChain.html)
 
 ## Inbound MDB
 The AmazonSQSExample module shows an example MDB that receives messages from a queue.
@@ -47,6 +53,7 @@ Valid properties are below. On Payara all properties can be replaced via System 
 |messageAttributeNames | String | All | The list of message attribute names that should be fetched with the message (MDB Only)
 |attributeNames | String| All | The list of attribute names that should be fetched with the message (MDB Only)
 
+
 Your MDB should contain one method annotated with `@OnSQSMessage` and that method should take a single parameter of type `com.amazonaws.services.sqs.model.Message`
 
 A full skeleton MDB using Access and Secret keys shown below
@@ -56,7 +63,7 @@ A full skeleton MDB using Access and Secret keys shown below
     @ActivationConfigProperty(propertyName = "awsSecretKey", propertyValue = "${ENV=secretKey}"),
     @ActivationConfigProperty(propertyName = "queueURL", propertyValue = "${ENV=queueURL}"),   
     @ActivationConfigProperty(propertyName = "pollInterval", propertyValue = "1"),    
-    @ActivationConfigProperty(propertyName = "region", propertyValue = "eu-west-2")    
+    @ActivationConfigProperty(propertyName = "region", propertyValue = "${ENV=region}")    
 })
 public class ReceiveSQSMessage implements AmazonSQSListener {
 
@@ -72,7 +79,7 @@ Using Profile Name
     @ActivationConfigProperty(propertyName = "profileName", propertyValue = "${ENV=profileName}"),
     @ActivationConfigProperty(propertyName = "queueURL", propertyValue = "${ENV=queueURL}"),   
     @ActivationConfigProperty(propertyName = "pollInterval", propertyValue = "1"),    
-    @ActivationConfigProperty(propertyName = "region", propertyValue = "eu-west-2")    
+    @ActivationConfigProperty(propertyName = "region", propertyValue = "${ENV=region}")    
 })
 public class ReceiveSQSMessage implements AmazonSQSListener {
 
@@ -104,12 +111,12 @@ An example annotation defined connection factory is shown below;
   transactionSupport = TransactionSupportLevel.NoTransaction,
   properties = {"awsAccessKeyId=${ENV=accessKey}",
                 "awsSecretKey=${ENV=secretKey}",
-                "region=eu-west-2"})
+                "region=${ENV=region}"})
 ```
 Profile Name properties configuration
 ```java
   properties = {"profileName=${ENV=profileName}"
-                "region=eu-west-2"})
+                "region=${ENV=region}"})
 ```
 This connection factory can then be injected into any JavaEE component;
 ```java

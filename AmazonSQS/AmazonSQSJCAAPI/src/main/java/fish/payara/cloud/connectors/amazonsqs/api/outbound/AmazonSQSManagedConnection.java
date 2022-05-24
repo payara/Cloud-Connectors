@@ -42,6 +42,7 @@ package fish.payara.cloud.connectors.amazonsqs.api.outbound;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
@@ -80,23 +81,8 @@ public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSC
     private final AmazonSQS sqsClient;
 
     AmazonSQSManagedConnection(Subject subject, ConnectionRequestInfo cxRequestInfo, AmazonSQSManagedConnectionFactory aThis) {
-        AWSCredentialsProvider credentialsProvider;
-        if (StringUtils.isNullOrEmpty(aThis.getProfileName())) {
-            credentialsProvider = new AWSStaticCredentialsProvider(new AWSCredentials() {
-                @Override
-                public String getAWSAccessKeyId() {
-                    return aThis.getAwsAccessKeyId();
-                }
-
-                @Override
-                public String getAWSSecretKey() {
-                    return aThis.getAwsSecretKey();
-                }
-            });
-        } else {
-            credentialsProvider = new ProfileCredentialsProvider(aThis.getProfileName());
-        }
-
+        
+        AWSCredentialsProvider credentialsProvider = getCredentials(aThis);
         sqsClient = AmazonSQSClientBuilder.standard().withRegion(aThis.getRegion()).withCredentials(credentialsProvider).build();
     }
 
@@ -211,6 +197,28 @@ public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSC
     @Override
     public void close() throws Exception {
         destroy();
+    }
+    
+        private AWSCredentialsProvider getCredentials(AmazonSQSManagedConnectionFactory aThis) {
+        AWSCredentialsProvider credentialsProvider;
+        if (!StringUtils.isNullOrEmpty(aThis.getProfileName())) {
+            credentialsProvider = new ProfileCredentialsProvider(aThis.getProfileName());
+        } else if (!StringUtils.isNullOrEmpty(aThis.getAwsAccessKeyId()) && !StringUtils.isNullOrEmpty(aThis.getAwsSecretKey()) ) {
+            credentialsProvider = new AWSStaticCredentialsProvider(new AWSCredentials() {
+                @Override
+                public String getAWSAccessKeyId() {
+                    return aThis.getAwsAccessKeyId();
+                }
+
+                @Override
+                public String getAWSSecretKey() {
+                    return aThis.getAwsSecretKey();
+                }
+            });
+        } else {
+            credentialsProvider = DefaultAWSCredentialsProviderChain.getInstance();
+        }
+        return credentialsProvider;
     }
 
 }
