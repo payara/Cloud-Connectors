@@ -131,7 +131,7 @@ public class KafkaSynchWorker implements KafkaWorker {
                         Logger.getLogger(KafkaSynchWorker.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     if (!recordsAnnt.matchOtherMethods()) {
-                        return;
+                        break;
                     }
                 }
                 
