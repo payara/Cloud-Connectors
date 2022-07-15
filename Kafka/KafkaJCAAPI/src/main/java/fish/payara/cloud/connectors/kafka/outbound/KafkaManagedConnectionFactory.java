@@ -364,6 +364,9 @@ public class KafkaManagedConnectionFactory implements ManagedConnectionFactory, 
                 additionalPropertiesParser == null
                         ? producerProperties
                         : AdditionalPropertiesParser.merge(producerProperties,  additionalPropertiesParser.parse());
+        if (producer == null) {
+            producer = new KafkaProducer(properties);
+        }
         return new KafkaManagedConnection(producer);
     }
 
