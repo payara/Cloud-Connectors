@@ -63,7 +63,7 @@ public @interface OnRecords {
      * if they also match the topic as well as this annotated method.
      * If set to false (the default) other methods will not be tested to see if they
      * have matching annotations.
-     * @return 
+     * @return the matchOtherMethods value
      */
     @Nonbinding boolean matchOtherMethods() default false;
 }

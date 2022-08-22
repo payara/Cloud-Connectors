@@ -60,16 +60,16 @@ public @interface OnRecord {
      * If topics is an empty array all topics will trigger the callback
      * Otherwise this method will only match records sent on the topics specified.
      * 
-     * @return 
+     * @return the topics
     */
     @Nonbinding String[] topics() default {};
-    
+
     /**
      * If set to true other methods on the KafkaListener class will be called
      * if they also match the topic as well as this annotated method
      * If set to false (the default) other methods will not be tested to see if they
      * have matching annotations.
-     * @return 
+     * @return the matchOtherMethods value
      */
     @Nonbinding boolean matchOtherMethods() default false;
 }

@@ -96,7 +96,7 @@
                             <splitindex>true</splitindex>
                             <doctitle>Cloud Connectors</doctitle>
                             <links>
-                                <link>https://docs.oracle.com/javaee/${javaee.version}/api/</link>
+                                <link>https://jakarta.ee/specifications/platform/8/apidocs/</link>
                             </links>
                         </configuration>
                         <executions>
