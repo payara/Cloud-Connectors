@@ -22,7 +22,7 @@
         <dependency>
             <groupId>com.microsoft.azure</groupId>
             <artifactId>azure-management</artifactId>
-            <version>0.9.0-SNAPSHOT</version>
+            <version>0.8.0</version>
         </dependency>
         <dependency>
             <groupId>fish.payara.cloud.connectors.azuresb</groupId>
