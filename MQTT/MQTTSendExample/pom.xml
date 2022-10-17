@@ -4,13 +4,12 @@
     <parent>
         <groupId>fish.payara.cloud.connectors</groupId>
         <artifactId>cloud-connectors</artifactId>
-        <version>0.8.0</version>
+        <version>0.9.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     
     <groupId>fish.payara.cloud.connectors.mqtt</groupId>
     <artifactId>mqtt-send-example</artifactId>
-    <version>0.8.0</version>
     <packaging>ejb</packaging>
 
     <name>MQTT Send Example</name>
