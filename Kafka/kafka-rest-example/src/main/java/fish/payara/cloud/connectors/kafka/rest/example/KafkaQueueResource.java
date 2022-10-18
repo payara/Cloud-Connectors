@@ -43,17 +43,17 @@ import fish.payara.cloud.connectors.kafka.api.KafkaConnection;
 import fish.payara.cloud.connectors.kafka.api.KafkaConnectionFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Resource;
-import javax.enterprise.context.ApplicationScoped;
-import javax.resource.ConnectionFactoryDefinition;
-import javax.resource.spi.TransactionSupport;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Path;
-import javax.ws.rs.PUT;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.MediaType;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.resource.ConnectionFactoryDefinition;
+import jakarta.resource.spi.TransactionSupport;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.UriInfo;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
 /**
@@ -65,7 +65,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 @ConnectionFactoryDefinition(name = "java:global/KafkaConnectionFactory", 
   description = "Kafka Conn Factory", 
   interfaceName = "fish.payara.cloud.connectors.kafka.api.KafkaConnectionFactory", 
-  resourceAdapter = "kafka-rar-0.8.0", 
+  resourceAdapter = "kafka-rar-0.9.0-SNAPSHOT", 
   minPoolSize = 2, 
   maxPoolSize = 20,
   transactionSupport = TransactionSupport.TransactionSupportLevel.NoTransaction,

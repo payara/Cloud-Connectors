@@ -42,7 +42,7 @@ package fish.payara.cloud.connectors.mqtt.api.outbound;
 import fish.payara.cloud.connectors.mqtt.api.MQTTConnection;
 import java.io.Closeable;
 import java.io.IOException;
-import javax.resource.ResourceException;
+import jakarta.resource.ResourceException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 /**

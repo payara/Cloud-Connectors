@@ -40,13 +40,13 @@
 package fish.payara.cloud.connectors.kafka.rest.example;
 
 import java.util.Set;
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.core.Application;
 
 /**
  *
  * @author Steve Millidge (Payara Foundation)
  */
-@javax.ws.rs.ApplicationPath("/kafka")
+@jakarta.ws.rs.ApplicationPath("/kafka")
 public class ApplicationConfig extends Application {
 
     @Override

@@ -44,11 +44,11 @@ import com.microsoft.azure.servicebus.Message;
 import fish.payara.cloud.connectors.azuresb.api.AzureSBConnection;
 import fish.payara.cloud.connectors.azuresb.api.AzureSBConnectionFactory;
 import java.util.LinkedList;
-import javax.annotation.Resource;
-import javax.ejb.Schedule;
-import javax.ejb.Stateless;
-import javax.resource.ConnectionFactoryDefinition;
-import javax.resource.spi.TransactionSupport.TransactionSupportLevel;
+import jakarta.annotation.Resource;
+import jakarta.ejb.Schedule;
+import jakarta.ejb.Stateless;
+import jakarta.resource.ConnectionFactoryDefinition;
+import jakarta.resource.spi.TransactionSupport.TransactionSupportLevel;
 
 /**
  *
@@ -57,7 +57,7 @@ import javax.resource.spi.TransactionSupport.TransactionSupportLevel;
 @ConnectionFactoryDefinition(name = "java:comp/env/AzureSBConnectionFactory",
         description = "Azure SB Conn Factory",
         interfaceName = "fish.payara.cloud.connectors.azuresb.api.AzureSBConnectionFactory",
-        resourceAdapter = "azure-sb-rar-0.8.0",
+        resourceAdapter = "azure-sb-rar-0.9.0-SNAPSHOT",
         minPoolSize = 2, maxPoolSize = 2,
         transactionSupport = TransactionSupportLevel.NoTransaction,
         properties = {"nameSpace=${ENV=nameSpace}",

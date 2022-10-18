@@ -43,8 +43,8 @@ import fish.payara.cloud.connectors.mqtt.api.MQTTConnection;
 import fish.payara.cloud.connectors.mqtt.api.MQTTConnectionFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.resource.ResourceException;
-import javax.resource.spi.ConnectionManager;
+import jakarta.resource.ResourceException;
+import jakarta.resource.spi.ConnectionManager;
 
 /**
  *

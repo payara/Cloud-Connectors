@@ -39,8 +39,8 @@
  */
 package fish.payara.cloud.connectors.kafka.api;
 
-import javax.resource.ResourceException;
-import javax.resource.cci.ConnectionSpec;
+import jakarta.resource.ResourceException;
+import jakarta.resource.cci.ConnectionSpec;
 
 /**
  *

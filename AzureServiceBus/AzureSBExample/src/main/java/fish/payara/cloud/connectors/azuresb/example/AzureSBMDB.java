@@ -42,8 +42,8 @@ package fish.payara.cloud.connectors.azuresb.example;
 import com.microsoft.azure.servicebus.IMessage;
 import fish.payara.cloud.connectors.azuresb.api.AzureSBListener;
 import fish.payara.cloud.connectors.azuresb.api.OnAzureSBMessage;
-import javax.ejb.ActivationConfigProperty;
-import javax.ejb.MessageDriven;
+import jakarta.ejb.ActivationConfigProperty;
+import jakarta.ejb.MessageDriven;
 
 /**
  *
