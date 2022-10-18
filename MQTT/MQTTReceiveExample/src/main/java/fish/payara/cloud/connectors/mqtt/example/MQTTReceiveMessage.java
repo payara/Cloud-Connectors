@@ -42,8 +42,8 @@ package fish.payara.cloud.connectors.mqtt.example;
 import fish.payara.cloud.connectors.mqtt.api.MQTTListener;
 import fish.payara.cloud.connectors.mqtt.api.OnMQTTMessage;
 import java.util.logging.Logger;
-import javax.ejb.ActivationConfigProperty;
-import javax.ejb.MessageDriven;
+import jakarta.ejb.ActivationConfigProperty;
+import jakarta.ejb.MessageDriven;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 /**

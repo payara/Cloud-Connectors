@@ -6,11 +6,11 @@ package fish.payara.cloud.connectors.mqtt.example;
 
 import fish.payara.cloud.connectors.mqtt.api.MQTTConnection;
 import fish.payara.cloud.connectors.mqtt.api.MQTTConnectionFactory;
-import javax.annotation.Resource;
-import javax.ejb.Stateless;
-import javax.ejb.Schedule;
-import javax.resource.ConnectionFactoryDefinition;
-import javax.resource.spi.TransactionSupport;
+import jakarta.annotation.Resource;
+import jakarta.ejb.Stateless;
+import jakarta.ejb.Schedule;
+import jakarta.resource.ConnectionFactoryDefinition;
+import jakarta.resource.spi.TransactionSupport;
 
 /**
  *
@@ -19,7 +19,7 @@ import javax.resource.spi.TransactionSupport;
 @ConnectionFactoryDefinition(name = "java:comp/env/MQTTConnectionFactory", 
   description = "MQTT Conn Factory", 
   interfaceName = "fish.payara.cloud.connectors.mqtt.api.MQTTConnectionFactory", 
-  resourceAdapter = "mqtt-rar-0.8.0", 
+  resourceAdapter = "mqtt-rar-0.9.0", 
   minPoolSize = 2, 
   maxPoolSize = 2,
   transactionSupport = TransactionSupport.TransactionSupportLevel.NoTransaction,
