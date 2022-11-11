@@ -3,7 +3,7 @@ package fish.payara.cloud.connectors.amazonsqs.example;
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2017 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017-2022 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,8 +40,6 @@ package fish.payara.cloud.connectors.amazonsqs.example;
  * holder.
  */
 
-
-import com.amazonaws.services.sqs.model.SendMessageRequest;
 import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnection;
 import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory;
 import javax.annotation.Resource;
@@ -49,28 +47,33 @@ import javax.ejb.Schedule;
 import javax.ejb.Stateless;
 import javax.resource.ConnectionFactoryDefinition;
 import javax.resource.spi.TransactionSupport.TransactionSupportLevel;
-
+import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 /**
  *
  * @author Steve Millidge (Payara Foundation)
  */
-@ConnectionFactoryDefinition(name = "java:comp/env/SQSConnectionFactory", 
-  description = "SQS Conn Factory", 
-  interfaceName = "fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory", 
-  resourceAdapter = "amazon-sqs-rar-0.8.0", 
-  minPoolSize = 2, maxPoolSize = 2,
-  transactionSupport = TransactionSupportLevel.NoTransaction,
-  properties = {"region=${ENV=region}"})
+@ConnectionFactoryDefinition(name = "java:comp/env/SQSConnectionFactory",
+        description = "SQS Conn Factory",
+        interfaceName = "fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory",
+        resourceAdapter = "amazon-sqs-rar-0.9.0",
+        minPoolSize = 2, maxPoolSize = 2,
+        transactionSupport = TransactionSupportLevel.NoTransaction,
+        properties = {"region=${ENV=region}"})
 @Stateless
 public class NewTimerSessionBean {
 
-    @Resource(lookup="java:comp/env/SQSConnectionFactory")
+    @Resource(lookup = "java:comp/env/SQSConnectionFactory")
     AmazonSQSConnectionFactory factory;
-    
-    @Schedule(second = "*/1", hour="*", minute="*")   
+
+    @Schedule(second = "*/1", hour = "*", minute = "*")
     public void myTimer() {
         try (AmazonSQSConnection connection = factory.getConnection()) {
-        connection.sendMessage(new SendMessageRequest(System.getenv("queueURL"), "Hello World"));
-        } catch (Exception e) {}
+            SendMessageRequest sendMsgRequest = SendMessageRequest.builder()
+                    .queueUrl(System.getenv("queueURL"))
+                    .messageBody("Hello World")
+                    .build();
+            connection.sendMessage(sendMsgRequest);
+        } catch (Exception e) {
+        }
     }
 }

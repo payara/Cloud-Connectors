@@ -4,12 +4,12 @@
     <parent>
         <groupId>fish.payara.cloud.connectors</groupId>
         <artifactId>cloud-connectors</artifactId>
-        <version>0.8.0</version>
+        <version>0.9.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <groupId>fish.payara.cloud.connectors.amazonsqs</groupId>
     <artifactId>amazon-sqs-example</artifactId>
-    <version>0.8.0</version>
+    <version>0.9.0</version>
     <packaging>ejb</packaging>
 
     <name>Amazon SQS Example</name>
@@ -24,9 +24,23 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-sqs</artifactId>
-            <version>1.12.286</version>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>sqs</artifactId>
+            <version>2.17.230</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>auth</artifactId>
+            <version>2.17.230</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>sso</artifactId>
+            <version>2.17.230</version>
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
