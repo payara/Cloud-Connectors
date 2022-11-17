@@ -187,10 +187,8 @@ public class AmazonSQSActivationSpec implements ActivationSpec, AwsCredentialsPr
     public AwsCredentials resolveCredentials() {
         // Return Credentials based on what is present, profileName taking priority.
         if (StringUtils.isBlank(getProfileName())) {
-
-            if (StringUtils.isNotBlank(awsAccessKeyId) && !StringUtils.isNotBlank(awsSecretKey)) {
+            if (StringUtils.isNotBlank(awsAccessKeyId) && StringUtils.isNotBlank(awsSecretKey)) {
                 return new AwsCredentials() {
-
                     @Override
                     public String accessKeyId() {
                         return awsAccessKeyId;

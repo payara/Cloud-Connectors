@@ -58,7 +58,8 @@ import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
         resourceAdapter = "amazon-sqs-rar-0.9.0",
         minPoolSize = 2, maxPoolSize = 2,
         transactionSupport = TransactionSupportLevel.NoTransaction,
-        properties = {"region=${ENV=region}"})
+        properties = {"region=${ENV=region}", "awsAccessKeyId=${ENV=awsAccessKeyId}",
+                "awsSecretKey=${ENV=awsSecretKey}", "profileName=${ENV=profileName}"})
 @Stateless
 public class NewTimerSessionBean {
 
@@ -74,6 +75,7 @@ public class NewTimerSessionBean {
                     .build();
             connection.sendMessage(sendMsgRequest);
         } catch (Exception e) {
+            System.out.println(e.toString());
         }
     }
 }

@@ -71,7 +71,8 @@ class SQSPoller extends TimerTask {
         spec = sqsSpec;
         ctx = context;
         factory = endpointFactory;
-        client = SqsClient.builder().region(Region.of(spec.getRegion())).credentialsProvider(ProfileCredentialsProvider.create()).build();
+        client = SqsClient.builder().region(Region.of(spec.getRegion()))
+                .credentialsProvider(spec).build();
     }
 
     @Override

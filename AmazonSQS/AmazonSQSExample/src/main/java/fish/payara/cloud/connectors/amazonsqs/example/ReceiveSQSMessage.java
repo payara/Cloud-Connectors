@@ -53,7 +53,10 @@ import java.util.Map;
 @MessageDriven(activationConfig = {
         @ActivationConfigProperty(propertyName = "queueURL", propertyValue = "${ENV=queueURL}"),
         @ActivationConfigProperty(propertyName = "pollInterval", propertyValue = "1000"),
-        @ActivationConfigProperty(propertyName = "region", propertyValue = "${ENV=region}")
+        @ActivationConfigProperty(propertyName = "region", propertyValue = "${ENV=region}"),
+        @ActivationConfigProperty(propertyName = "awsAccessKeyId", propertyValue = "${ENV=awsAccessKeyId}"),
+        @ActivationConfigProperty(propertyName = "awsSecretKey", propertyValue = "${ENV=awsSecretKey}"),
+        @ActivationConfigProperty(propertyName = "profileName", propertyValue = "${ENV=profileName}"),
 })
 public class ReceiveSQSMessage implements AmazonSQSListener {
 

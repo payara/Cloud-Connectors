@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2017 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017-2022 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -90,8 +90,8 @@ public class AmazonSQSManagedConnectionFactory implements ManagedConnectionFacto
         return awsAccessKeyId;
     }
 
-    public void setAwsAccessKeyId(String awsAccessKey) {
-        this.awsAccessKeyId = awsAccessKey;
+    public void setAwsAccessKeyId(String awsAccessKeyId) {
+        this.awsAccessKeyId = awsAccessKeyId;
     }
 
     public String getRegion() {
