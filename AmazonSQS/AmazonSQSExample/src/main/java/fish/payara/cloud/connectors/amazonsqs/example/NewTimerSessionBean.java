@@ -55,11 +55,11 @@ import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 @ConnectionFactoryDefinition(name = "java:comp/env/SQSConnectionFactory",
         description = "SQS Conn Factory",
         interfaceName = "fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory",
-        resourceAdapter = "amazon-sqs-rar-0.9.0",
+        resourceAdapter = "amazon-sqs-rar-0.9.0-SNAPSHOT",
         minPoolSize = 2, maxPoolSize = 2,
         transactionSupport = TransactionSupportLevel.NoTransaction,
         properties = {"region=${ENV=region}", "awsAccessKeyId=${ENV=awsAccessKeyId}",
-                "awsSecretKey=${ENV=awsSecretKey}", "profileName=${ENV=profileName}"})
+                "awsSecretKey=${ENV=awsSecretKey}"})
 @Stateless
 public class NewTimerSessionBean {
 
