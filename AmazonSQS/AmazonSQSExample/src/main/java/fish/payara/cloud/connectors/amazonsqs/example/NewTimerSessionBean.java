@@ -58,8 +58,7 @@ import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
         resourceAdapter = "amazon-sqs-rar-0.9.0-SNAPSHOT",
         minPoolSize = 2, maxPoolSize = 2,
         transactionSupport = TransactionSupportLevel.NoTransaction,
-        properties = {"region=${ENV=region}", "awsAccessKeyId=${ENV=awsAccessKeyId}",
-                "awsSecretKey=${ENV=awsSecretKey}"})
+        properties = {"region=${ENV=region}"})
 @Stateless
 public class NewTimerSessionBean {
 
