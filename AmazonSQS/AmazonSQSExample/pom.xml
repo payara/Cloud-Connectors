@@ -30,13 +30,6 @@
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>auth</artifactId>
-            <version>2.18.17</version>
-            <type>jar</type>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 
     <build>
