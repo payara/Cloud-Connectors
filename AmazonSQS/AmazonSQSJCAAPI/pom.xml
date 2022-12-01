@@ -4,11 +4,12 @@
     <parent>
         <groupId>fish.payara.cloud.connectors</groupId>
         <artifactId>cloud-connectors</artifactId>
-        <version>0.9.0-SNAPSHOT</version>
+        <version>0.8.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <groupId>fish.payara.cloud.connectors.amazonsqs</groupId>
     <artifactId>amazon-sqs-jca-api</artifactId>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
     <name>Amazon SQS JCA Adapter API</name>
     <description>API classes for the Amazon SQS JCA Adapter</description>

@@ -55,7 +55,7 @@ import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 @ConnectionFactoryDefinition(name = "java:comp/env/SQSConnectionFactory",
         description = "SQS Conn Factory",
         interfaceName = "fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory",
-        resourceAdapter = "amazon-sqs-rar-0.9.0-SNAPSHOT",
+        resourceAdapter = "amazon-sqs-rar-1.0.0",
         minPoolSize = 2, maxPoolSize = 2,
         transactionSupport = TransactionSupportLevel.NoTransaction,
         properties = {"region=${ENV=region}"})
