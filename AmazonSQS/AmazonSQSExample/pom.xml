@@ -9,7 +9,7 @@
     </parent>
     <groupId>fish.payara.cloud.connectors.amazonsqs</groupId>
     <artifactId>amazon-sqs-example</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>ejb</packaging>
 
     <name>Amazon SQS Example</name>
