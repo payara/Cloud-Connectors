@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2017 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017-2022 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,19 +39,7 @@
  */
 package fish.payara.cloud.connectors.amazonsqs.api.outbound;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
-import com.amazonaws.services.sqs.AmazonSQS;
-import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
-import com.amazonaws.services.sqs.model.SendMessageBatchRequest;
-import com.amazonaws.services.sqs.model.SendMessageBatchRequestEntry;
-import com.amazonaws.services.sqs.model.SendMessageBatchResult;
-import com.amazonaws.services.sqs.model.SendMessageRequest;
-import com.amazonaws.services.sqs.model.SendMessageResult;
-import com.amazonaws.util.StringUtils;
+
 import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnection;
 
 import javax.resource.NotSupportedException;
@@ -69,6 +57,18 @@ import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import software.amazon.awssdk.auth.credentials.AwsCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.sqs.SqsClient;
+import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequest;
+import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequestEntry;
+import software.amazon.awssdk.services.sqs.model.SendMessageBatchResponse;
+import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
+import software.amazon.awssdk.services.sqs.model.SendMessageResponse;
+import software.amazon.awssdk.utils.StringUtils;
 
 /**
  * @author Steve Millidge (Payara Foundation)
@@ -78,12 +78,11 @@ public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSC
     private final List<AmazonSQSConnection> connectionHandles = new LinkedList<>();
     private final HashSet<ConnectionEventListener> listeners = new HashSet<>();
     private PrintWriter logWriter;
-    private final AmazonSQS sqsClient;
+    private final SqsClient sqsClient;
 
     AmazonSQSManagedConnection(Subject subject, ConnectionRequestInfo cxRequestInfo, AmazonSQSManagedConnectionFactory aThis) {
-        
-        AWSCredentialsProvider credentialsProvider = getCredentials(aThis);
-        sqsClient = AmazonSQSClientBuilder.standard().withRegion(aThis.getRegion()).withCredentials(credentialsProvider).build();
+        AwsCredentialsProvider credentialsProvider = getCredentials(aThis);
+        sqsClient = SqsClient.builder().region(Region.of(aThis.getRegion())).credentialsProvider(credentialsProvider).build();
     }
 
     @Override
@@ -95,7 +94,7 @@ public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSC
 
     @Override
     public void destroy() throws ResourceException {
-        sqsClient.shutdown();
+
     }
 
     @Override
@@ -175,48 +174,53 @@ public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSC
     }
 
     @Override
-    public SendMessageResult sendMessage(SendMessageRequest request) {
+    public SendMessageResponse sendMessage(SendMessageRequest request) {
         return sqsClient.sendMessage(request);
     }
 
     @Override
-    public SendMessageResult sendMessage(String queueURL, String messageBody) {
-        return sqsClient.sendMessage(queueURL, messageBody);
+    public SendMessageResponse sendMessage(String queueURL, String messageBody) {
+        return sqsClient.sendMessage(SendMessageRequest.builder().queueUrl(queueURL).messageBody(messageBody).build());
     }
 
     @Override
-    public SendMessageBatchResult sendMessageBatch(String queueURL, List<SendMessageBatchRequestEntry> entries) {
-        return sqsClient.sendMessageBatch(queueURL, entries);
-    }
-
-    @Override
-    public SendMessageBatchResult sendMessageBatch(SendMessageBatchRequest batch) {
+    public SendMessageBatchResponse sendMessageBatch(SendMessageBatchRequest batch) {
         return sqsClient.sendMessageBatch(batch);
+    }
+
+    @Override
+    public SendMessageBatchResponse sendMessageBatch(String queueURL, List<SendMessageBatchRequestEntry> entries) {
+        return sqsClient.sendMessageBatch(SendMessageBatchRequest.builder().queueUrl(queueURL).entries(entries).build());
     }
 
     @Override
     public void close() throws Exception {
         destroy();
     }
-    
-        private AWSCredentialsProvider getCredentials(AmazonSQSManagedConnectionFactory aThis) {
-        AWSCredentialsProvider credentialsProvider;
-        if (!StringUtils.isNullOrEmpty(aThis.getProfileName())) {
-            credentialsProvider = new ProfileCredentialsProvider(aThis.getProfileName());
-        } else if (!StringUtils.isNullOrEmpty(aThis.getAwsAccessKeyId()) && !StringUtils.isNullOrEmpty(aThis.getAwsSecretKey()) ) {
-            credentialsProvider = new AWSStaticCredentialsProvider(new AWSCredentials() {
-                @Override
-                public String getAWSAccessKeyId() {
-                    return aThis.getAwsAccessKeyId();
-                }
 
+    private AwsCredentialsProvider getCredentials(AmazonSQSManagedConnectionFactory aThis) {
+        AwsCredentialsProvider credentialsProvider;
+        if (StringUtils.isNotBlank(aThis.getProfileName())) {
+            credentialsProvider = ProfileCredentialsProvider.create(aThis.getProfileName());
+        } else if (StringUtils.isNotBlank(aThis.getAwsAccessKeyId()) && StringUtils.isNotBlank(aThis.getAwsSecretKey())) {
+            credentialsProvider = new AwsCredentialsProvider(){
                 @Override
-                public String getAWSSecretKey() {
-                    return aThis.getAwsSecretKey();
+                public AwsCredentials resolveCredentials() {
+                    return new AwsCredentials() {
+                        @Override
+                        public String accessKeyId() {
+                            return aThis.getAwsAccessKeyId();
+                        }
+
+                        @Override
+                        public String secretAccessKey() {
+                            return aThis.getAwsSecretKey();
+                        }
+                    };
                 }
-            });
+            };
         } else {
-            credentialsProvider = DefaultAWSCredentialsProviderChain.getInstance();
+            credentialsProvider = DefaultCredentialsProvider.create();
         }
         return credentialsProvider;
     }
