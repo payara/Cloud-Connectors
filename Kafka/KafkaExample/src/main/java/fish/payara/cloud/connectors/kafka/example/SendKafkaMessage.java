@@ -57,7 +57,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 @ConnectionFactoryDefinition(name = "java:comp/env/KafkaConnectionFactory", 
   description = "Kafka Conn Factory", 
   interfaceName = "fish.payara.cloud.connectors.kafka.api.KafkaConnectionFactory", 
-  resourceAdapter = "kafka-rar-0.9.0-SNAPSHOT", 
+  resourceAdapter = "kafka-rar-1.0.0-SNAPSHOT",
   minPoolSize = 2, 
   maxPoolSize = 2,
   transactionSupport = TransactionSupportLevel.NoTransaction,

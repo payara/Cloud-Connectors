@@ -4,12 +4,11 @@
     <parent>
         <groupId>fish.payara.cloud.connectors</groupId>
         <artifactId>cloud-connectors</artifactId>
-        <version>0.8.0</version>
+        <version>1.0.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <groupId>fish.payara.cloud.connectors.kafka</groupId>
     <artifactId>kafka-rest-example</artifactId>
-    <version>0.8.0</version>
     <packaging>war</packaging>
 
     <name>Kafka REST Example</name>
@@ -18,7 +17,7 @@
         <dependency>
             <groupId>fish.payara.cloud.connectors.kafka</groupId>
             <artifactId>kafka-jca-api</artifactId>
-            <version>0.8.0</version>
+            <version>${project.version}</version>
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
