@@ -69,6 +69,7 @@ public class KafkaActivationSpec implements ActivationSpec {
     private String valueDeserializer;
     private String keyDeserializer;
     private String topics;
+    private String regexTopics;
     private Long pollInterval = 1000L;
     private Long initialPollDelay = 1000L;
     private Long fetchMinBytes;
@@ -219,6 +220,14 @@ public class KafkaActivationSpec implements ActivationSpec {
 
     public void setTopics(String topics) {
         this.topics = topics;
+    }
+
+    public String getRegexTopics() {
+        return regexTopics;
+    }
+
+    public void setRegexTopics(String regexTopics) {
+        this.regexTopics = regexTopics;
     }
 
     public Long getInitialPollDelay() {

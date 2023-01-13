@@ -45,6 +45,8 @@ Valid properties are below. On Payara all properties in annotations can be repla
 |pollInterval | Long | 1000 | How often the MDB Consumer should poll Kafka for new records (MDBs only)
 |autoCommitInterval | Long | None | Interval before autoCommit is sent to the broker (ms) (MDBs only)
 |useSynchMode | Boolean | false | In synch mode a single MDB instance will consume all the records in sequence on a single thread (MDBs only)
+|topics | String | null | Subscribe to list of topics given as comma separated string. Use of topics and regexTopics properties are mutually exclusive.
+|regexTopics | java.util.regex.Pattern | null | Subscribe to all topics matching specified Java regular expression to get dynamically assigned partitions. Use of topics and regexTopics properties are mutually exclusive.
 
 ## Inbound Processing (MDBs)
 
@@ -86,6 +88,7 @@ A full skeleton MDB is shown below
     @ActivationConfigProperty(propertyName = "clientId", propertyValue = "testClient"),
     @ActivationConfigProperty(propertyName = "groupIdConfig", propertyValue = "testGroup"),
     @ActivationConfigProperty(propertyName = "topics", propertyValue = "test,test2"),
+    //@ActivationConfigProperty(propertyName = "regexTopics", propertyValue = "test.*"),
     @ActivationConfigProperty(propertyName = "bootstrapServersConfig", propertyValue = "localhost:9092"),    
     @ActivationConfigProperty(propertyName = "enableAutoCommit", propertyValue = "true"),    
     @ActivationConfigProperty(propertyName = "autoCommitInterval", propertyValue = "100"),    
