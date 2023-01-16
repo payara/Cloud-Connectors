@@ -42,11 +42,11 @@ package fish.payara.cloud.connectors.amazonsqs.example;
 
 import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnection;
 import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory;
-import javax.annotation.Resource;
-import javax.ejb.Schedule;
-import javax.ejb.Stateless;
-import javax.resource.ConnectionFactoryDefinition;
-import javax.resource.spi.TransactionSupport.TransactionSupportLevel;
+import jakarta.annotation.Resource;
+import jakarta.ejb.Schedule;
+import jakarta.ejb.Stateless;
+import jakarta.resource.ConnectionFactoryDefinition;
+import jakarta.resource.spi.TransactionSupport.TransactionSupportLevel;
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 /**
  *
@@ -55,7 +55,7 @@ import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 @ConnectionFactoryDefinition(name = "java:comp/env/SQSConnectionFactory",
         description = "SQS Conn Factory",
         interfaceName = "fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory",
-        resourceAdapter = "amazon-sqs-rar-1.0.0",
+        resourceAdapter = "amazon-sqs-rar-2.0.0",
         minPoolSize = 2, maxPoolSize = 2,
         transactionSupport = TransactionSupportLevel.NoTransaction,
         properties = {"region=${ENV=region}"})

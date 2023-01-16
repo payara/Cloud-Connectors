@@ -40,8 +40,8 @@
 package fish.payara.cloud.connectors.amazonsqs.example;
 
 import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSListener;
-import javax.ejb.ActivationConfigProperty;
-import javax.ejb.MessageDriven;
+import jakarta.ejb.ActivationConfigProperty;
+import jakarta.ejb.MessageDriven;
 import fish.payara.cloud.connectors.amazonsqs.api.OnSQSMessage;
 import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;

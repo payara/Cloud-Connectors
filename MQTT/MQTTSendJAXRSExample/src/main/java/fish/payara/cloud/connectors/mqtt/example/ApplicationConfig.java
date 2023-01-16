@@ -6,13 +6,13 @@
 package fish.payara.cloud.connectors.mqtt.example;
 
 import java.util.Set;
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.core.Application;
 
 /**
  *
  * @author steve
  */
-@javax.ws.rs.ApplicationPath("demo")
+@jakarta.ws.rs.ApplicationPath("demo")
 public class ApplicationConfig extends Application {
 
     @Override

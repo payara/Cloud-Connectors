@@ -40,7 +40,7 @@
 package fish.payara.cloud.connectors.kafka.inbound;
 
 import java.util.Objects;
-import javax.resource.spi.endpoint.MessageEndpointFactory;
+import jakarta.resource.spi.endpoint.MessageEndpointFactory;
 
 /**
  *
