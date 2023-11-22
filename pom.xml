@@ -172,14 +172,14 @@
                 <repository>
                     <id>payara-enterprise</id>
                     <name>Payara Enterprise Nexus</name>
-                    <url>https://nexus.payara.fish/content/repositories/payara-enterprise</url>
+                    <url>https://nexus.dev.payara.fish/content/repositories/payara-enterprise</url>
                 </repository>
             </distributionManagement>
             <repositories>
                 <repository>
                     <id>payara-enterprise</id>
                     <name>Payara Enterprise Nexus</name>
-                    <url>https://nexus.payara.fish/content/repositories/payara-enterprise</url>
+                    <url>https://nexus.dev.payara.fish/content/repositories/payara-enterprise</url>
                     <releases>
                         <enabled>true</enabled>
                     </releases>
