@@ -41,7 +41,7 @@ package fish.payara.cloud.connectors.kafka.api;
 
 import java.util.List;
 import java.util.concurrent.Future;
-import javax.resource.ResourceException;
+import jakarta.resource.ResourceException;
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;

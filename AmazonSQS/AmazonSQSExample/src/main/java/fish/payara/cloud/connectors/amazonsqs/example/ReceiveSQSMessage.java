@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2017 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017-2022 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,33 +40,32 @@
 package fish.payara.cloud.connectors.amazonsqs.example;
 
 import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSListener;
-import javax.ejb.ActivationConfigProperty;
-import javax.ejb.MessageDriven;
-import com.amazonaws.services.sqs.model.Message;
-import com.amazonaws.services.sqs.model.MessageAttributeValue;
+import jakarta.ejb.ActivationConfigProperty;
+import jakarta.ejb.MessageDriven;
 import fish.payara.cloud.connectors.amazonsqs.api.OnSQSMessage;
+import software.amazon.awssdk.services.sqs.model.Message;
+import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
 import java.util.Map;
 
 /**
- *
  * @author Steve Millidge (Payara Foundation)
  */
 @MessageDriven(activationConfig = {
-    @ActivationConfigProperty(propertyName = "queueURL", propertyValue = "${ENV=queueURL}"),   
-    @ActivationConfigProperty(propertyName = "pollInterval", propertyValue = "1000"),    
-    @ActivationConfigProperty(propertyName = "region", propertyValue = "${ENV=region}")    
+        @ActivationConfigProperty(propertyName = "queueURL", propertyValue = "${ENV=queueURL}"),
+        @ActivationConfigProperty(propertyName = "pollInterval", propertyValue = "1000"),
+        @ActivationConfigProperty(propertyName = "region", propertyValue = "${ENV=region}")
 })
 public class ReceiveSQSMessage implements AmazonSQSListener {
 
     @OnSQSMessage
     public void receiveMessage(Message message) {
-        System.out.println("Got message " + message.getBody());
-        Map<String,MessageAttributeValue> mattrs = message.getMessageAttributes();
+        System.out.println("Got message " + message.body());
+        Map<String, MessageAttributeValue> mattrs = message.messageAttributes();
         for (String key : mattrs.keySet()) {
-            System.out.println("Got Message attribute " + key + "," + mattrs.get(key).getStringValue());
+            System.out.println("Got Message attribute " + key + "," + mattrs.get(key).stringValue());
         }
-        
-        Map<String,String> attrs = message.getAttributes();
+
+        Map<String, String> attrs = message.attributesAsStrings();
         for (String key : attrs.keySet()) {
             System.out.println("Got attribute " + key + "," + attrs.get(key));
         }

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2017 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017-2022 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,12 +39,13 @@
  */
 package fish.payara.cloud.connectors.amazonsqs.api;
 
-import com.amazonaws.services.sqs.model.SendMessageBatchRequest;
-import com.amazonaws.services.sqs.model.SendMessageBatchRequestEntry;
-import com.amazonaws.services.sqs.model.SendMessageBatchResult;
-import com.amazonaws.services.sqs.model.SendMessageRequest;
-import com.amazonaws.services.sqs.model.SendMessageResult;
 import java.util.List;
+import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequest;
+import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequestEntry;
+import software.amazon.awssdk.services.sqs.model.SendMessageBatchResponse;
+import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
+import software.amazon.awssdk.services.sqs.model.SendMessageResponse;
+
 
 /**
  *
@@ -52,9 +53,10 @@ import java.util.List;
  */
 public interface AmazonSQSConnection extends AutoCloseable {
     
-    public SendMessageResult sendMessage(SendMessageRequest request);
-    public SendMessageResult sendMessage(String queueURL, String messageBody);
-    public SendMessageBatchResult sendMessageBatch(String queueURL, List<SendMessageBatchRequestEntry> entries);
-    public SendMessageBatchResult sendMessageBatch(SendMessageBatchRequest batch);
+    public SendMessageResponse sendMessage(SendMessageRequest request);
+    public SendMessageResponse sendMessage(String queueURL, String messageBody);
+    public SendMessageBatchResponse sendMessageBatch(SendMessageBatchRequest batch);
+    public SendMessageBatchResponse sendMessageBatch(String queueURL, List<SendMessageBatchRequestEntry> entries);
+
     
 }

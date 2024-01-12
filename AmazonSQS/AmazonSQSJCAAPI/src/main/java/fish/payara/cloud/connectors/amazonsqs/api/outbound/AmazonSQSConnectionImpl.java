@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2017 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017-2022 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,13 +39,13 @@
  */
 package fish.payara.cloud.connectors.amazonsqs.api.outbound;
 
-import com.amazonaws.services.sqs.model.SendMessageBatchRequest;
-import com.amazonaws.services.sqs.model.SendMessageBatchRequestEntry;
-import com.amazonaws.services.sqs.model.SendMessageBatchResult;
-import com.amazonaws.services.sqs.model.SendMessageRequest;
-import com.amazonaws.services.sqs.model.SendMessageResult;
 import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnection;
 import java.util.List;
+import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequest;
+import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequestEntry;
+import software.amazon.awssdk.services.sqs.model.SendMessageBatchResponse;
+import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
+import software.amazon.awssdk.services.sqs.model.SendMessageResponse;
 
 /**
  *
@@ -60,23 +60,23 @@ class AmazonSQSConnectionImpl  implements AmazonSQSConnection {
     }
 
     @Override
-    public SendMessageResult sendMessage(SendMessageRequest request) {
+    public SendMessageResponse sendMessage(SendMessageRequest request) {
         return underlyingConnection.sendMessage(request);
     }
 
     @Override
-    public SendMessageResult sendMessage(String queueURL, String messageBody) {
+    public SendMessageResponse sendMessage(String queueURL, String messageBody) {
         return underlyingConnection.sendMessage(queueURL, messageBody);
     }
 
     @Override
-    public SendMessageBatchResult sendMessageBatch(String queueURL, List<SendMessageBatchRequestEntry> entries) {
-        return underlyingConnection.sendMessageBatch(queueURL, entries);
+    public SendMessageBatchResponse sendMessageBatch(SendMessageBatchRequest batch) {
+        return underlyingConnection.sendMessageBatch(batch);
     }
 
     @Override
-    public SendMessageBatchResult sendMessageBatch(SendMessageBatchRequest batch) {
-        return underlyingConnection.sendMessageBatch(batch);
+    public SendMessageBatchResponse sendMessageBatch(String queueURL, List<SendMessageBatchRequestEntry> entries) {
+        return underlyingConnection.sendMessageBatch(queueURL, entries);
     }
 
     @Override
@@ -87,5 +87,4 @@ class AmazonSQSConnectionImpl  implements AmazonSQSConnection {
     void setRealConnection(AmazonSQSManagedConnection aThis) {
         this.underlyingConnection = aThis;
     }
-    
 }

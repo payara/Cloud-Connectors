@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2017 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017-2023 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -43,7 +43,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import javax.enterprise.util.Nonbinding;
+import jakarta.enterprise.util.Nonbinding;
 
 /**
  * Annotation to indicate the method to be called on an MDB when a message is
@@ -60,7 +60,7 @@ public @interface OnRecord {
      * If topics is an empty array all topics will trigger the callback
      * Otherwise this method will only match records sent on the topics specified.
      * 
-     * @return 
+     * @return A String list of topics from the annotation
     */
     @Nonbinding String[] topics() default {};
     
@@ -69,7 +69,7 @@ public @interface OnRecord {
      * if they also match the topic as well as this annotated method
      * If set to false (the default) other methods will not be tested to see if they
      * have matching annotations.
-     * @return 
+     * @return The value of matchOtherMethods from the annotation
      */
     @Nonbinding boolean matchOtherMethods() default false;
 }

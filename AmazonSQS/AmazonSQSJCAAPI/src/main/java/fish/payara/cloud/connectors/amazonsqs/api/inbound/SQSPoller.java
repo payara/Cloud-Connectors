@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2017 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017-2022 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,59 +39,65 @@
  */
 package fish.payara.cloud.connectors.amazonsqs.api.inbound;
 
-import com.amazonaws.services.sqs.AmazonSQS;
-import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
-import com.amazonaws.services.sqs.model.Message;
-import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
-import com.amazonaws.services.sqs.model.ReceiveMessageResult;
 import fish.payara.cloud.connectors.amazonsqs.api.OnSQSMessage;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.resource.spi.BootstrapContext;
-import javax.resource.spi.endpoint.MessageEndpointFactory;
-import javax.resource.spi.work.WorkException;
+import java.util.stream.Collectors;
+import jakarta.resource.spi.BootstrapContext;
+import jakarta.resource.spi.endpoint.MessageEndpointFactory;
+import jakarta.resource.spi.work.WorkException;
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.sqs.SqsClient;
+import software.amazon.awssdk.services.sqs.model.Message;
+import software.amazon.awssdk.services.sqs.model.QueueAttributeName;
+import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 
 /**
- *
  * @author Steve Millidge (Payara Foundation)
  */
 class SQSPoller extends TimerTask {
-    
+
     AmazonSQSActivationSpec spec;
     BootstrapContext ctx;
     MessageEndpointFactory factory;
-    AmazonSQS client;
+    SqsClient client;
 
     SQSPoller(AmazonSQSActivationSpec sqsSpec, BootstrapContext context, MessageEndpointFactory endpointFactory) {
         spec = sqsSpec;
         ctx = context;
         factory = endpointFactory;
-        client = AmazonSQSClientBuilder.standard().withCredentials(spec).withRegion(spec.getRegion()).build();
+        client = SqsClient.builder().region(Region.of(spec.getRegion()))
+                .credentialsProvider(spec).build();
     }
 
     @Override
     public void run() {
         try {
-            ReceiveMessageRequest rmr = new ReceiveMessageRequest(spec.getQueueURL());
-            rmr.setMaxNumberOfMessages(spec.getMaxMessages());
-            rmr.setVisibilityTimeout(spec.getVisibilityTimeout());
-            rmr.setWaitTimeSeconds(spec.getPollInterval()/1000);
-            rmr.setAttributeNames(Arrays.asList(spec.getAttributeNames().split(",")));
-            rmr.setMessageAttributeNames(Arrays.asList(spec.getMessageAttributeNames().split(",")));
-            ReceiveMessageResult rmResult = client.receiveMessage(rmr);
-            if (!rmResult.getMessages().isEmpty()) {
-
+            ReceiveMessageRequest rmr = ReceiveMessageRequest.builder()
+                    .queueUrl(spec.getQueueURL())
+                    .maxNumberOfMessages(spec.getMaxMessages()).visibilityTimeout(spec.getVisibilityTimeout())
+                    .waitTimeSeconds(spec.getPollInterval() / 1000)
+                    .attributeNames(Arrays.stream(spec.getAttributeNames().split(","))
+                            .map(s -> QueueAttributeName.fromValue(s)).collect(Collectors.toList()))
+                    .messageAttributeNames(Arrays.asList(spec.getMessageAttributeNames().split(","))).build();
+            List<Message> messages = client.receiveMessage(rmr).messages();
+            if (!messages.isEmpty()) {
                 Class<?> mdbClass = factory.getEndpointClass();
-                for (Message message : rmResult.getMessages()) {
+                for (Message message : messages) {
                     for (Method m : mdbClass.getMethods()) {
-                        if (m.isAnnotationPresent(OnSQSMessage.class) && m.getParameterCount() == 1 && m.getParameterTypes()[0].equals(Message.class)) {
+                        if (m.isAnnotationPresent(OnSQSMessage.class) && m.getParameterCount() == 1
+                                && m.getParameterTypes()[0].equals(Message.class)) {
                             try {
-                                ctx.getWorkManager().scheduleWork(new SQSWork(client, factory, m, message,spec.getQueueURL()));
+                                ctx.getWorkManager()
+                                        .scheduleWork(new SQSWork(client, factory, m, message, spec.getQueueURL()));
                             } catch (WorkException ex) {
-                                Logger.getLogger(AmazonSQSResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
+                                Logger.getLogger(AmazonSQSResourceAdapter.class.getName())
+                                        .log(Level.SEVERE, null, ex);
                             }
                         }
                     }
@@ -100,14 +106,12 @@ class SQSPoller extends TimerTask {
             }
         } catch (IllegalStateException ise) {
             // Fix #29 ensure Illegal State Exception doesn't blow up the timer
-            Logger.getLogger(AmazonSQSResourceAdapter.class.getName()).log(Level.WARNING, "Poller caught an Illegal State Exception", ise);
-        } catch(Exception e) {
-            Logger.getLogger(AmazonSQSResourceAdapter.class.getName()).log(Level.WARNING, "Poller caught an Unexpected Exception", e);            
+            Logger.getLogger(AmazonSQSResourceAdapter.class.getName())
+                    .log(Level.WARNING, "Poller caught an Illegal State Exception", ise);
+        } catch (Exception e) {
+            Logger.getLogger(AmazonSQSResourceAdapter.class.getName())
+                    .log(Level.WARNING, "Poller caught an Unexpected Exception", e);
         }
     }
 
-    void stop() {
-        client.shutdown();
-    }
-    
 }

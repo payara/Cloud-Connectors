@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2017 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017-2023 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,8 +39,7 @@
  */
 package fish.payara.cloud.connectors.mqtt.api;
 
-import java.io.Closeable;
-import javax.resource.ResourceException;
+import jakarta.resource.ResourceException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 /**
@@ -55,15 +54,15 @@ public interface MQTTConnection extends AutoCloseable {
       * @param payload Byte array to use as message payload
      * @param qos Quality of Service valid values are 0,1,2
      * @param retained Whether or not this message should be retained by the server.
-     * @throws javax.resource.ResourceException
+     * @throws jakarta.resource.ResourceException When unable to send the message to the MQTT Server
      */
     public void publish(String topic, byte payload[], int qos, boolean retained) throws ResourceException;
     
     /**
      * Publish a message on the MQTT topic
-     * @param topic
-     * @param message
-     * @throws ResourceException
+     * @param topic Name of the topic to publish the message
+     * @param message The MQTT message to be published
+     * @throws jakarta.resource.ResourceException When unable to send the message to the MQTT Server
      */
     public void publish (String topic, MqttMessage message) throws ResourceException;
     

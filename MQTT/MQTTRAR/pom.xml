@@ -4,12 +4,11 @@
     <parent>
         <groupId>fish.payara.cloud.connectors</groupId>
         <artifactId>cloud-connectors</artifactId>
-        <version>0.8.0</version>
+        <version>1.0.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <groupId>fish.payara.cloud.connectors.mqtt</groupId>
     <artifactId>mqtt-rar</artifactId>
-    <version>0.8.0</version>
     <packaging>rar</packaging>
     <name>MQTT JCA Adapter RAR</name>
     <description>RAR for the MQTT JCA Adapter</description>

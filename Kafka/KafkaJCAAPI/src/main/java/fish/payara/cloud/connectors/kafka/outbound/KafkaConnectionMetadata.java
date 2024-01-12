@@ -39,8 +39,8 @@
  */
 package fish.payara.cloud.connectors.kafka.outbound;
 
-import javax.resource.ResourceException;
-import javax.resource.spi.ManagedConnectionMetaData;
+import jakarta.resource.ResourceException;
+import jakarta.resource.spi.ManagedConnectionMetaData;
 
 /**
  *

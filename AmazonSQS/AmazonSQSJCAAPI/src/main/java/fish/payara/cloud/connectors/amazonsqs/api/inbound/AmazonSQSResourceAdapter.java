@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2017 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017-2022 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -45,27 +45,26 @@ import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.resource.ResourceException;
-import javax.resource.spi.ActivationSpec;
-import javax.resource.spi.BootstrapContext;
-import javax.resource.spi.Connector;
-import javax.resource.spi.ResourceAdapter;
-import javax.resource.spi.ResourceAdapterInternalException;
-import javax.resource.spi.UnavailableException;
-import javax.resource.spi.endpoint.MessageEndpointFactory;
+import jakarta.resource.ResourceException;
+import jakarta.resource.spi.ActivationSpec;
+import jakarta.resource.spi.BootstrapContext;
+import jakarta.resource.spi.Connector;
+import jakarta.resource.spi.ResourceAdapter;
+import jakarta.resource.spi.ResourceAdapterInternalException;
+import jakarta.resource.spi.UnavailableException;
+import jakarta.resource.spi.endpoint.MessageEndpointFactory;
 import javax.transaction.xa.XAResource;
 
 /**
- *
  * @author Steve Millidge (Payara Foundation)
  */
-@Connector( 
+@Connector(
         displayName = "Amazon SQS Resource Adapter",
         vendorName = "Payara Services Limited",
         version = "1.0"
 )
 public class AmazonSQSResourceAdapter implements ResourceAdapter, Serializable {
-    
+
     private static final Logger LOGGER = Logger.getLogger(AmazonSQSResourceAdapter.class.getName());
     private final Map<MessageEndpointFactory, SQSPoller> registeredFactories;
     private final Map<MessageEndpointFactory, Timer> registeredTimers;
@@ -75,9 +74,9 @@ public class AmazonSQSResourceAdapter implements ResourceAdapter, Serializable {
         registeredFactories = new ConcurrentHashMap<>();
         registeredTimers = new ConcurrentHashMap<>();
     }
-    
+
     @Override
-    public void start(BootstrapContext ctx) throws ResourceAdapterInternalException {        
+    public void start(BootstrapContext ctx) throws ResourceAdapterInternalException {
         LOGGER.info("Amazon SQS Resource Adapter Started..");
         context = ctx;
     }
@@ -91,7 +90,7 @@ public class AmazonSQSResourceAdapter implements ResourceAdapter, Serializable {
     public void endpointActivation(MessageEndpointFactory endpointFactory, ActivationSpec spec) throws ResourceException {
         if (spec instanceof AmazonSQSActivationSpec) {
             AmazonSQSActivationSpec sqsSpec = (AmazonSQSActivationSpec) spec;
-            SQSPoller sqsTask = new SQSPoller(sqsSpec,context,endpointFactory);
+            SQSPoller sqsTask = new SQSPoller(sqsSpec, context, endpointFactory);
             registeredFactories.put(endpointFactory, sqsTask);
 
             Timer timer = createTimer();
@@ -100,13 +99,12 @@ public class AmazonSQSResourceAdapter implements ResourceAdapter, Serializable {
 
         } else {
             LOGGER.log(Level.WARNING, "Got endpoint activation for an ActivationSpec of unknown class {0}", spec.getClass().getName());
-        }     
+        }
     }
 
     @Override
     public void endpointDeactivation(MessageEndpointFactory endpointFactory, ActivationSpec spec) {
         SQSPoller sqsTask = registeredFactories.get(endpointFactory);
-        sqsTask.stop();
         sqsTask.cancel();
 
         Timer timer = registeredTimers.get(endpointFactory);
@@ -137,7 +135,6 @@ public class AmazonSQSResourceAdapter implements ResourceAdapter, Serializable {
     public boolean equals(Object obj) {
         return super.equals(obj);
     }
-    
 
-    
+
 }

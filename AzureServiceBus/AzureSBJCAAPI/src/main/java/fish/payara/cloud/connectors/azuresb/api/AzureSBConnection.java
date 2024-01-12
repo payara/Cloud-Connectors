@@ -41,7 +41,7 @@ package fish.payara.cloud.connectors.azuresb.api;
 
 import com.microsoft.azure.servicebus.IMessage;
 import java.util.Collection;
-import javax.resource.ResourceException;
+import jakarta.resource.ResourceException;
 
 /**
  *
