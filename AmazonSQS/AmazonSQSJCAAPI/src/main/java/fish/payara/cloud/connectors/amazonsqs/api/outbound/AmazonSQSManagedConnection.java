@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2017 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017-2024 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -69,6 +69,18 @@ import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.sqs.SqsClient;
+import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequest;
+import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequestEntry;
+import software.amazon.awssdk.services.sqs.model.SendMessageBatchResponse;
+import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
+import software.amazon.awssdk.services.sqs.model.SendMessageResponse;
+import software.amazon.awssdk.utils.StringUtils;
 
 /**
  * @author Steve Millidge (Payara Foundation)
@@ -198,23 +210,15 @@ public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSC
     public void close() throws Exception {
         destroy();
     }
-    
-        private AWSCredentialsProvider getCredentials(AmazonSQSManagedConnectionFactory aThis) {
-        AWSCredentialsProvider credentialsProvider;
-        if (!StringUtils.isNullOrEmpty(aThis.getProfileName())) {
-            credentialsProvider = new ProfileCredentialsProvider(aThis.getProfileName());
-        } else if (!StringUtils.isNullOrEmpty(aThis.getAwsAccessKeyId()) && !StringUtils.isNullOrEmpty(aThis.getAwsSecretKey()) ) {
-            credentialsProvider = new AWSStaticCredentialsProvider(new AWSCredentials() {
-                @Override
-                public String getAWSAccessKeyId() {
-                    return aThis.getAwsAccessKeyId();
-                }
 
-                @Override
-                public String getAWSSecretKey() {
-                    return aThis.getAwsSecretKey();
-                }
-            });
+    private AwsCredentialsProvider getCredentials(AmazonSQSManagedConnectionFactory aThis) {
+        AwsCredentialsProvider credentialsProvider;
+        if (StringUtils.isNotBlank(aThis.getRoleArn())) {
+            credentialsProvider = STSCredentialsProvider.create(aThis.getRoleArn(), aThis.getRoleSessionName(), Region.of(aThis.getRegion()));
+        } else if (StringUtils.isNotBlank(aThis.getProfileName())) {
+            credentialsProvider = ProfileCredentialsProvider.create(aThis.getProfileName());
+        } else if (StringUtils.isNotBlank(aThis.getAwsAccessKeyId()) && StringUtils.isNotBlank(aThis.getAwsSecretKey())) {
+            credentialsProvider = () -> AwsBasicCredentials.create(aThis.getAwsAccessKeyId(), aThis.getAwsSecretKey());
         } else {
             credentialsProvider = DefaultAWSCredentialsProviderChain.getInstance();
         }

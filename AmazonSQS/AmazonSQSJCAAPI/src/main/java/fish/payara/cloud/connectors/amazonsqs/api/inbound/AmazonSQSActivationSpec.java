@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2017 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017-2024 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -45,12 +45,20 @@ import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.util.StringUtils;
 import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSListener;
+import fish.payara.cloud.connectors.amazonsqs.api.outbound.STSCredentialsProvider;
 
 import javax.resource.ResourceException;
 import javax.resource.spi.Activation;
 import javax.resource.spi.ActivationSpec;
 import javax.resource.spi.InvalidPropertyException;
 import javax.resource.spi.ResourceAdapter;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.utils.StringUtils;
 
 /**
  * Activation Specification for Amazon SQS
@@ -73,7 +81,9 @@ public class AmazonSQSActivationSpec implements ActivationSpec, AWSCredentialsPr
     private String messageAttributeNames = "All";
     private String attributeNames = "All";
     private String profileName;
-    
+    private String roleArn;
+    private String roleSessionName;
+
     @Override
     public void validate() throws InvalidPropertyException {
         if (StringUtils.isNullOrEmpty(region)) {
@@ -182,31 +192,33 @@ public class AmazonSQSActivationSpec implements ActivationSpec, AWSCredentialsPr
     public void setProfileName(String profileName) {
         this.profileName = profileName;
     }
-    
-    @Override
-    public AWSCredentials getCredentials() {
 
-        // Return Credentials based on what is present, profileName taking priority.
-        if (StringUtils.isNullOrEmpty(getProfileName())) {
-            
-            if (!StringUtils.isNullOrEmpty(awsAccessKeyId) && !StringUtils.isNullOrEmpty(awsSecretKey)) {
-                return new AWSCredentials() {
-                    @Override
-                    public String getAWSAccessKeyId() {
-                        return awsAccessKeyId;
-                    }
-                    
-                    @Override
-                    public String getAWSSecretKey() {
-                        return awsSecretKey;
-                    }
-                };
-            } else {
-                return DefaultAWSCredentialsProviderChain.getInstance().getCredentials();
-            }
-            
+    public String getRoleArn() {
+        return roleArn;
+    }
+
+    public void setRoleArn(String roleArn) {
+        this.roleArn = roleArn;
+    }
+
+    public String getRoleSessionName() {
+        return roleSessionName;
+    }
+
+    public void setRoleSessionName(String roleSessionName) {
+        this.roleSessionName = roleSessionName;
+    }
+
+    @Override
+    public AwsCredentials resolveCredentials() {
+        if (StringUtils.isNotBlank(getRoleArn())) {
+            return STSCredentialsProvider.create(getRoleArn(), getRoleSessionName(), Region.of(getRegion())).resolveCredentials();
+        } else if (StringUtils.isNotBlank(getProfileName())) {
+            return ProfileCredentialsProvider.builder().profileName(getProfileName()).build().resolveCredentials();
+        } else if (StringUtils.isNotBlank(getAwsAccessKeyId()) && StringUtils.isNotBlank(getAwsSecretKey())) {
+            return AwsBasicCredentials.create(getAwsAccessKeyId(), getAwsSecretKey());
         } else {
-            return new ProfileCredentialsProvider(getProfileName()).getCredentials();
+            return DefaultCredentialsProvider.create().resolveCredentials();
         }
     }
     
