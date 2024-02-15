@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2017-2022 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017-2024 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -76,6 +76,12 @@ public class AmazonSQSManagedConnectionFactory implements ManagedConnectionFacto
     @ConfigProperty(description = "AWS Profile Name", type = String.class)
     private String profileName;
 
+    @ConfigProperty(description = "AWS Role ARN", type = String.class)
+    private String roleArn;
+
+    @ConfigProperty(description = "AWS Session name", type = String.class)
+    private String roleSessionName;
+
     private PrintWriter logger;
 
     public String getAwsSecretKey() {
@@ -110,10 +116,21 @@ public class AmazonSQSManagedConnectionFactory implements ManagedConnectionFacto
         this.profileName = profileName;
     }
 
-    public AmazonSQSManagedConnectionFactory() {
+    public String getRoleArn() {
+        return roleArn;
     }
 
+    public void setRoleArn(String roleArn) {
+        this.roleArn = roleArn;
+    }
 
+    public String getRoleSessionName() {
+        return roleSessionName;
+    }
+
+    public void setRoleSessionName(String roleSessionName) {
+        this.roleSessionName = roleSessionName;
+    }
 
     @Override
     public Object createConnectionFactory(ConnectionManager cxManager) throws ResourceException {
@@ -148,11 +165,13 @@ public class AmazonSQSManagedConnectionFactory implements ManagedConnectionFacto
 
     @Override
     public int hashCode() {
-        int hash = 5;
+        int hash = 7;
         hash = 97 * hash + Objects.hashCode(this.awsSecretKey);
         hash = 97 * hash + Objects.hashCode(this.awsAccessKeyId);
         hash = 97 * hash + Objects.hashCode(this.region);
         hash = 97 * hash + Objects.hashCode(this.profileName);
+        hash = 97 * hash + Objects.hashCode(this.roleArn);
+        hash = 97 * hash + Objects.hashCode(this.roleSessionName);
         return hash;
     }
 
@@ -180,7 +199,10 @@ public class AmazonSQSManagedConnectionFactory implements ManagedConnectionFacto
         if (!Objects.equals(this.profileName, other.profileName)) {
             return false;
         }
-        return true;
+        if (!Objects.equals(this.roleArn, other.roleArn)) {
+            return false;
+        }
+        return Objects.equals(this.roleSessionName, other.roleSessionName);
     }
 
 

@@ -14,6 +14,9 @@
     <name>Amazon SQS JCA Adapter RAR</name>
     <description>RAR for the Amazon SQS JCA Adapter</description>
     <url>http://www.payara.fish</url>
+    <properties>
+        <awssdk.version>2.23.3</awssdk.version>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>fish.payara.cloud.connectors.amazonsqs</groupId>
@@ -23,13 +26,19 @@
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>sqs</artifactId>
-            <version>2.18.17</version>
+            <version>${awssdk.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>sso</artifactId>
-            <version>2.18.17</version>
+            <version>${awssdk.version}</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>sts</artifactId>
+            <version>${awssdk.version}</version>
             <type>jar</type>
         </dependency>
     </dependencies>
