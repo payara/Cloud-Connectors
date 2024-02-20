@@ -39,6 +39,16 @@
  */
 package fish.payara.cloud.connectors.amazonsqs.api.outbound;
 
+import com.amazonaws.services.securitytoken.AWSSecurityTokenService;
+import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClientBuilder;
+import com.amazonaws.services.securitytoken.model.AssumeRoleRequest;
+import com.amazonaws.services.securitytoken.model.AssumeRoleResult;
+import com.amazonaws.services.securitytoken.model.Credentials;
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.AWSSessionCredentials;
+import com.amazonaws.auth.BasicSessionCredentials;
+import com.amazonaws.regions.Regions;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -47,14 +57,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import software.amazon.awssdk.auth.credentials.AwsCredentials;
-import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
-import software.amazon.awssdk.auth.credentials.AwsSessionCredentials;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.sts.StsClient;
-import software.amazon.awssdk.services.sts.model.AssumeRoleRequest;
-import software.amazon.awssdk.services.sts.model.AssumeRoleResponse;
-import software.amazon.awssdk.services.sts.model.Credentials;
 
 /**
  * AWS STS Credentials Provider with caching and thread safety.
@@ -64,14 +66,14 @@ import software.amazon.awssdk.services.sts.model.Credentials;
  * 
  * @author Gaurav Gupta
  */
-public class STSCredentialsProvider implements AwsCredentialsProvider {
+public class STSCredentialsProvider implements AWSCredentialsProvider {
 
     private static final Logger LOGGER = Logger.getLogger(STSCredentialsProvider.class.getName());
     private static final Duration EXPIRATION_THRESHOLD = Duration.ofMinutes(5);
     private final String roleArn;
     private final String roleSessionName;
-    private final Region region;
-    private volatile AwsSessionCredentials cachedCredentials;
+    private final Regions region;
+    private volatile AWSSessionCredentials cachedCredentials;
     private volatile Instant expirationTime;
     private final Lock lock = new ReentrantLock();
     private static final Map<String, STSCredentialsProvider> providerInstances = new HashMap<>();
@@ -84,19 +86,19 @@ public class STSCredentialsProvider implements AwsCredentialsProvider {
      * @param region The AWS region.
      * @return The STSCredentialsProvider instance.
      */
-    public static STSCredentialsProvider create(String roleArn, String roleSessionName, Region region) {
-        String uniqueSessionKey = roleSessionName + "@" + region.id();
+    public static STSCredentialsProvider create(String roleArn, String roleSessionName, Regions region) {
+        String uniqueSessionKey = roleSessionName + "@" + region.getName();
         return providerInstances.computeIfAbsent(uniqueSessionKey, key -> new STSCredentialsProvider(roleArn, roleSessionName, region));
     }
 
-    private STSCredentialsProvider(String roleArn, String roleSessionName, Region region) {
+    private STSCredentialsProvider(String roleArn, String roleSessionName, Regions region) {
         this.roleArn = roleArn;
         this.roleSessionName = roleSessionName;
         this.region = region;
     }
 
     @Override
-    public AwsCredentials resolveCredentials() {
+    public AWSCredentials getCredentials() {
         if (cachedCredentials != null && !isCredentialsExpired()) {
             LOGGER.fine("Reusing cached AWS session credentials");
             return cachedCredentials;
@@ -108,22 +110,7 @@ public class STSCredentialsProvider implements AwsCredentialsProvider {
                     return cachedCredentials;
                 }
                 LOGGER.fine("Cached AWS session credentials expired or not present");
-
-                StsClient stsClient = StsClient.builder().region(region).build();
-                AssumeRoleRequest assumeRoleRequest = AssumeRoleRequest.builder()
-                        .roleArn(roleArn)
-                        .roleSessionName(roleSessionName)
-                        .build();
-
-                AssumeRoleResponse assumeRoleResponse = stsClient.assumeRole(assumeRoleRequest);
-                Credentials stsCredentials = assumeRoleResponse.credentials();
-                cachedCredentials = AwsSessionCredentials.create(
-                        stsCredentials.accessKeyId(),
-                        stsCredentials.secretAccessKey(),
-                        stsCredentials.sessionToken()
-                );
-                expirationTime = stsCredentials.expiration();
-                LOGGER.log(Level.FINE, "Obtained new AWS session credentials - Session Token: {0}, Expiration Time: {1}", new Object[]{stsCredentials.sessionToken(), stsCredentials.expiration()});
+                refresh();
                 return cachedCredentials;
             } finally {
                 lock.unlock();
@@ -134,5 +121,23 @@ public class STSCredentialsProvider implements AwsCredentialsProvider {
     private boolean isCredentialsExpired() {
         // Check if the credentials are expired or about to expire
         return expirationTime == null || Instant.now().isAfter(expirationTime.minus(EXPIRATION_THRESHOLD));
+    }
+
+    @Override
+    public void refresh() {
+        AWSSecurityTokenService stsClient = AWSSecurityTokenServiceClientBuilder.standard().withRegion(region).build();
+        AssumeRoleRequest assumeRoleRequest = new AssumeRoleRequest()
+                .withRoleArn(roleArn)
+                .withRoleSessionName(roleSessionName);
+
+        AssumeRoleResult assumeRoleResponse = stsClient.assumeRole(assumeRoleRequest);
+        Credentials stsCredentials = assumeRoleResponse.getCredentials();
+        cachedCredentials = new BasicSessionCredentials(
+                stsCredentials.getAccessKeyId(),
+                stsCredentials.getSecretAccessKey(),
+                stsCredentials.getSessionToken()
+        );
+        expirationTime = stsCredentials.getExpiration().toInstant();
+        LOGGER.log(Level.FINE, "Obtained new AWS session credentials - Session Token: {0}, Expiration Time: {1}", new Object[]{stsCredentials.getSessionToken(), stsCredentials.getExpiration()});
     }
 }

@@ -44,6 +44,7 @@ import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import com.amazonaws.services.sqs.model.SendMessageBatchRequest;
@@ -69,18 +70,6 @@ import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.sqs.SqsClient;
-import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequest;
-import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequestEntry;
-import software.amazon.awssdk.services.sqs.model.SendMessageBatchResponse;
-import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
-import software.amazon.awssdk.services.sqs.model.SendMessageResponse;
-import software.amazon.awssdk.utils.StringUtils;
 
 /**
  * @author Steve Millidge (Payara Foundation)
@@ -211,14 +200,24 @@ public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSC
         destroy();
     }
 
-    private AwsCredentialsProvider getCredentials(AmazonSQSManagedConnectionFactory aThis) {
-        AwsCredentialsProvider credentialsProvider;
-        if (StringUtils.isNotBlank(aThis.getRoleArn())) {
-            credentialsProvider = STSCredentialsProvider.create(aThis.getRoleArn(), aThis.getRoleSessionName(), Region.of(aThis.getRegion()));
-        } else if (StringUtils.isNotBlank(aThis.getProfileName())) {
-            credentialsProvider = ProfileCredentialsProvider.create(aThis.getProfileName());
-        } else if (StringUtils.isNotBlank(aThis.getAwsAccessKeyId()) && StringUtils.isNotBlank(aThis.getAwsSecretKey())) {
-            credentialsProvider = () -> AwsBasicCredentials.create(aThis.getAwsAccessKeyId(), aThis.getAwsSecretKey());
+    private AWSCredentialsProvider getCredentials(AmazonSQSManagedConnectionFactory aThis) {
+        AWSCredentialsProvider credentialsProvider;
+        if (!StringUtils.isNullOrEmpty(aThis.getRoleArn())) {
+            credentialsProvider = STSCredentialsProvider.create(aThis.getRoleArn(), aThis.getRoleSessionName(), Regions.fromName(aThis.getRegion()));
+        } else if (!StringUtils.isNullOrEmpty(aThis.getProfileName())) {
+            credentialsProvider = new ProfileCredentialsProvider(aThis.getProfileName());
+        } else if (!StringUtils.isNullOrEmpty(aThis.getAwsAccessKeyId()) && !StringUtils.isNullOrEmpty(aThis.getAwsSecretKey()) ) {
+            credentialsProvider = new AWSStaticCredentialsProvider(new AWSCredentials() {
+                @Override
+                public String getAWSAccessKeyId() {
+                    return aThis.getAwsAccessKeyId();
+                }
+
+                @Override
+                public String getAWSSecretKey() {
+                    return aThis.getAwsSecretKey();
+                }
+            });
         } else {
             credentialsProvider = DefaultAWSCredentialsProviderChain.getInstance();
         }
