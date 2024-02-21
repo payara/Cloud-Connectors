@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2017 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017-2024 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -44,6 +44,7 @@ import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import com.amazonaws.services.sqs.model.SendMessageBatchRequest;
@@ -198,10 +199,12 @@ public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSC
     public void close() throws Exception {
         destroy();
     }
-    
-        private AWSCredentialsProvider getCredentials(AmazonSQSManagedConnectionFactory aThis) {
+
+    private AWSCredentialsProvider getCredentials(AmazonSQSManagedConnectionFactory aThis) {
         AWSCredentialsProvider credentialsProvider;
-        if (!StringUtils.isNullOrEmpty(aThis.getProfileName())) {
+        if (!StringUtils.isNullOrEmpty(aThis.getRoleArn())) {
+            credentialsProvider = STSCredentialsProvider.create(aThis.getRoleArn(), aThis.getRoleSessionName(), Regions.fromName(aThis.getRegion()));
+        } else if (!StringUtils.isNullOrEmpty(aThis.getProfileName())) {
             credentialsProvider = new ProfileCredentialsProvider(aThis.getProfileName());
         } else if (!StringUtils.isNullOrEmpty(aThis.getAwsAccessKeyId()) && !StringUtils.isNullOrEmpty(aThis.getAwsSecretKey()) ) {
             credentialsProvider = new AWSStaticCredentialsProvider(new AWSCredentials() {
