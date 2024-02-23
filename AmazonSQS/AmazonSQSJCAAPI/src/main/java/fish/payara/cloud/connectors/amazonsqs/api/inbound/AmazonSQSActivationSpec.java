@@ -41,7 +41,6 @@ package fish.payara.cloud.connectors.amazonsqs.api.inbound;
 
 import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSListener;
 import fish.payara.cloud.connectors.amazonsqs.api.outbound.STSCredentialsProvider;
-
 import jakarta.resource.ResourceException;
 import jakarta.resource.spi.Activation;
 import jakarta.resource.spi.ActivationSpec;

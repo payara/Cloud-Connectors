@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2017-2022 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017-2024 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,12 +39,6 @@
  */
 package fish.payara.cloud.connectors.amazonsqs.api.inbound;
 
-import java.io.Serializable;
-import java.util.Map;
-import java.util.Timer;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import jakarta.resource.ResourceException;
 import jakarta.resource.spi.ActivationSpec;
 import jakarta.resource.spi.BootstrapContext;
@@ -53,6 +47,12 @@ import jakarta.resource.spi.ResourceAdapter;
 import jakarta.resource.spi.ResourceAdapterInternalException;
 import jakarta.resource.spi.UnavailableException;
 import jakarta.resource.spi.endpoint.MessageEndpointFactory;
+import java.io.Serializable;
+import java.util.Map;
+import java.util.Timer;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.transaction.xa.XAResource;
 
 /**
@@ -135,6 +135,5 @@ public class AmazonSQSResourceAdapter implements ResourceAdapter, Serializable {
     public boolean equals(Object obj) {
         return super.equals(obj);
     }
-
 
 }

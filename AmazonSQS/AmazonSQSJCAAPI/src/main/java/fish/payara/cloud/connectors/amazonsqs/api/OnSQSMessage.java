@@ -47,6 +47,7 @@ import java.lang.annotation.Target;
 /**
  * Annotation to indicate the method to be called on an MDB when a message is
  * received from Amazon SQS.
+ *
  * @author Steve Millidge (Payara Foundation)
  */
 @Retention(RetentionPolicy.RUNTIME)

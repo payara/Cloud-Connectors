@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2017-2022 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017-2024 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,6 +40,9 @@
 package fish.payara.cloud.connectors.amazonsqs.api.inbound;
 
 import fish.payara.cloud.connectors.amazonsqs.api.OnSQSMessage;
+import jakarta.resource.spi.BootstrapContext;
+import jakarta.resource.spi.endpoint.MessageEndpointFactory;
+import jakarta.resource.spi.work.WorkException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -47,10 +50,6 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import jakarta.resource.spi.BootstrapContext;
-import jakarta.resource.spi.endpoint.MessageEndpointFactory;
-import jakarta.resource.spi.work.WorkException;
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.Message;

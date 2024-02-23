@@ -41,10 +41,6 @@ package fish.payara.cloud.connectors.amazonsqs.api.outbound;
 
 import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnection;
 import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory;
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.util.Objects;
-import java.util.Set;
 import jakarta.resource.ResourceException;
 import jakarta.resource.spi.ConfigProperty;
 import jakarta.resource.spi.ConnectionDefinition;
@@ -52,6 +48,10 @@ import jakarta.resource.spi.ConnectionManager;
 import jakarta.resource.spi.ConnectionRequestInfo;
 import jakarta.resource.spi.ManagedConnection;
 import jakarta.resource.spi.ManagedConnectionFactory;
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.util.Objects;
+import java.util.Set;
 import javax.security.auth.Subject;
 
 /**
@@ -204,7 +204,5 @@ public class AmazonSQSManagedConnectionFactory implements ManagedConnectionFacto
         }
         return Objects.equals(this.roleSessionName, other.roleSessionName);
     }
-
-
 
 }
