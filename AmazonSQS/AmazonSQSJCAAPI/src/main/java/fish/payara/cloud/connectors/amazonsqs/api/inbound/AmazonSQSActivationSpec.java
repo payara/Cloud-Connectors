@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2017-2022 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017-2024 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,16 +40,19 @@
 package fish.payara.cloud.connectors.amazonsqs.api.inbound;
 
 import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSListener;
+import fish.payara.cloud.connectors.amazonsqs.api.outbound.STSCredentialsProvider;
 
 import jakarta.resource.ResourceException;
 import jakarta.resource.spi.Activation;
 import jakarta.resource.spi.ActivationSpec;
 import jakarta.resource.spi.InvalidPropertyException;
 import jakarta.resource.spi.ResourceAdapter;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.utils.StringUtils;
 
 /**
@@ -73,6 +76,8 @@ public class AmazonSQSActivationSpec implements ActivationSpec, AwsCredentialsPr
     private String messageAttributeNames = "All";
     private String attributeNames = "All";
     private String profileName;
+    private String roleArn;
+    private String roleSessionName;
 
     @Override
     public void validate() throws InvalidPropertyException {
@@ -183,28 +188,32 @@ public class AmazonSQSActivationSpec implements ActivationSpec, AwsCredentialsPr
         this.profileName = profileName;
     }
 
+    public String getRoleArn() {
+        return roleArn;
+    }
+
+    public void setRoleArn(String roleArn) {
+        this.roleArn = roleArn;
+    }
+
+    public String getRoleSessionName() {
+        return roleSessionName;
+    }
+
+    public void setRoleSessionName(String roleSessionName) {
+        this.roleSessionName = roleSessionName;
+    }
+
     @Override
     public AwsCredentials resolveCredentials() {
-        // Return Credentials based on what is present, profileName taking priority.
-        if (StringUtils.isBlank(getProfileName())) {
-            if (StringUtils.isNotBlank(awsAccessKeyId) && StringUtils.isNotBlank(awsSecretKey)) {
-                return new AwsCredentials() {
-                    @Override
-                    public String accessKeyId() {
-                        return awsAccessKeyId;
-                    }
-
-                    @Override
-                    public String secretAccessKey() {
-                        return awsSecretKey;
-                    }
-                };
-            } else {
-                return DefaultCredentialsProvider.create().resolveCredentials();
-            }
-
-        } else {
+        if (StringUtils.isNotBlank(getRoleArn())) {
+            return STSCredentialsProvider.create(getRoleArn(), getRoleSessionName(), Region.of(getRegion())).resolveCredentials();
+        } else if (StringUtils.isNotBlank(getProfileName())) {
             return ProfileCredentialsProvider.builder().profileName(getProfileName()).build().resolveCredentials();
+        } else if (StringUtils.isNotBlank(getAwsAccessKeyId()) && StringUtils.isNotBlank(getAwsSecretKey())) {
+            return AwsBasicCredentials.create(getAwsAccessKeyId(), getAwsSecretKey());
+        } else {
+            return DefaultCredentialsProvider.create().resolveCredentials();
         }
     }
 }

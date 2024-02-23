@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2017-2022 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017-2024 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -57,7 +57,7 @@ import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import software.amazon.awssdk.auth.credentials.AwsCredentials;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
@@ -200,25 +200,12 @@ public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSC
 
     private AwsCredentialsProvider getCredentials(AmazonSQSManagedConnectionFactory aThis) {
         AwsCredentialsProvider credentialsProvider;
-        if (StringUtils.isNotBlank(aThis.getProfileName())) {
+        if (StringUtils.isNotBlank(aThis.getRoleArn())) {
+            credentialsProvider = STSCredentialsProvider.create(aThis.getRoleArn(), aThis.getRoleSessionName(), Region.of(aThis.getRegion()));
+        } else if (StringUtils.isNotBlank(aThis.getProfileName())) {
             credentialsProvider = ProfileCredentialsProvider.create(aThis.getProfileName());
         } else if (StringUtils.isNotBlank(aThis.getAwsAccessKeyId()) && StringUtils.isNotBlank(aThis.getAwsSecretKey())) {
-            credentialsProvider = new AwsCredentialsProvider(){
-                @Override
-                public AwsCredentials resolveCredentials() {
-                    return new AwsCredentials() {
-                        @Override
-                        public String accessKeyId() {
-                            return aThis.getAwsAccessKeyId();
-                        }
-
-                        @Override
-                        public String secretAccessKey() {
-                            return aThis.getAwsSecretKey();
-                        }
-                    };
-                }
-            };
+            credentialsProvider = () -> AwsBasicCredentials.create(aThis.getAwsAccessKeyId(), aThis.getAwsSecretKey());
         } else {
             credentialsProvider = DefaultCredentialsProvider.create();
         }
