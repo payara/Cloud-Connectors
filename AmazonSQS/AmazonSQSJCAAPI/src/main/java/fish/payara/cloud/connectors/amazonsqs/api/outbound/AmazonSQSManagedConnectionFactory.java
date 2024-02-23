@@ -205,6 +205,4 @@ public class AmazonSQSManagedConnectionFactory implements ManagedConnectionFacto
         return Objects.equals(this.roleSessionName, other.roleSessionName);
     }
 
-
-
 }

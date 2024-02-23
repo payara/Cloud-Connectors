@@ -44,7 +44,7 @@ package fish.payara.cloud.connectors.amazonsqs.api;
  * @author Steve Millidge (Payara Foundation)
  */
 public interface AmazonSQSConnectionFactory {
-    
+
     public AmazonSQSConnection getConnection();
-    
+
 }

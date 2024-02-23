@@ -39,7 +39,6 @@
  */
 package fish.payara.cloud.connectors.amazonsqs.api.outbound;
 
-
 import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnection;
 
 import javax.resource.NotSupportedException;
@@ -52,22 +51,66 @@ import javax.resource.spi.ManagedConnection;
 import javax.resource.spi.ManagedConnectionMetaData;
 import javax.security.auth.Subject;
 import javax.transaction.xa.XAResource;
-
 import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
+import javax.security.auth.Subject;
+import javax.transaction.xa.XAResource;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsClient;
+import software.amazon.awssdk.services.sqs.model.AddPermissionRequest;
+import software.amazon.awssdk.services.sqs.model.AddPermissionResponse;
+import software.amazon.awssdk.services.sqs.model.CancelMessageMoveTaskRequest;
+import software.amazon.awssdk.services.sqs.model.CancelMessageMoveTaskResponse;
+import software.amazon.awssdk.services.sqs.model.ChangeMessageVisibilityBatchRequest;
+import software.amazon.awssdk.services.sqs.model.ChangeMessageVisibilityBatchResponse;
+import software.amazon.awssdk.services.sqs.model.ChangeMessageVisibilityRequest;
+import software.amazon.awssdk.services.sqs.model.ChangeMessageVisibilityResponse;
+import software.amazon.awssdk.services.sqs.model.CreateQueueRequest;
+import software.amazon.awssdk.services.sqs.model.CreateQueueResponse;
+import software.amazon.awssdk.services.sqs.model.DeleteMessageBatchRequest;
+import software.amazon.awssdk.services.sqs.model.DeleteMessageBatchResponse;
+import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
+import software.amazon.awssdk.services.sqs.model.DeleteMessageResponse;
+import software.amazon.awssdk.services.sqs.model.DeleteQueueRequest;
+import software.amazon.awssdk.services.sqs.model.DeleteQueueResponse;
+import software.amazon.awssdk.services.sqs.model.GetQueueAttributesRequest;
+import software.amazon.awssdk.services.sqs.model.GetQueueAttributesResponse;
+import software.amazon.awssdk.services.sqs.model.GetQueueUrlRequest;
+import software.amazon.awssdk.services.sqs.model.GetQueueUrlResponse;
+import software.amazon.awssdk.services.sqs.model.ListDeadLetterSourceQueuesRequest;
+import software.amazon.awssdk.services.sqs.model.ListDeadLetterSourceQueuesResponse;
+import software.amazon.awssdk.services.sqs.model.ListMessageMoveTasksRequest;
+import software.amazon.awssdk.services.sqs.model.ListMessageMoveTasksResponse;
+import software.amazon.awssdk.services.sqs.model.ListQueueTagsRequest;
+import software.amazon.awssdk.services.sqs.model.ListQueueTagsResponse;
+import software.amazon.awssdk.services.sqs.model.ListQueuesRequest;
+import software.amazon.awssdk.services.sqs.model.ListQueuesResponse;
+import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest;
+import software.amazon.awssdk.services.sqs.model.PurgeQueueResponse;
+import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
+import software.amazon.awssdk.services.sqs.model.ReceiveMessageResponse;
+import software.amazon.awssdk.services.sqs.model.RemovePermissionRequest;
+import software.amazon.awssdk.services.sqs.model.RemovePermissionResponse;
 import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequest;
 import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequestEntry;
 import software.amazon.awssdk.services.sqs.model.SendMessageBatchResponse;
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 import software.amazon.awssdk.services.sqs.model.SendMessageResponse;
+import software.amazon.awssdk.services.sqs.model.SetQueueAttributesRequest;
+import software.amazon.awssdk.services.sqs.model.SetQueueAttributesResponse;
+import software.amazon.awssdk.services.sqs.model.StartMessageMoveTaskRequest;
+import software.amazon.awssdk.services.sqs.model.StartMessageMoveTaskResponse;
+import software.amazon.awssdk.services.sqs.model.TagQueueRequest;
+import software.amazon.awssdk.services.sqs.model.TagQueueResponse;
+import software.amazon.awssdk.services.sqs.model.UntagQueueRequest;
+import software.amazon.awssdk.services.sqs.model.UntagQueueResponse;
 import software.amazon.awssdk.utils.StringUtils;
 
 /**
@@ -191,6 +234,196 @@ public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSC
     @Override
     public SendMessageBatchResponse sendMessageBatch(String queueURL, List<SendMessageBatchRequestEntry> entries) {
         return sqsClient.sendMessageBatch(SendMessageBatchRequest.builder().queueUrl(queueURL).entries(entries).build());
+    }
+
+    @Override
+    public ReceiveMessageResponse receiveMessage(ReceiveMessageRequest receiveMessageRequest) {
+        return sqsClient.receiveMessage(receiveMessageRequest);
+    }
+
+    @Override
+    public ReceiveMessageResponse receiveMessage(Consumer<ReceiveMessageRequest.Builder> receiveMessageRequest) {
+        return sqsClient.receiveMessage(receiveMessageRequest);
+    }
+
+    @Override
+    public GetQueueAttributesResponse getQueueAttributes(GetQueueAttributesRequest getQueueAttributesRequest) {
+        return sqsClient.getQueueAttributes(getQueueAttributesRequest);
+    }
+
+    @Override
+    public GetQueueAttributesResponse getQueueAttributes(Consumer<GetQueueAttributesRequest.Builder> getQueueAttributesRequest) {
+        return sqsClient.getQueueAttributes(getQueueAttributesRequest);
+    }
+
+    @Override
+    public SetQueueAttributesResponse setQueueAttributes(SetQueueAttributesRequest setQueueAttributesRequest) {
+        return sqsClient.setQueueAttributes(setQueueAttributesRequest);
+    }
+
+    @Override
+    public SetQueueAttributesResponse setQueueAttributes(Consumer<SetQueueAttributesRequest.Builder> setQueueAttributesRequest) {
+        return sqsClient.setQueueAttributes(setQueueAttributesRequest);
+    }
+
+    @Override
+    public CreateQueueResponse createQueue(CreateQueueRequest createQueueRequest) {
+        return sqsClient.createQueue(createQueueRequest);
+    }
+
+    @Override
+    public CreateQueueResponse createQueue(Consumer<CreateQueueRequest.Builder> createQueueRequest) {
+        return sqsClient.createQueue(createQueueRequest);
+    }
+
+    @Override
+    public DeleteMessageResponse deleteMessage(DeleteMessageRequest deleteMessageRequest) {
+        return sqsClient.deleteMessage(deleteMessageRequest);
+    }
+
+    @Override
+    public DeleteMessageResponse deleteMessage(Consumer<DeleteMessageRequest.Builder> deleteMessageRequest) {
+        return sqsClient.deleteMessage(deleteMessageRequest);
+    }
+
+    @Override
+    public DeleteMessageBatchResponse deleteMessageBatch(DeleteMessageBatchRequest deleteMessageBatchRequest) {
+        return sqsClient.deleteMessageBatch(deleteMessageBatchRequest);
+    }
+
+    @Override
+    public DeleteMessageBatchResponse deleteMessageBatch(Consumer<DeleteMessageBatchRequest.Builder> deleteMessageBatchRequest) {
+        return sqsClient.deleteMessageBatch(deleteMessageBatchRequest);
+    }
+
+    @Override
+    public DeleteQueueResponse deleteQueue(DeleteQueueRequest deleteQueueRequest) {
+        return sqsClient.deleteQueue(deleteQueueRequest);
+    }
+
+    @Override
+    public DeleteQueueResponse deleteQueue(Consumer<DeleteQueueRequest.Builder> deleteQueueRequest) {
+        return sqsClient.deleteQueue(deleteQueueRequest);
+    }
+
+    @Override
+    public GetQueueUrlResponse getQueueUrl(GetQueueUrlRequest getQueueUrlRequest) {
+        return sqsClient.getQueueUrl(getQueueUrlRequest);
+    }
+
+    @Override
+    public GetQueueUrlResponse getQueueUrl(Consumer<GetQueueUrlRequest.Builder> getQueueUrlRequest) {
+        return sqsClient.getQueueUrl(getQueueUrlRequest);
+    }
+
+    @Override
+    public ListQueueTagsResponse listQueueTags(ListQueueTagsRequest listQueueTagsRequest) {
+        return sqsClient.listQueueTags(listQueueTagsRequest);
+    }
+
+    @Override
+    public ListQueueTagsResponse listQueueTags(Consumer<ListQueueTagsRequest.Builder> listQueueTagsRequest) {
+        return sqsClient.listQueueTags(listQueueTagsRequest);
+    }
+
+    @Override
+    public ListQueuesResponse listQueues(ListQueuesRequest listQueuesRequest) {
+        return sqsClient.listQueues(listQueuesRequest);
+    }
+
+    @Override
+    public ListQueuesResponse listQueues() {
+        return sqsClient.listQueues();
+    }
+
+    @Override
+    public ListQueuesResponse listQueues(Consumer<ListQueuesRequest.Builder> listQueuesRequest) {
+        return sqsClient.listQueues(listQueuesRequest);
+    }
+
+    @Override
+    public PurgeQueueResponse purgeQueue(PurgeQueueRequest purgeQueueRequest) {
+        return sqsClient.purgeQueue(purgeQueueRequest);
+    }
+
+    @Override
+    public TagQueueResponse tagQueue(TagQueueRequest tagQueueRequest) {
+        return sqsClient.tagQueue(tagQueueRequest);
+    }
+
+    @Override
+    public TagQueueResponse tagQueue(Consumer<TagQueueRequest.Builder> tagQueueRequest) {
+        return sqsClient.tagQueue(tagQueueRequest);
+    }
+
+    @Override
+    public UntagQueueResponse untagQueue(UntagQueueRequest untagQueueRequest) {
+        return sqsClient.untagQueue(untagQueueRequest);
+    }
+
+    @Override
+    public UntagQueueResponse untagQueue(Consumer<UntagQueueRequest.Builder> untagQueueRequest) {
+        return sqsClient.untagQueue(untagQueueRequest);
+    }
+
+    @Override
+    public AddPermissionResponse addPermission(AddPermissionRequest addPermissionRequest) {
+        return sqsClient.addPermission(addPermissionRequest);
+    }
+
+    @Override
+    public AddPermissionResponse addPermission(Consumer<AddPermissionRequest.Builder> addPermissionRequest) {
+        return sqsClient.addPermission(addPermissionRequest);
+    }
+
+    @Override
+    public CancelMessageMoveTaskResponse cancelMessageMoveTask(CancelMessageMoveTaskRequest cancelMessageMoveTaskRequest) {
+        return sqsClient.cancelMessageMoveTask(cancelMessageMoveTaskRequest);
+    }
+
+    @Override
+    public ChangeMessageVisibilityResponse changeMessageVisibility(ChangeMessageVisibilityRequest changeMessageVisibilityRequest) {
+        return sqsClient.changeMessageVisibility(changeMessageVisibilityRequest);
+    }
+
+    @Override
+    public ChangeMessageVisibilityResponse changeMessageVisibility(Consumer<ChangeMessageVisibilityRequest.Builder> changeMessageVisibilityRequest) {
+        return sqsClient.changeMessageVisibility(changeMessageVisibilityRequest);
+    }
+
+    @Override
+    public ChangeMessageVisibilityBatchResponse changeMessageVisibilityBatch(ChangeMessageVisibilityBatchRequest changeMessageVisibilityBatchRequest) {
+        return sqsClient.changeMessageVisibilityBatch(changeMessageVisibilityBatchRequest);
+    }
+
+    @Override
+    public ChangeMessageVisibilityBatchResponse changeMessageVisibilityBatch(Consumer<ChangeMessageVisibilityBatchRequest.Builder> changeMessageVisibilityBatchRequest) {
+        return sqsClient.changeMessageVisibilityBatch(changeMessageVisibilityBatchRequest);
+    }
+
+    @Override
+    public ListDeadLetterSourceQueuesResponse listDeadLetterSourceQueues(ListDeadLetterSourceQueuesRequest listDeadLetterSourceQueuesRequest) {
+        return sqsClient.listDeadLetterSourceQueues(listDeadLetterSourceQueuesRequest);
+    }
+
+    @Override
+    public ListMessageMoveTasksResponse listMessageMoveTasks(ListMessageMoveTasksRequest listMessageMoveTasksRequest) {
+        return sqsClient.listMessageMoveTasks(listMessageMoveTasksRequest);
+    }
+
+    @Override
+    public RemovePermissionResponse removePermission(RemovePermissionRequest removePermissionRequest) {
+        return sqsClient.removePermission(removePermissionRequest);
+    }
+
+    @Override
+    public RemovePermissionResponse removePermission(Consumer<RemovePermissionRequest.Builder> removePermissionRequest) {
+        return sqsClient.removePermission(removePermissionRequest);
+    }
+
+    @Override
+    public StartMessageMoveTaskResponse startMessageMoveTask(StartMessageMoveTaskRequest startMessageMoveTaskRequest) {
+        return sqsClient.startMessageMoveTask(startMessageMoveTaskRequest);
     }
 
     @Override
