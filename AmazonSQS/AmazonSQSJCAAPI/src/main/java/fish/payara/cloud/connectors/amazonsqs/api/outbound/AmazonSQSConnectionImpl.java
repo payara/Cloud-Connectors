@@ -39,22 +39,22 @@
  */
 package fish.payara.cloud.connectors.amazonsqs.api.outbound;
 
-import com.amazonaws.services.sqs.model.SendMessageBatchRequest;
-import com.amazonaws.services.sqs.model.SendMessageBatchRequestEntry;
-import com.amazonaws.services.sqs.model.SendMessageBatchResult;
-import com.amazonaws.services.sqs.model.SendMessageRequest;
-import com.amazonaws.services.sqs.model.SendMessageResult;
+import com.amazonaws.AmazonWebServiceRequest;
+import com.amazonaws.ResponseMetadata;
+import com.amazonaws.services.sqs.model.*;
 import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnection;
+
 import java.util.List;
+import java.util.Map;
 
 /**
  *
  * @author Steve Millidge (Payara Foundation)
  */
-class AmazonSQSConnectionImpl  implements AmazonSQSConnection {
-    
+class AmazonSQSConnectionImpl implements AmazonSQSConnection {
+
     private AmazonSQSManagedConnection underlyingConnection;
-    
+
     AmazonSQSConnectionImpl(AmazonSQSManagedConnection realConn) {
         underlyingConnection = realConn;
     }
@@ -87,5 +87,201 @@ class AmazonSQSConnectionImpl  implements AmazonSQSConnection {
     void setRealConnection(AmazonSQSManagedConnection aThis) {
         this.underlyingConnection = aThis;
     }
-    
+
+    @Override
+    public ReceiveMessageResult receiveMessage(ReceiveMessageRequest receiveMessageRequest) {
+        return underlyingConnection.receiveMessage(receiveMessageRequest);
+    }
+
+    @Override
+    public ReceiveMessageResult receiveMessage(String queueUrl) {
+        return underlyingConnection.receiveMessage(queueUrl);
+    }
+
+    @Override
+    public GetQueueAttributesResult getQueueAttributes(GetQueueAttributesRequest getQueueAttributesRequest) {
+        return underlyingConnection.getQueueAttributes(getQueueAttributesRequest);
+    }
+
+    @Override
+    public GetQueueAttributesResult getQueueAttributes(String queueUrl, List<String> attributeNames) {
+        return underlyingConnection.getQueueAttributes(queueUrl, attributeNames);
+    }
+
+    @Override
+    public SetQueueAttributesResult setQueueAttributes(SetQueueAttributesRequest setQueueAttributesRequest) {
+        return underlyingConnection.setQueueAttributes(setQueueAttributesRequest);
+    }
+
+    @Override
+    public SetQueueAttributesResult setQueueAttributes(String queueUrl, Map<String, String> attributes) {
+        return underlyingConnection.setQueueAttributes(queueUrl, attributes);
+    }
+
+    @Override
+    public CreateQueueResult createQueue(CreateQueueRequest createQueueRequest) {
+        return underlyingConnection.createQueue(createQueueRequest);
+    }
+
+    @Override
+    public CreateQueueResult createQueue(String queueName) {
+        return underlyingConnection.createQueue(queueName);
+    }
+
+    @Override
+    public DeleteMessageResult deleteMessage(DeleteMessageRequest deleteMessageRequest) {
+        return underlyingConnection.deleteMessage(deleteMessageRequest);
+    }
+
+    @Override
+    public DeleteMessageResult deleteMessage(String queueUrl, String receiptHandle) {
+        return underlyingConnection.deleteMessage(queueUrl, receiptHandle);
+    }
+
+    @Override
+    public DeleteMessageBatchResult deleteMessageBatch(DeleteMessageBatchRequest deleteMessageBatchRequest) {
+        return underlyingConnection.deleteMessageBatch(deleteMessageBatchRequest);
+    }
+
+    @Override
+    public DeleteMessageBatchResult deleteMessageBatch(String queueUrl, List<DeleteMessageBatchRequestEntry> entries) {
+        return underlyingConnection.deleteMessageBatch(queueUrl, entries);
+    }
+
+    @Override
+    public DeleteQueueResult deleteQueue(DeleteQueueRequest deleteQueueRequest) {
+        return underlyingConnection.deleteQueue(deleteQueueRequest);
+    }
+
+    @Override
+    public DeleteQueueResult deleteQueue(String queueUrl) {
+        return underlyingConnection.deleteQueue(queueUrl);
+    }
+
+    @Override
+    public GetQueueUrlResult getQueueUrl(GetQueueUrlRequest getQueueUrlRequest) {
+        return underlyingConnection.getQueueUrl(getQueueUrlRequest);
+    }
+
+    @Override
+    public GetQueueUrlResult getQueueUrl(String queueName) {
+        return underlyingConnection.getQueueUrl(queueName);
+    }
+
+    @Override
+    public ListQueueTagsResult listQueueTags(ListQueueTagsRequest listQueueTagsRequest) {
+        return underlyingConnection.listQueueTags(listQueueTagsRequest);
+    }
+
+    @Override
+    public ListQueueTagsResult listQueueTags(String queueUrl) {
+        return underlyingConnection.listQueueTags(queueUrl);
+    }
+
+    @Override
+    public ListQueuesResult listQueues() {
+        return underlyingConnection.listQueues();
+    }
+
+    @Override
+    public ListQueuesResult listQueues(ListQueuesRequest listQueuesRequest) {
+        return underlyingConnection.listQueues(listQueuesRequest);
+    }
+
+    @Override
+    public ListQueuesResult listQueues(String queueNamePrefix) {
+        return underlyingConnection.listQueues(queueNamePrefix);
+    }
+
+    @Override
+    public PurgeQueueResult purgeQueue(PurgeQueueRequest purgeQueueRequest) {
+        return underlyingConnection.purgeQueue(purgeQueueRequest);
+    }
+
+    @Override
+    public TagQueueResult tagQueue(TagQueueRequest tagQueueRequest) {
+        return underlyingConnection.tagQueue(tagQueueRequest);
+    }
+
+    @Override
+    public TagQueueResult tagQueue(String queueUrl, Map<String, String> tags) {
+        return underlyingConnection.tagQueue(queueUrl, tags);
+    }
+
+    @Override
+    public UntagQueueResult untagQueue(UntagQueueRequest untagQueueRequest) {
+        return underlyingConnection.untagQueue(untagQueueRequest);
+    }
+
+    @Override
+    public UntagQueueResult untagQueue(String queueUrl, List<String> tagKeys) {
+        return underlyingConnection.untagQueue(queueUrl, tagKeys);
+    }
+
+    // ... (Previous code)
+    @Override
+    public AddPermissionResult addPermission(AddPermissionRequest addPermissionRequest) {
+        return underlyingConnection.addPermission(addPermissionRequest);
+    }
+
+    @Override
+    public AddPermissionResult addPermission(String queueUrl, String label, List<String> awsAccountIds, List<String> actions) {
+        return underlyingConnection.addPermission(queueUrl, label, awsAccountIds, actions);
+    }
+
+    @Override
+    public CancelMessageMoveTaskResult cancelMessageMoveTask(CancelMessageMoveTaskRequest cancelMessageMoveTaskRequest) {
+        return underlyingConnection.cancelMessageMoveTask(cancelMessageMoveTaskRequest);
+    }
+
+    @Override
+    public ChangeMessageVisibilityResult changeMessageVisibility(ChangeMessageVisibilityRequest changeMessageVisibilityRequest) {
+        return underlyingConnection.changeMessageVisibility(changeMessageVisibilityRequest);
+    }
+
+    @Override
+    public ChangeMessageVisibilityResult changeMessageVisibility(String queueUrl, String receiptHandle, Integer visibilityTimeout) {
+        return underlyingConnection.changeMessageVisibility(queueUrl, receiptHandle, visibilityTimeout);
+    }
+
+    @Override
+    public ChangeMessageVisibilityBatchResult changeMessageVisibilityBatch(ChangeMessageVisibilityBatchRequest changeMessageVisibilityBatchRequest) {
+        return underlyingConnection.changeMessageVisibilityBatch(changeMessageVisibilityBatchRequest);
+    }
+
+    @Override
+    public ChangeMessageVisibilityBatchResult changeMessageVisibilityBatch(String queueUrl, List<ChangeMessageVisibilityBatchRequestEntry> entries) {
+        return underlyingConnection.changeMessageVisibilityBatch(queueUrl, entries);
+    }
+
+    @Override
+    public ListDeadLetterSourceQueuesResult listDeadLetterSourceQueues(ListDeadLetterSourceQueuesRequest listDeadLetterSourceQueuesRequest) {
+        return underlyingConnection.listDeadLetterSourceQueues(listDeadLetterSourceQueuesRequest);
+    }
+
+    @Override
+    public ListMessageMoveTasksResult listMessageMoveTasks(ListMessageMoveTasksRequest listMessageMoveTasksRequest) {
+        return underlyingConnection.listMessageMoveTasks(listMessageMoveTasksRequest);
+    }
+
+    @Override
+    public RemovePermissionResult removePermission(RemovePermissionRequest removePermissionRequest) {
+        return underlyingConnection.removePermission(removePermissionRequest);
+    }
+
+    @Override
+    public RemovePermissionResult removePermission(String queueUrl, String label) {
+        return underlyingConnection.removePermission(queueUrl, label);
+    }
+
+    @Override
+    public StartMessageMoveTaskResult startMessageMoveTask(StartMessageMoveTaskRequest startMessageMoveTaskRequest) {
+        return underlyingConnection.startMessageMoveTask(startMessageMoveTaskRequest);
+    }
+
+    @Override
+    public ResponseMetadata getCachedResponseMetadata(AmazonWebServiceRequest amazonWebServiceRequest) {
+        return underlyingConnection.getCachedResponseMetadata(amazonWebServiceRequest);
+    }
+
 }
