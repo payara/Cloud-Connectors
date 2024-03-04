@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2017 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017-2024 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -41,17 +41,17 @@ package fish.payara.cloud.connectors.amazonsqs.api.outbound;
 
 import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnection;
 import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnectionFactory;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import jakarta.resource.ResourceException;
 import jakarta.resource.spi.ConnectionManager;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Steve Millidge (Payara Foundation)
  */
-class AmazonSQSConnectionFactoryImpl implements AmazonSQSConnectionFactory{
-    
+class AmazonSQSConnectionFactoryImpl implements AmazonSQSConnectionFactory {
+
     private ConnectionManager cxManager;
     private AmazonSQSManagedConnectionFactory mcf;
 
@@ -77,5 +77,5 @@ class AmazonSQSConnectionFactoryImpl implements AmazonSQSConnectionFactory{
         }
         return null;
     }
-    
+
 }

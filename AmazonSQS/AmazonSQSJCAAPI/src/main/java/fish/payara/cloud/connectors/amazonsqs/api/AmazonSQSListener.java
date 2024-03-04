@@ -40,10 +40,11 @@
 package fish.payara.cloud.connectors.amazonsqs.api;
 
 /**
- * Marker interface for your class to indicate that you Message Driven Bean 
- * is listening on an Amazon Queue
+ * Marker interface for your class to indicate that you Message Driven Bean is
+ * listening on an Amazon Queue
+ *
  * @author Steve Millidge (Payara Foundation)
  */
 public interface AmazonSQSListener {
-    
+
 }

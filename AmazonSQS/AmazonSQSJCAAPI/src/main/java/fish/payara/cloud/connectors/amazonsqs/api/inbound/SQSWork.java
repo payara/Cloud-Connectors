@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2017-2022 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017-2024 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,15 +39,15 @@
  */
 package fish.payara.cloud.connectors.amazonsqs.api.inbound;
 
+import jakarta.resource.ResourceException;
+import jakarta.resource.spi.endpoint.MessageEndpoint;
+import jakarta.resource.spi.endpoint.MessageEndpointFactory;
+import jakarta.resource.spi.work.Work;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jakarta.resource.ResourceException;
-import jakarta.resource.spi.endpoint.MessageEndpoint;
-import jakarta.resource.spi.endpoint.MessageEndpointFactory;
-import jakarta.resource.spi.work.Work;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
 import software.amazon.awssdk.services.sqs.model.Message;
@@ -95,7 +95,6 @@ public class SQSWork implements Work {
             }
         }
     }
-
 
     @Override
     public void release() {

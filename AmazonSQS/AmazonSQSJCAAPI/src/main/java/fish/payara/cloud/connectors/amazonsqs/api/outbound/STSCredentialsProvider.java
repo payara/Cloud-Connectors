@@ -58,10 +58,11 @@ import software.amazon.awssdk.services.sts.model.Credentials;
 
 /**
  * AWS STS Credentials Provider with caching and thread safety.
- * 
- * This class provides AWS credentials by assuming a role using the AWS Security Token Service (STS).
- * It caches the credentials and ensures thread safety using locks.
- * 
+ *
+ * This class provides AWS credentials by assuming a role using the AWS Security
+ * Token Service (STS). It caches the credentials and ensures thread safety
+ * using locks.
+ *
  * @author Gaurav Gupta
  */
 public class STSCredentialsProvider implements AwsCredentialsProvider {
@@ -75,10 +76,11 @@ public class STSCredentialsProvider implements AwsCredentialsProvider {
     private volatile Instant expirationTime;
     private final Lock lock = new ReentrantLock();
     private static final Map<String, STSCredentialsProvider> providerInstances = new HashMap<>();
-   
+
     /**
-     * Returns a singleton instance of STSCredentialsProvider for a unique session name.
-     * 
+     * Returns a singleton instance of STSCredentialsProvider for a unique
+     * session name.
+     *
      * @param roleArn The ARN of the role to assume.
      * @param roleSessionName The name of the role session.
      * @param region The AWS region.

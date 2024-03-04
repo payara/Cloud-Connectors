@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2017-2022 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017-2024 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,23 +40,143 @@
 package fish.payara.cloud.connectors.amazonsqs.api;
 
 import java.util.List;
+import java.util.function.Consumer;
+import software.amazon.awssdk.services.sqs.model.AddPermissionRequest;
+import software.amazon.awssdk.services.sqs.model.AddPermissionResponse;
+import software.amazon.awssdk.services.sqs.model.CancelMessageMoveTaskRequest;
+import software.amazon.awssdk.services.sqs.model.CancelMessageMoveTaskResponse;
+import software.amazon.awssdk.services.sqs.model.ChangeMessageVisibilityBatchRequest;
+import software.amazon.awssdk.services.sqs.model.ChangeMessageVisibilityBatchResponse;
+import software.amazon.awssdk.services.sqs.model.ChangeMessageVisibilityRequest;
+import software.amazon.awssdk.services.sqs.model.ChangeMessageVisibilityResponse;
+import software.amazon.awssdk.services.sqs.model.CreateQueueRequest;
+import software.amazon.awssdk.services.sqs.model.CreateQueueResponse;
+import software.amazon.awssdk.services.sqs.model.DeleteMessageBatchRequest;
+import software.amazon.awssdk.services.sqs.model.DeleteMessageBatchResponse;
+import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
+import software.amazon.awssdk.services.sqs.model.DeleteMessageResponse;
+import software.amazon.awssdk.services.sqs.model.DeleteQueueRequest;
+import software.amazon.awssdk.services.sqs.model.DeleteQueueResponse;
+import software.amazon.awssdk.services.sqs.model.GetQueueAttributesRequest;
+import software.amazon.awssdk.services.sqs.model.GetQueueAttributesResponse;
+import software.amazon.awssdk.services.sqs.model.GetQueueUrlRequest;
+import software.amazon.awssdk.services.sqs.model.GetQueueUrlResponse;
+import software.amazon.awssdk.services.sqs.model.ListDeadLetterSourceQueuesRequest;
+import software.amazon.awssdk.services.sqs.model.ListDeadLetterSourceQueuesResponse;
+import software.amazon.awssdk.services.sqs.model.ListMessageMoveTasksRequest;
+import software.amazon.awssdk.services.sqs.model.ListMessageMoveTasksResponse;
+import software.amazon.awssdk.services.sqs.model.ListQueueTagsRequest;
+import software.amazon.awssdk.services.sqs.model.ListQueueTagsResponse;
+import software.amazon.awssdk.services.sqs.model.ListQueuesRequest;
+import software.amazon.awssdk.services.sqs.model.ListQueuesResponse;
+import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest;
+import software.amazon.awssdk.services.sqs.model.PurgeQueueResponse;
+import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
+import software.amazon.awssdk.services.sqs.model.ReceiveMessageResponse;
+import software.amazon.awssdk.services.sqs.model.RemovePermissionRequest;
+import software.amazon.awssdk.services.sqs.model.RemovePermissionResponse;
 import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequest;
 import software.amazon.awssdk.services.sqs.model.SendMessageBatchRequestEntry;
 import software.amazon.awssdk.services.sqs.model.SendMessageBatchResponse;
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 import software.amazon.awssdk.services.sqs.model.SendMessageResponse;
-
+import software.amazon.awssdk.services.sqs.model.SetQueueAttributesRequest;
+import software.amazon.awssdk.services.sqs.model.SetQueueAttributesResponse;
+import software.amazon.awssdk.services.sqs.model.StartMessageMoveTaskRequest;
+import software.amazon.awssdk.services.sqs.model.StartMessageMoveTaskResponse;
+import software.amazon.awssdk.services.sqs.model.TagQueueRequest;
+import software.amazon.awssdk.services.sqs.model.TagQueueResponse;
+import software.amazon.awssdk.services.sqs.model.UntagQueueRequest;
+import software.amazon.awssdk.services.sqs.model.UntagQueueResponse;
 
 /**
  *
  * @author Steve Millidge (Payara Foundation)
  */
 public interface AmazonSQSConnection extends AutoCloseable {
-    
-    public SendMessageResponse sendMessage(SendMessageRequest request);
-    public SendMessageResponse sendMessage(String queueURL, String messageBody);
-    public SendMessageBatchResponse sendMessageBatch(SendMessageBatchRequest batch);
-    public SendMessageBatchResponse sendMessageBatch(String queueURL, List<SendMessageBatchRequestEntry> entries);
 
-    
+    SendMessageResponse sendMessage(SendMessageRequest request);
+
+    SendMessageResponse sendMessage(String queueURL, String messageBody);
+
+    SendMessageBatchResponse sendMessageBatch(SendMessageBatchRequest batch);
+
+    SendMessageBatchResponse sendMessageBatch(String queueURL, List<SendMessageBatchRequestEntry> entries);
+
+    ReceiveMessageResponse receiveMessage(ReceiveMessageRequest receiveMessageRequest);
+
+    ReceiveMessageResponse receiveMessage(Consumer<ReceiveMessageRequest.Builder> receiveMessageRequest);
+
+    GetQueueAttributesResponse getQueueAttributes(GetQueueAttributesRequest getQueueAttributesRequest);
+
+    GetQueueAttributesResponse getQueueAttributes(Consumer<GetQueueAttributesRequest.Builder> getQueueAttributesRequest);
+
+    SetQueueAttributesResponse setQueueAttributes(SetQueueAttributesRequest setQueueAttributesRequest);
+
+    SetQueueAttributesResponse setQueueAttributes(Consumer<SetQueueAttributesRequest.Builder> setQueueAttributesRequest);
+
+    CreateQueueResponse createQueue(CreateQueueRequest createQueueRequest);
+
+    CreateQueueResponse createQueue(Consumer<CreateQueueRequest.Builder> createQueueRequest);
+
+    DeleteMessageResponse deleteMessage(DeleteMessageRequest deleteMessageRequest);
+
+    DeleteMessageResponse deleteMessage(Consumer<DeleteMessageRequest.Builder> deleteMessageRequest);
+
+    DeleteMessageBatchResponse deleteMessageBatch(DeleteMessageBatchRequest deleteMessageBatchRequest);
+
+    DeleteMessageBatchResponse deleteMessageBatch(Consumer<DeleteMessageBatchRequest.Builder> deleteMessageBatchRequest);
+
+    DeleteQueueResponse deleteQueue(DeleteQueueRequest deleteQueueRequest);
+
+    DeleteQueueResponse deleteQueue(Consumer<DeleteQueueRequest.Builder> deleteQueueRequest);
+
+    GetQueueUrlResponse getQueueUrl(GetQueueUrlRequest getQueueUrlRequest);
+
+    GetQueueUrlResponse getQueueUrl(Consumer<GetQueueUrlRequest.Builder> getQueueUrlRequest);
+
+    ListQueuesResponse listQueues(ListQueuesRequest listQueuesRequest);
+
+    ListQueuesResponse listQueues();
+
+    ListQueuesResponse listQueues(Consumer<ListQueuesRequest.Builder> listQueuesRequest);
+
+    PurgeQueueResponse purgeQueue(PurgeQueueRequest purgeQueueRequest);
+
+    TagQueueResponse tagQueue(TagQueueRequest tagQueueRequest);
+
+    TagQueueResponse tagQueue(Consumer<TagQueueRequest.Builder> tagQueueRequest);
+
+    UntagQueueResponse untagQueue(UntagQueueRequest untagQueueRequest);
+
+    UntagQueueResponse untagQueue(Consumer<UntagQueueRequest.Builder> untagQueueRequest);
+
+    ListQueueTagsResponse listQueueTags(ListQueueTagsRequest listQueueTagsRequest);
+
+    ListQueueTagsResponse listQueueTags(Consumer<ListQueueTagsRequest.Builder> listQueueTagsRequest);
+
+    AddPermissionResponse addPermission(AddPermissionRequest addPermissionRequest);
+
+    AddPermissionResponse addPermission(Consumer<AddPermissionRequest.Builder> addPermissionRequest);
+
+    RemovePermissionResponse removePermission(RemovePermissionRequest removePermissionRequest);
+
+    RemovePermissionResponse removePermission(Consumer<RemovePermissionRequest.Builder> removePermissionRequest);
+
+    StartMessageMoveTaskResponse startMessageMoveTask(StartMessageMoveTaskRequest startMessageMoveTaskRequest);
+
+    CancelMessageMoveTaskResponse cancelMessageMoveTask(CancelMessageMoveTaskRequest cancelMessageMoveTaskRequest);
+
+    ListMessageMoveTasksResponse listMessageMoveTasks(ListMessageMoveTasksRequest listMessageMoveTasksRequest);
+
+    ChangeMessageVisibilityResponse changeMessageVisibility(ChangeMessageVisibilityRequest changeMessageVisibilityRequest);
+
+    ChangeMessageVisibilityResponse changeMessageVisibility(Consumer<ChangeMessageVisibilityRequest.Builder> changeMessageVisibilityRequest);
+
+    ChangeMessageVisibilityBatchResponse changeMessageVisibilityBatch(ChangeMessageVisibilityBatchRequest changeMessageVisibilityBatchRequest);
+
+    ChangeMessageVisibilityBatchResponse changeMessageVisibilityBatch(Consumer<ChangeMessageVisibilityBatchRequest.Builder> changeMessageVisibilityBatchRequest);
+
+    ListDeadLetterSourceQueuesResponse listDeadLetterSourceQueues(ListDeadLetterSourceQueuesRequest listDeadLetterSourceQueuesRequest);
+
 }

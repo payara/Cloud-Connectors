@@ -54,7 +54,7 @@ Valid properties are below. On Payara all properties can be replaced via System 
 |attributeNames | String| All | The list of attribute names that should be fetched with the message (MDB Only)
 
 
-Your MDB should contain one method annotated with `@OnSQSMessage` and that method should take a single parameter of type `com.amazonaws.services.sqs.model.Message`
+Your MDB should contain one method annotated with `@OnSQSMessage` and that method should take a single parameter of type `software.amazon.awssdk.services.sqs.model.Message`
 
 A full skeleton MDB using Access and Secret keys shown below
 ```java
