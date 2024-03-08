@@ -39,6 +39,8 @@
  */
 package fish.payara.cloud.connectors.amazonsqs.api.outbound;
 
+import com.amazon.sqs.javamessaging.AmazonSQSExtendedClient;
+import com.amazon.sqs.javamessaging.ExtendedClientConfiguration;
 import fish.payara.cloud.connectors.amazonsqs.api.AmazonSQSConnection;
 import jakarta.resource.NotSupportedException;
 import jakarta.resource.ResourceException;
@@ -60,6 +62,7 @@ import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.AddPermissionRequest;
 import software.amazon.awssdk.services.sqs.model.AddPermissionResponse;
@@ -127,7 +130,7 @@ public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSC
 
         ExtendedClientConfiguration extendedClientConfig = new ExtendedClientConfiguration();
         if (aThis.getS3BucketName() != null) {
-            final AmazonS3 s3 = AmazonS3ClientBuilder.standard().withRegion(aThis.getRegion()).withCredentials(credentialsProvider).build();
+            final S3Client s3 = S3Client.builder().region(Region.of(aThis.getRegion())).credentialsProvider(credentialsProvider).build();
             extendedClientConfig = extendedClientConfig.withPayloadSupportEnabled(s3, aThis.getS3BucketName());
             if (aThis.getS3SizeThreshold() != null && aThis.getS3SizeThreshold() > 0) {
                 extendedClientConfig = extendedClientConfig.withPayloadSizeThreshold(aThis.getS3SizeThreshold());
@@ -229,7 +232,7 @@ public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSC
 
     @Override
     public SendMessageResponse sendMessage(SendMessageRequest request) {
-         if (isLargeMessage(request.getMessageBody())) {
+         if (isLargeMessage(request.messageBody())) {
             return sqsExtClient.sendMessage(request);
         } else {
             return sqsClient.sendMessage(request);
@@ -242,6 +245,7 @@ public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSC
             return sqsExtClient.sendMessage(SendMessageRequest.builder().queueUrl(queueURL).messageBody(messageBody).build());
         } else {
             return sqsClient.sendMessage(SendMessageRequest.builder().queueUrl(queueURL).messageBody(messageBody).build());
+        }
     }
 
     @Override

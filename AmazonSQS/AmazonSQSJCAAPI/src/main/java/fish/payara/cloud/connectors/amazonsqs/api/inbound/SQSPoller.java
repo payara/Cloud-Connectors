@@ -40,9 +40,17 @@
 package fish.payara.cloud.connectors.amazonsqs.api.inbound;
 
 import fish.payara.cloud.connectors.amazonsqs.api.OnSQSMessage;
+import jakarta.json.Json;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonException;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonReader;
+import jakarta.json.JsonValue;
 import jakarta.resource.spi.BootstrapContext;
 import jakarta.resource.spi.endpoint.MessageEndpointFactory;
 import jakarta.resource.spi.work.WorkException;
+import java.io.IOException;
+import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -50,11 +58,16 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.QueueAttributeName;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
+import software.amazon.awssdk.utils.IoUtils;
 
 /**
  * @author Steve Millidge (Payara Foundation)
@@ -65,7 +78,7 @@ class SQSPoller extends TimerTask {
     private final BootstrapContext ctx;
     private final MessageEndpointFactory factory;
     private final SqsClient client;
-    private AmazonS3 s3;
+    private S3Client s3;
     private static final String S3_BUCKET_NAME_KEY = "s3BucketName";
     private static final String S3_KEY_KEY = "s3Key";
     private static final Logger LOG = Logger.getLogger(SQSPoller.class.getName());
@@ -76,6 +89,10 @@ class SQSPoller extends TimerTask {
         factory = endpointFactory;
         client = SqsClient.builder().region(Region.of(spec.getRegion()))
                 .credentialsProvider(spec).build();
+        if (spec.getS3BucketName() != null) {
+            s3 = S3Client.builder().region(Region.of(spec.getRegion()))
+                    .credentialsProvider(spec).build();
+        }
     }
 
     @Override
@@ -93,8 +110,8 @@ class SQSPoller extends TimerTask {
                 Class<?> mdbClass = factory.getEndpointClass();
                 for (Message message : messages) {
                     for (Method m : mdbClass.getMethods()) {
-                        if (isOnSQSMessageMethod(m, message) && shouldFetchS3Message(message)) {
-                            fetchS3MessageContent(message);
+                        if (isOnSQSMessageMethod(m) && shouldFetchS3Message(message)) {
+                            message = fetchS3MessageContent(message);
                             scheduleSQSWork(m, message);
                         }
                     }
@@ -108,7 +125,7 @@ class SQSPoller extends TimerTask {
         }
     }
 
-    private boolean isOnSQSMessageMethod(Method method, Message message) {
+    private boolean isOnSQSMessageMethod(Method method) {
         return method.isAnnotationPresent(OnSQSMessage.class)
                 && method.getParameterCount() == 1
                 && method.getParameterTypes()[0].equals(Message.class);
@@ -117,11 +134,12 @@ class SQSPoller extends TimerTask {
     private boolean shouldFetchS3Message(Message message) {
         return s3 != null
                 && Boolean.TRUE.equals(spec.getS3FetchMessage())
-                && message.getBody().contains(S3_BUCKET_NAME_KEY);
+                && message.body().contains(S3_BUCKET_NAME_KEY);
     }
 
-    private void fetchS3MessageContent(Message message) throws IOException {
-        try (JsonReader jsonReader = Json.createReader(new StringReader(message.getBody()))) {
+    private Message fetchS3MessageContent(Message message) throws IOException {
+        Message updatedMessage = message;
+        try (JsonReader jsonReader = Json.createReader(new StringReader(message.body()))) {
             JsonArray jsonArray = jsonReader.readArray();
             for (JsonValue jsonValue : jsonArray) {
                 if (jsonValue instanceof JsonObject) {
@@ -129,22 +147,28 @@ class SQSPoller extends TimerTask {
                     String s3BucketName = jsonBody.getString(S3_BUCKET_NAME_KEY);
                     String s3Key = jsonBody.getString(S3_KEY_KEY);
                     LOG.log(Level.FINE, "S3 object received, S3 bucket name: {0}, S3 object key:{1}", new Object[]{s3BucketName, s3Key});
-                    GetObjectRequest getObjectRequest = new GetObjectRequest(s3BucketName, s3Key);
-                    S3Object s3Object = s3.getObject(getObjectRequest);
-                    try (S3ObjectInputStream objectInputStream = s3Object.getObjectContent()) {
-                        byte[] buffer = new byte[1024];
-                        int bytesRead;
-                        StringBuilder content = new StringBuilder();
-                        while ((bytesRead = objectInputStream.read(buffer)) != -1) {
-                            content.append(new String(buffer, 0, bytesRead));
-                        }
-                        message.setBody(content.toString());
+                    GetObjectRequest getObjectRequest = GetObjectRequest.builder().bucket(s3BucketName).key(s3Key).build();
+                    ResponseInputStream<GetObjectResponse> responseInputStream = s3.getObject(getObjectRequest);
+                    String content;
+                    try {
+                        content = IoUtils.toUtf8String(responseInputStream);
+                        updatedMessage = Message.builder()
+                                .attributes(message.attributes())
+                                .body(content)
+                                .md5OfBody(message.md5OfBody())
+                                .messageAttributes(message.messageAttributes())
+                                .messageId(message.messageId())
+                                .receiptHandle(message.receiptHandle())
+                                .build();
+                    } finally {
+                        responseInputStream.close();
                     }
                 }
             }
         } catch (JsonException e) {
             LOG.log(Level.WARNING, "Error parsing S3 message metadata JSON", e);
         }
+        return updatedMessage;
     }
 
     private void scheduleSQSWork(Method method, Message message) {
@@ -153,10 +177,6 @@ class SQSPoller extends TimerTask {
         } catch (WorkException ex) {
             Logger.getLogger(AmazonSQSResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-
-    void stop() {
-        client.shutdown();
     }
 
 }
