@@ -78,6 +78,10 @@ public class AmazonSQSActivationSpec implements ActivationSpec, AwsCredentialsPr
     private String profileName;
     private String roleArn;
     private String roleSessionName;
+    private String s3BucketName;
+    private Integer s3SizeThreshold = 0;
+    private String s3KeyPrefix;
+    private Boolean s3FetchMessage = true;
 
     @Override
     public void validate() throws InvalidPropertyException {
@@ -202,6 +206,38 @@ public class AmazonSQSActivationSpec implements ActivationSpec, AwsCredentialsPr
 
     public void setRoleSessionName(String roleSessionName) {
         this.roleSessionName = roleSessionName;
+    }
+
+    public String getS3BucketName() {
+        return s3BucketName;
+    }
+
+    public void setS3BucketName(String s3BucketName) {
+        this.s3BucketName = s3BucketName;
+    }
+
+    public Integer getS3SizeThreshold() {
+        return s3SizeThreshold;
+    }
+
+    public void setS3SizeThreshold(Integer s3SizeThreshold) {
+        this.s3SizeThreshold = s3SizeThreshold;
+    }
+
+    public String getS3KeyPrefix() {
+        return s3KeyPrefix;
+    }
+
+    public void setS3KeyPrefix(String s3KeyPrefix) {
+        this.s3KeyPrefix = s3KeyPrefix;
+    }
+
+    public Boolean getS3FetchMessage() {
+        return s3FetchMessage;
+    }
+
+    public void setS3FetchMessage(Boolean s3FetchMessage) {
+        this.s3FetchMessage = s3FetchMessage;
     }
 
     @Override
