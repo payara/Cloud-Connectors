@@ -119,10 +119,24 @@ public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSC
     private final HashSet<ConnectionEventListener> listeners = new HashSet<>();
     private PrintWriter logWriter;
     private final SqsClient sqsClient;
-
+    private final AmazonSQSExtendedClient sqsExtClient;
+    
     AmazonSQSManagedConnection(Subject subject, ConnectionRequestInfo cxRequestInfo, AmazonSQSManagedConnectionFactory aThis) {
         AwsCredentialsProvider credentialsProvider = getCredentials(aThis);
         sqsClient = SqsClient.builder().region(Region.of(aThis.getRegion())).credentialsProvider(credentialsProvider).build();
+
+        ExtendedClientConfiguration extendedClientConfig = new ExtendedClientConfiguration();
+        if (aThis.getS3BucketName() != null) {
+            final AmazonS3 s3 = AmazonS3ClientBuilder.standard().withRegion(aThis.getRegion()).withCredentials(credentialsProvider).build();
+            extendedClientConfig = extendedClientConfig.withPayloadSupportEnabled(s3, aThis.getS3BucketName());
+            if (aThis.getS3SizeThreshold() != null && aThis.getS3SizeThreshold() > 0) {
+                extendedClientConfig = extendedClientConfig.withPayloadSizeThreshold(aThis.getS3SizeThreshold());
+            }
+            if (aThis.getS3KeyPrefix() != null) {
+                extendedClientConfig = extendedClientConfig.withS3KeyPrefix(aThis.getS3KeyPrefix());
+            }
+        }
+        sqsExtClient = new AmazonSQSExtendedClient(sqsClient, extendedClientConfig);
     }
 
     @Override
@@ -215,12 +229,19 @@ public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSC
 
     @Override
     public SendMessageResponse sendMessage(SendMessageRequest request) {
-        return sqsClient.sendMessage(request);
+         if (isLargeMessage(request.getMessageBody())) {
+            return sqsExtClient.sendMessage(request);
+        } else {
+            return sqsClient.sendMessage(request);
+        }
     }
 
     @Override
     public SendMessageResponse sendMessage(String queueURL, String messageBody) {
-        return sqsClient.sendMessage(SendMessageRequest.builder().queueUrl(queueURL).messageBody(messageBody).build());
+        if (isLargeMessage(messageBody)) {
+            return sqsExtClient.sendMessage(SendMessageRequest.builder().queueUrl(queueURL).messageBody(messageBody).build());
+        } else {
+            return sqsClient.sendMessage(SendMessageRequest.builder().queueUrl(queueURL).messageBody(messageBody).build());
     }
 
     @Override
@@ -231,6 +252,10 @@ public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSC
     @Override
     public SendMessageBatchResponse sendMessageBatch(String queueURL, List<SendMessageBatchRequestEntry> entries) {
         return sqsClient.sendMessageBatch(SendMessageBatchRequest.builder().queueUrl(queueURL).entries(entries).build());
+    }
+
+    private boolean isLargeMessage(String messageBody) {
+        return messageBody.length() > 256 * 1024; // 256KB
     }
 
     @Override

@@ -61,10 +61,14 @@ import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
  */
 class SQSPoller extends TimerTask {
 
-    AmazonSQSActivationSpec spec;
-    BootstrapContext ctx;
-    MessageEndpointFactory factory;
-    SqsClient client;
+    private final AmazonSQSActivationSpec spec;
+    private final BootstrapContext ctx;
+    private final MessageEndpointFactory factory;
+    private final SqsClient client;
+    private AmazonS3 s3;
+    private static final String S3_BUCKET_NAME_KEY = "s3BucketName";
+    private static final String S3_KEY_KEY = "s3Key";
+    private static final Logger LOG = Logger.getLogger(SQSPoller.class.getName());
 
     SQSPoller(AmazonSQSActivationSpec sqsSpec, BootstrapContext context, MessageEndpointFactory endpointFactory) {
         spec = sqsSpec;
@@ -89,28 +93,70 @@ class SQSPoller extends TimerTask {
                 Class<?> mdbClass = factory.getEndpointClass();
                 for (Message message : messages) {
                     for (Method m : mdbClass.getMethods()) {
-                        if (m.isAnnotationPresent(OnSQSMessage.class) && m.getParameterCount() == 1
-                                && m.getParameterTypes()[0].equals(Message.class)) {
-                            try {
-                                ctx.getWorkManager()
-                                        .scheduleWork(new SQSWork(client, factory, m, message, spec.getQueueURL()));
-                            } catch (WorkException ex) {
-                                Logger.getLogger(AmazonSQSResourceAdapter.class.getName())
-                                        .log(Level.SEVERE, null, ex);
-                            }
+                        if (isOnSQSMessageMethod(m, message) && shouldFetchS3Message(message)) {
+                            fetchS3MessageContent(message);
+                            scheduleSQSWork(m, message);
                         }
                     }
-
                 }
             }
         } catch (IllegalStateException ise) {
             // Fix #29 ensure Illegal State Exception doesn't blow up the timer
-            Logger.getLogger(AmazonSQSResourceAdapter.class.getName())
-                    .log(Level.WARNING, "Poller caught an Illegal State Exception", ise);
+            LOG.log(Level.WARNING, "Poller caught an Illegal State Exception", ise);
         } catch (Exception e) {
-            Logger.getLogger(AmazonSQSResourceAdapter.class.getName())
-                    .log(Level.WARNING, "Poller caught an Unexpected Exception", e);
+            LOG.log(Level.WARNING, "Poller caught an Unexpected Exception", e);
         }
+    }
+
+    private boolean isOnSQSMessageMethod(Method method, Message message) {
+        return method.isAnnotationPresent(OnSQSMessage.class)
+                && method.getParameterCount() == 1
+                && method.getParameterTypes()[0].equals(Message.class);
+    }
+
+    private boolean shouldFetchS3Message(Message message) {
+        return s3 != null
+                && Boolean.TRUE.equals(spec.getS3FetchMessage())
+                && message.getBody().contains(S3_BUCKET_NAME_KEY);
+    }
+
+    private void fetchS3MessageContent(Message message) throws IOException {
+        try (JsonReader jsonReader = Json.createReader(new StringReader(message.getBody()))) {
+            JsonArray jsonArray = jsonReader.readArray();
+            for (JsonValue jsonValue : jsonArray) {
+                if (jsonValue instanceof JsonObject) {
+                    JsonObject jsonBody = (JsonObject) jsonValue;
+                    String s3BucketName = jsonBody.getString(S3_BUCKET_NAME_KEY);
+                    String s3Key = jsonBody.getString(S3_KEY_KEY);
+                    LOG.log(Level.FINE, "S3 object received, S3 bucket name: {0}, S3 object key:{1}", new Object[]{s3BucketName, s3Key});
+                    GetObjectRequest getObjectRequest = new GetObjectRequest(s3BucketName, s3Key);
+                    S3Object s3Object = s3.getObject(getObjectRequest);
+                    try (S3ObjectInputStream objectInputStream = s3Object.getObjectContent()) {
+                        byte[] buffer = new byte[1024];
+                        int bytesRead;
+                        StringBuilder content = new StringBuilder();
+                        while ((bytesRead = objectInputStream.read(buffer)) != -1) {
+                            content.append(new String(buffer, 0, bytesRead));
+                        }
+                        message.setBody(content.toString());
+                    }
+                }
+            }
+        } catch (JsonException e) {
+            LOG.log(Level.WARNING, "Error parsing S3 message metadata JSON", e);
+        }
+    }
+
+    private void scheduleSQSWork(Method method, Message message) {
+        try {
+            ctx.getWorkManager().scheduleWork(new SQSWork(client, factory, method, message, spec.getQueueURL()));
+        } catch (WorkException ex) {
+            Logger.getLogger(AmazonSQSResourceAdapter.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    void stop() {
+        client.shutdown();
     }
 
 }
