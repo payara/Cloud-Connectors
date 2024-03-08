@@ -82,6 +82,18 @@ public class AmazonSQSManagedConnectionFactory implements ManagedConnectionFacto
     @ConfigProperty(description = "AWS Session name", type = String.class)
     private String roleSessionName;
 
+    @ConfigProperty(description = "AWS S3 bucket name", type = String.class)
+    private String s3BucketName;
+
+    @ConfigProperty(description = "AWS S3 size threshold", type = Integer.class, defaultValue ="0")
+    private Integer s3SizeThreshold;
+
+    @ConfigProperty(description = "AWS S3 key prefix", type = String.class)
+    private String s3KeyPrefix;
+
+    @ConfigProperty(description = "AWS S3 fetch message", type = Boolean.class, defaultValue ="true")
+    private Boolean s3FetchMessage;
+
     private PrintWriter logger;
 
     public String getAwsSecretKey() {
@@ -130,6 +142,38 @@ public class AmazonSQSManagedConnectionFactory implements ManagedConnectionFacto
 
     public void setRoleSessionName(String roleSessionName) {
         this.roleSessionName = roleSessionName;
+    }
+
+    public String getS3BucketName() {
+        return s3BucketName;
+    }
+
+    public void setS3BucketName(String s3BucketName) {
+        this.s3BucketName = s3BucketName;
+    }
+
+    public Integer getS3SizeThreshold() {
+        return s3SizeThreshold;
+    }
+
+    public void setS3SizeThreshold(Integer s3SizeThreshold) {
+        this.s3SizeThreshold = s3SizeThreshold;
+    }
+
+    public String getS3KeyPrefix() {
+        return s3KeyPrefix;
+    }
+
+    public void setS3KeyPrefix(String s3KeyPrefix) {
+        this.s3KeyPrefix = s3KeyPrefix;
+    }
+
+    public Boolean getS3FetchMessage() {
+        return s3FetchMessage;
+    }
+
+    public void setS3FetchMessage(Boolean s3FetchMessage) {
+        this.s3FetchMessage = s3FetchMessage;
     }
 
     @Override

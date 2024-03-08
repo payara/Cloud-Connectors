@@ -39,6 +39,8 @@
  */
 package fish.payara.cloud.connectors.amazonsqs.api.outbound;
 
+import com.amazon.sqs.javamessaging.AmazonSQSExtendedClient;
+import com.amazon.sqs.javamessaging.ExtendedClientConfiguration;
 import com.amazonaws.AmazonWebServiceRequest;
 import com.amazonaws.ResponseMetadata;
 import com.amazonaws.auth.AWSCredentials;
@@ -47,6 +49,8 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import com.amazonaws.services.sqs.model.AddPermissionRequest;
@@ -127,11 +131,25 @@ public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSC
     private final HashSet<ConnectionEventListener> listeners = new HashSet<>();
     private PrintWriter logWriter;
     private final AmazonSQS sqsClient;
+    private final AmazonSQSExtendedClient sqsExtClient;
 
     AmazonSQSManagedConnection(Subject subject, ConnectionRequestInfo cxRequestInfo, AmazonSQSManagedConnectionFactory aThis) {
 
         AWSCredentialsProvider credentialsProvider = getCredentials(aThis);
         sqsClient = AmazonSQSClientBuilder.standard().withRegion(aThis.getRegion()).withCredentials(credentialsProvider).build();
+
+        ExtendedClientConfiguration extendedClientConfig = new ExtendedClientConfiguration();
+        if (aThis.getS3BucketName() != null) {
+            final AmazonS3 s3 = AmazonS3ClientBuilder.standard().withRegion(aThis.getRegion()).withCredentials(credentialsProvider).build();
+            extendedClientConfig = extendedClientConfig.withPayloadSupportEnabled(s3, aThis.getS3BucketName());
+            if (aThis.getS3SizeThreshold() != null && aThis.getS3SizeThreshold() > 0) {
+                extendedClientConfig = extendedClientConfig.withPayloadSizeThreshold(aThis.getS3SizeThreshold());
+            }
+            if (aThis.getS3KeyPrefix() != null) {
+                extendedClientConfig = extendedClientConfig.withS3KeyPrefix(aThis.getS3KeyPrefix());
+            }
+        }
+        sqsExtClient = new AmazonSQSExtendedClient(sqsClient, extendedClientConfig);
     }
 
     @Override
@@ -224,22 +242,36 @@ public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSC
 
     @Override
     public SendMessageResult sendMessage(SendMessageRequest request) {
-        return sqsClient.sendMessage(request);
+        if (isLargeMessage(request.getMessageBody())) {
+            return sqsExtClient.sendMessage(request);
+        } else {
+            return sqsClient.sendMessage(request);
+        }
     }
 
     @Override
     public SendMessageResult sendMessage(String queueURL, String messageBody) {
-        return sqsClient.sendMessage(queueURL, messageBody);
+        if (isLargeMessage(messageBody)) {
+            return sqsExtClient.sendMessage(queueURL, messageBody);
+        } else {
+            return sqsClient.sendMessage(queueURL, messageBody);
+        }
     }
 
     @Override
     public SendMessageBatchResult sendMessageBatch(String queueURL, List<SendMessageBatchRequestEntry> entries) {
-        return sqsClient.sendMessageBatch(queueURL, entries);
+        boolean largeMessageFound = entries.stream().anyMatch(entry -> isLargeMessage(entry.getMessageBody()));
+        return largeMessageFound ? sqsExtClient.sendMessageBatch(queueURL, entries) : sqsClient.sendMessageBatch(queueURL, entries);
     }
 
     @Override
     public SendMessageBatchResult sendMessageBatch(SendMessageBatchRequest batch) {
-        return sqsClient.sendMessageBatch(batch);
+        boolean largeMessageFound = batch.getEntries().stream().anyMatch(entry -> isLargeMessage(entry.getMessageBody()));
+        return largeMessageFound ? sqsExtClient.sendMessageBatch(batch) : sqsClient.sendMessageBatch(batch);
+    }
+
+    private boolean isLargeMessage(String messageBody) {
+        return messageBody.length() > 256 * 1024; // 256KB
     }
 
     @Override
@@ -372,56 +404,73 @@ public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSC
         return sqsClient.untagQueue(queueUrl, tagKeys);
     }
 
+    @Override
     public AddPermissionResult addPermission(AddPermissionRequest addPermissionRequest) {
         return sqsClient.addPermission(addPermissionRequest);
     }
 
+    @Override
     public AddPermissionResult addPermission(String queueUrl, String label, List<String> awsAccountIds, List<String> actions) {
         return sqsClient.addPermission(queueUrl, label, awsAccountIds, actions);
     }
 
+    @Override
     public CancelMessageMoveTaskResult cancelMessageMoveTask(CancelMessageMoveTaskRequest cancelMessageMoveTaskRequest) {
         return sqsClient.cancelMessageMoveTask(cancelMessageMoveTaskRequest);
     }
 
+    @Override
     public ChangeMessageVisibilityResult changeMessageVisibility(ChangeMessageVisibilityRequest changeMessageVisibilityRequest) {
         return sqsClient.changeMessageVisibility(changeMessageVisibilityRequest);
     }
 
+    @Override
     public ChangeMessageVisibilityResult changeMessageVisibility(String queueUrl, String receiptHandle, Integer visibilityTimeout) {
         return sqsClient.changeMessageVisibility(queueUrl, receiptHandle, visibilityTimeout);
     }
 
+    @Override
     public ChangeMessageVisibilityBatchResult changeMessageVisibilityBatch(ChangeMessageVisibilityBatchRequest changeMessageVisibilityBatchRequest) {
         return sqsClient.changeMessageVisibilityBatch(changeMessageVisibilityBatchRequest);
     }
 
+    @Override
     public ChangeMessageVisibilityBatchResult changeMessageVisibilityBatch(String queueUrl, List<ChangeMessageVisibilityBatchRequestEntry> entries) {
         return sqsClient.changeMessageVisibilityBatch(queueUrl, entries);
     }
 
+    @Override
     public ListDeadLetterSourceQueuesResult listDeadLetterSourceQueues(ListDeadLetterSourceQueuesRequest listDeadLetterSourceQueuesRequest) {
         return sqsClient.listDeadLetterSourceQueues(listDeadLetterSourceQueuesRequest);
     }
 
+    @Override
     public ListMessageMoveTasksResult listMessageMoveTasks(ListMessageMoveTasksRequest listMessageMoveTasksRequest) {
         return sqsClient.listMessageMoveTasks(listMessageMoveTasksRequest);
     }
 
+    @Override
     public RemovePermissionResult removePermission(RemovePermissionRequest removePermissionRequest) {
         return sqsClient.removePermission(removePermissionRequest);
     }
 
+    @Override
     public RemovePermissionResult removePermission(String queueUrl, String label) {
         return sqsClient.removePermission(queueUrl, label);
     }
 
+    @Override
     public StartMessageMoveTaskResult startMessageMoveTask(StartMessageMoveTaskRequest startMessageMoveTaskRequest) {
         return sqsClient.startMessageMoveTask(startMessageMoveTaskRequest);
     }
 
+    @Override
     public ResponseMetadata getCachedResponseMetadata(AmazonWebServiceRequest amazonWebServiceRequest) {
         return sqsClient.getCachedResponseMetadata(amazonWebServiceRequest);
+    }
+
+    public AmazonSQS getSqsClient() {
+        return sqsClient;
     }
 
     @Override
