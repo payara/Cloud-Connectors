@@ -40,6 +40,7 @@
 package fish.payara.cloud.connectors.amazonsqs.api.inbound;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
@@ -86,6 +87,9 @@ class SQSPoller extends TimerTask {
         ctx = context;
         factory = endpointFactory;
         client = AmazonSQSClientBuilder.standard().withCredentials(spec).withRegion(spec.getRegion()).build();
+        if (spec.getS3BucketName() != null) {
+            s3 = AmazonS3ClientBuilder.standard().withCredentials(spec).withRegion(spec.getRegion()).build();
+        }
     }
 
     @Override
@@ -102,7 +106,7 @@ class SQSPoller extends TimerTask {
                 Class<?> mdbClass = factory.getEndpointClass();
                 for (Message message : rmResult.getMessages()) {
                     for (Method m : mdbClass.getMethods()) {
-                        if (isOnSQSMessageMethod(m, message) && shouldFetchS3Message(message)) {
+                        if (isOnSQSMessageMethod(m) && shouldFetchS3Message(message)) {
                             fetchS3MessageContent(message);
                             scheduleSQSWork(m, message);
                         }
@@ -117,7 +121,7 @@ class SQSPoller extends TimerTask {
         }
     }
 
-    private boolean isOnSQSMessageMethod(Method method, Message message) {
+    private boolean isOnSQSMessageMethod(Method method) {
         return method.isAnnotationPresent(OnSQSMessage.class)
                 && method.getParameterCount() == 1
                 && method.getParameterTypes()[0].equals(Message.class);
