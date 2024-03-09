@@ -79,7 +79,7 @@ class SQSPoller extends TimerTask {
     private final MessageEndpointFactory factory;
     private final SqsClient client;
     private S3Client s3;
-    private static final String S3_BUCKET_NAME_KEY = "s3BucketName";
+    private static final String S3_BUCKET_NAME = "s3BucketName";
     private static final String S3_KEY = "s3Key";
     private static final Logger LOG = Logger.getLogger(SQSPoller.class.getName());
 
@@ -134,7 +134,7 @@ class SQSPoller extends TimerTask {
     private boolean shouldFetchS3Message(Message message) {
         return s3 != null
                 && Boolean.TRUE.equals(spec.getS3FetchMessage())
-                && message.body().contains(S3_BUCKET_NAME_KEY);
+                && message.body().contains(S3_BUCKET_NAME);
     }
 
     private Message fetchS3MessageContent(Message message) throws IOException {
@@ -144,7 +144,7 @@ class SQSPoller extends TimerTask {
             for (JsonValue jsonValue : jsonArray) {
                 if (jsonValue instanceof JsonObject) {
                     JsonObject jsonBody = (JsonObject) jsonValue;
-                    String s3BucketName = jsonBody.getString(S3_BUCKET_NAME_KEY);
+                    String s3BucketName = jsonBody.getString(S3_BUCKET_NAME);
                     String s3Key = jsonBody.getString(S3_KEY);
                     LOG.log(Level.FINE, "S3 object received, S3 bucket name: {0}, S3 object key:{1}", new Object[]{s3BucketName, s3Key});
                     GetObjectRequest getObjectRequest = GetObjectRequest.builder().bucket(s3BucketName).key(s3Key).build();
