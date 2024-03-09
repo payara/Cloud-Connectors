@@ -80,7 +80,7 @@ class SQSPoller extends TimerTask {
     private final SqsClient client;
     private S3Client s3;
     private static final String S3_BUCKET_NAME_KEY = "s3BucketName";
-    private static final String S3_KEY_KEY = "s3Key";
+    private static final String S3_KEY = "s3Key";
     private static final Logger LOG = Logger.getLogger(SQSPoller.class.getName());
 
     SQSPoller(AmazonSQSActivationSpec sqsSpec, BootstrapContext context, MessageEndpointFactory endpointFactory) {
