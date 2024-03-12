@@ -199,7 +199,7 @@ public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSC
 
             @Override
             public String getEISProductVersion() throws ResourceException {
-                return "1.0.0";
+                return "1.1.0";
             }
 
             @Override
