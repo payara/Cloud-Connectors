@@ -46,9 +46,6 @@ import javax.json.JsonException;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.JsonValue;
-import javax.resource.spi.BootstrapContext;
-import javax.resource.spi.endpoint.MessageEndpointFactory;
-import jakjavaxarta.resource.spi.work.WorkException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Method;
@@ -61,7 +58,6 @@ import java.util.stream.Collectors;
 import javax.resource.spi.BootstrapContext;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
 import javax.resource.spi.work.WorkException;
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -114,8 +110,10 @@ class SQSPoller extends TimerTask {
                 Class<?> mdbClass = factory.getEndpointClass();
                 for (Message message : messages) {
                     for (Method m : mdbClass.getMethods()) {
-                        if (isOnSQSMessageMethod(m) && shouldFetchS3Message(message)) {
-                            message = fetchS3MessageContent(message);
+                        if (isOnSQSMessageMethod(m)) {
+                             if (shouldFetchS3Message(message)) {
+                                message = fetchS3MessageContent(message);
+                            }
                             scheduleSQSWork(m, message);
                         }
                     }
