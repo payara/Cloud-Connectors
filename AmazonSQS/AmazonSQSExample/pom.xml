@@ -48,7 +48,7 @@ holder.
     </parent>
     <groupId>fish.payara.cloud.connectors.amazonsqs</groupId>
     <artifactId>amazon-sqs-example</artifactId>
-    <version>2.0.0</version>
+    <version>2.1.0</version>
     <packaging>ejb</packaging>
 
     <name>Amazon SQS Example</name>
