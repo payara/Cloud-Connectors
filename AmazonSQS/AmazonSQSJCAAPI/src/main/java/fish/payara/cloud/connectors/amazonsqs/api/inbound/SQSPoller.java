@@ -110,8 +110,10 @@ class SQSPoller extends TimerTask {
                 Class<?> mdbClass = factory.getEndpointClass();
                 for (Message message : messages) {
                     for (Method m : mdbClass.getMethods()) {
-                        if (isOnSQSMessageMethod(m) && shouldFetchS3Message(message)) {
-                            message = fetchS3MessageContent(message);
+                        if (isOnSQSMessageMethod(m)) {
+                            if (shouldFetchS3Message(message)) {
+                                message = fetchS3MessageContent(message);
+                            }
                             scheduleSQSWork(m, message);
                         }
                     }
