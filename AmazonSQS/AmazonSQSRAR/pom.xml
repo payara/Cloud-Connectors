@@ -54,7 +54,7 @@ holder.
     <description>RAR for the Amazon SQS JCA Adapter</description>
     <url>http://www.payara.fish</url>
     <properties>
-        <awssdk.version>2.25.6</awssdk.version>
+        <awssdk.version>2.25.31</awssdk.version>
     </properties>
     <dependencies>
         <dependency>
