@@ -127,7 +127,9 @@ class SQSPollerTest {
             mockedIoUtils.when(() -> software.amazon.awssdk.utils.IoUtils.toUtf8String(responseInputStream))
                     .thenReturn(s3Content);
 
-            Message updated = poller.fetchS3MessageContent(origMsg);
+            var method = SQSPoller.class.getDeclaredMethod("fetchS3MessageContent", Message.class);
+            method.setAccessible(true);
+            Message updated = (Message) method.invoke(poller, origMsg);
 
             assertNotNull(updated);
             assertEquals(s3Content, updated.body());
@@ -145,7 +147,9 @@ class SQSPollerTest {
         poller = new SQSPoller(spec, ctx, factory);
 
         // Should not throw, should return original message
-        Message result = poller.fetchS3MessageContent(origMsg);
+        var method = SQSPoller.class.getDeclaredMethod("fetchS3MessageContent", Message.class);
+        method.setAccessible(true);
+        Message result = (Message) method.invoke(poller, origMsg);
         assertEquals(origMsg, result);
     }
 

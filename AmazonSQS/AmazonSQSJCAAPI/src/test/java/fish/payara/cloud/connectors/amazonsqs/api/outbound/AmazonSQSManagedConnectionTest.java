@@ -56,6 +56,7 @@ import javax.security.auth.Subject;
 import java.io.PrintWriter;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class AmazonSQSManagedConnectionTest {
@@ -161,10 +162,9 @@ class AmazonSQSManagedConnectionTest {
         when(fac.getS3SizeThreshold()).thenReturn(null);
         when(fac.getS3KeyPrefix()).thenReturn(null);
 
-        // Use a spy to override isLargeMessage
         AmazonSQSManagedConnection conn = spy(new AmazonSQSManagedConnection(subject, cxRequestInfo, fac));
         SendMessageRequest req = SendMessageRequest.builder().queueUrl("url").messageBody("short").build();
-        doReturn(false).when(conn).isLargeMessage(anyString());
+        //doReturn(false).when(conn).isLargeMessage(anyString());
 
         // Mock SqsClient and AmazonSQSExtendedClient
         SqsClient sqsClient = mock(SqsClient.class);
@@ -203,9 +203,16 @@ class AmazonSQSManagedConnectionTest {
         when(fac.getS3SizeThreshold()).thenReturn(null);
         when(fac.getS3KeyPrefix()).thenReturn(null);
 
+        // Generate a string > 256KB to be considered a large message
+        int size = 262145;
+        StringBuilder sb = new StringBuilder(size);
+        for (int i = 0; i < size; i++) {
+            sb.append('A');
+        }
+        String largeMessage = sb.toString();
+
         AmazonSQSManagedConnection conn = spy(new AmazonSQSManagedConnection(subject, cxRequestInfo, fac));
-        SendMessageRequest req = SendMessageRequest.builder().queueUrl("url").messageBody("large message").build();
-        doReturn(true).when(conn).isLargeMessage(anyString());
+        SendMessageRequest req = SendMessageRequest.builder().queueUrl("url").messageBody(largeMessage).build();
 
         SqsClient sqsClient = mock(SqsClient.class);
         AmazonSQSExtendedClient extClient = mock(AmazonSQSExtendedClient.class);
