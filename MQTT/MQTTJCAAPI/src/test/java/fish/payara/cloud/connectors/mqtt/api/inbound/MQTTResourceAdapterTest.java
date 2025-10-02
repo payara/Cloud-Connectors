@@ -6,7 +6,6 @@ import jakarta.resource.spi.endpoint.MessageEndpointFactory;
 import javax.transaction.xa.XAResource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Disabled;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -17,7 +16,6 @@ class MQTTResourceAdapterTest {
     private BootstrapContext bootstrapContext;
     private MessageEndpointFactory endpointFactory;
     private ActivationSpec activationSpec;
-    private MQTTSubscriber subscriber;
 
     @BeforeEach
     void setUp() {

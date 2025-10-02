@@ -76,9 +76,7 @@ class MQTTWorkTest {
 
         MQTTWork work = new MQTTWork("topic/test", new MqttMessage("payload".getBytes()), factory);
 
-        // Should not throw or call any endpoint methods
         work.run();
-        // No exception expected
     }
 
     @Test
