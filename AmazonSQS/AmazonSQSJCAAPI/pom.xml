@@ -90,7 +90,7 @@ holder.
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.13.0-M3</version>
+            <version>6.0.0</version>
             <scope>test</scope>
             <type>jar</type>
         </dependency>
