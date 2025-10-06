@@ -52,7 +52,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Disabled;
 import static org.mockito.Mockito.*;
-import org.mockito.Mockito;
 
 class AzureSBResourceAdapterTest {
 
