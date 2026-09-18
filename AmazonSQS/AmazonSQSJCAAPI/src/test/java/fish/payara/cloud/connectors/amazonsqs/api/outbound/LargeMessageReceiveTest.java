@@ -97,7 +97,9 @@ public class LargeMessageReceiveTest {
         InMemoryS3Client fakeS3 = new InMemoryS3Client();
         AmazonSQSExtendedClient sqsExtClient = extendedClient(fakeSqs, fakeS3);
 
-        String largeBody = "x".repeat(THRESHOLD * 4);
+        char[] largeBodyChars = new char[THRESHOLD * 4];
+        java.util.Arrays.fill(largeBodyChars, 'x');
+        String largeBody = new String(largeBodyChars);
         sqsExtClient.sendMessage(SendMessageRequest.builder().queueUrl(QUEUE_URL).messageBody(largeBody).build());
 
         // Sanity check: the queue itself only holds the S3 pointer, not the payload -
