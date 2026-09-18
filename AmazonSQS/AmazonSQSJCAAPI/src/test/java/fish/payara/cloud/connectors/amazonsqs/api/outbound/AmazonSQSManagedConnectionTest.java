@@ -54,6 +54,7 @@ import software.amazon.awssdk.services.sqs.model.*;
 
 import javax.security.auth.Subject;
 import java.io.PrintWriter;
+import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -241,5 +242,54 @@ class AmazonSQSManagedConnectionTest {
         AmazonSQSManagedConnection conn = spy(new AmazonSQSManagedConnection(subject, cxRequestInfo, factory));
         conn.close();
         verify(conn).destroy();
+    }
+
+    @Test
+    void testReceiveMessageDelegatesToExtendedClient() {
+        AmazonSQSManagedConnection conn = new AmazonSQSManagedConnection(subject, cxRequestInfo, factory);
+        ReceiveMessageRequest req = ReceiveMessageRequest.builder().queueUrl("url").build();
+
+        SqsClient sqsClient = mock(SqsClient.class);
+        AmazonSQSExtendedClient extClient = mock(AmazonSQSExtendedClient.class);
+        setClients(conn, sqsClient, extClient);
+
+        ReceiveMessageResponse resp = ReceiveMessageResponse.builder().build();
+        when(extClient.receiveMessage(req)).thenReturn(resp);
+
+        ReceiveMessageResponse result = conn.receiveMessage(req);
+        assertEquals(resp, result);
+        verify(extClient).receiveMessage(req);
+        verify(sqsClient, never()).receiveMessage(any(ReceiveMessageRequest.class));
+    }
+
+    @Test
+    void testReceiveMessageConsumerOverloadDelegatesToExtendedClient() {
+        AmazonSQSManagedConnection conn = new AmazonSQSManagedConnection(subject, cxRequestInfo, factory);
+        Consumer<ReceiveMessageRequest.Builder> requestConsumer = builder -> builder.queueUrl("url");
+
+        SqsClient sqsClient = mock(SqsClient.class);
+        AmazonSQSExtendedClient extClient = mock(AmazonSQSExtendedClient.class);
+        setClients(conn, sqsClient, extClient);
+
+        ReceiveMessageResponse resp = ReceiveMessageResponse.builder().build();
+        when(extClient.receiveMessage(requestConsumer)).thenReturn(resp);
+
+        ReceiveMessageResponse result = conn.receiveMessage(requestConsumer);
+        assertEquals(resp, result);
+        verify(extClient).receiveMessage(requestConsumer);
+        verify(sqsClient, never()).receiveMessage(any(Consumer.class));
+    }
+
+    private static void setClients(AmazonSQSManagedConnection conn, SqsClient sqsClient, AmazonSQSExtendedClient extClient) {
+        try {
+            var sqsField = AmazonSQSManagedConnection.class.getDeclaredField("sqsClient");
+            sqsField.setAccessible(true);
+            sqsField.set(conn, sqsClient);
+            var extField = AmazonSQSManagedConnection.class.getDeclaredField("sqsExtClient");
+            extField.setAccessible(true);
+            extField.set(conn, extClient);
+        } catch (Exception e) {
+            fail("Reflection failed: " + e.getMessage());
+        }
     }
 }
