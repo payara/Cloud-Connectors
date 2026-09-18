@@ -267,12 +267,12 @@ public class AmazonSQSManagedConnection implements ManagedConnection, AmazonSQSC
 
     @Override
     public ReceiveMessageResponse receiveMessage(ReceiveMessageRequest receiveMessageRequest) {
-        return sqsClient.receiveMessage(receiveMessageRequest);
+        return sqsExtClient.receiveMessage(receiveMessageRequest);
     }
 
     @Override
     public ReceiveMessageResponse receiveMessage(Consumer<ReceiveMessageRequest.Builder> receiveMessageRequest) {
-        return sqsClient.receiveMessage(receiveMessageRequest);
+        return sqsExtClient.receiveMessage(receiveMessageRequest);
     }
 
     @Override
